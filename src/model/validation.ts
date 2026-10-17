@@ -1,3 +1,4 @@
+import { surfaces } from './infrastructure';
 import { catalogue } from './catalogue';
 import { migrateDocument, type SettlementDocument } from './document';
 const fail = (path: string): never => { throw new Error(`Invalid Hearthlands project: ${path}.`); };
@@ -38,7 +39,7 @@ export function validateDocument(value: unknown): SettlementDocument {
     if (d.version===2||b.name!==undefined) text(b.name,'building name',true); if (d.version===2||b.locked!==undefined) boolean(b.locked,'building lock');
   }
   const roads=list(d.roads,'roads',10_000); ids(roads,'road'); let totalPoints=0;
-  for (const value of roads) { const r=record(value,'road'); cells(r.points,'road points'); totalPoints+=(r.points as unknown[]).length; if (totalPoints>500_000) fail('too many road points'); if(r.kind!==undefined)oneOf(r.kind,['primary','secondary','access'],'road kind');if(r.style!==undefined)oneOf(r.style,['organic','planned','contextual'],'road style'); }
+  for (const value of roads) { const r=record(value,'road'); cells(r.points,'road points'); totalPoints+=(r.points as unknown[]).length; if (totalPoints>500_000) fail('too many road points'); if(r.editVersion===1){if((r.points as unknown[]).length>5000)fail('too many infrastructure control points');for(const p of r.points as {x:number;y:number}[])if(p.x<-.5||p.y<-.5||p.x>(grid.width as number)-.5||p.y>(grid.height as number)-.5)fail('infrastructure points outside map');}if(r.editVersion!==undefined&&r.editVersion!==1)fail('unsupported infrastructure version'); if(r.surface!==undefined)oneOf(r.surface,Object.keys(surfaces),'infrastructure material');if(r.width!==undefined)number(r.width,'infrastructure width',.15,3);if(r.locked!==undefined)boolean(r.locked,'infrastructure lock');if(r.name!==undefined)text(r.name,'infrastructure name',true); if(r.kind!==undefined)oneOf(r.kind,['primary','secondary','access'],'road kind');if(r.style!==undefined)oneOf(r.style,['organic','planned','contextual'],'road style'); }
   const districts=list(d.districts,'districts',1000); ids(districts,'district');
   for (const value of districts) { const r=record(value,'district'); text(r.name,'district name',true); text(r.color,'district colour'); cells(r.cells,'district cells'); }
   if (d.planning!==undefined) {

@@ -1,3 +1,4 @@
+import { infrastructureStrokes } from '../rendering/infrastructureGeometry';
 import type { SettlementDocument } from '../model/document';
 import { footprint } from '../model/buildings';
 import { buildingDefinition } from '../model/catalogue';
@@ -17,7 +18,7 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
   const terrain=(Object.keys(colors) as (keyof typeof colors)[]).map(kind=>`<path fill="${colors[kind]}" d="${doc.terrain.filter(t=>t.kind===kind).map(t=>`M${t.x} ${t.y}h1v1h-1z`).join('')}"/>`).join('');
   const spaces=(doc.planning?.openSpaces??[]).filter(s=>s.kind!=='expansion').map(s=>`<path fill="${s.kind==='field'?'#71734d':s.kind==='yard'?'#59694b':'#777052'}" opacity=".65" d="${s.cells.filter(c=>(tiles.get(`${c.x},${c.y}`)??'grass')==='grass').map(c=>`M${c.x} ${c.y}h1v1h-1z`).join('')}"/>`).join('');
   const visible=(id:string)=>doc.layers.find(l=>l.id===id)?.visible;
-  const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).map(r=>{const g=roadGeometry(doc,r,context);return `<path data-road="${escapeText(r.id)}" d="${g.data}" stroke="#b79e72" stroke-width="${g.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;}).join('');
+  const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}">${infrastructureStrokes(r,g).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
   const buildings=doc.buildings.filter(b=>visible(b.layerId)).map(b=>{
     const f=footprint(b),w=b.width,h=b.height;

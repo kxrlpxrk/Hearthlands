@@ -1,3 +1,4 @@
+import { infrastructureWidth } from './infrastructure';
 import { buildingDefinition } from './catalogue';
 import { footprint } from './buildings';
 import { type SettlementDocument, type Cell, type TerrainKind, type BuildingKind, isInside } from './document';
@@ -15,6 +16,7 @@ export function eraseCell(doc: SettlementDocument, cell: Cell): SettlementDocume
 }
 export function resizeGrid(doc: SettlementDocument, width: number, height: number): SettlementDocument {
   if (![width, height].every(n => Number.isInteger(n) && n >= 8 && n <= 192)) return doc;
+  if(doc.roads.some(r=>r.editVersion===1&&r.points.some(p=>p.x+.5+infrastructureWidth(r)/2>width||p.y+.5+infrastructureWidth(r)/2>height)))return doc;
   // Preserve all placed content rather than silently deleting it when shrinking.
   if (doc.buildings.some(b => { const f = footprint(b); return b.x + f.width > width || b.y + f.height > height; })) return doc;
   if ([...doc.terrain, ...doc.buildings, ...doc.roads.flatMap(r => r.points), ...doc.districts.flatMap(d => d.cells)].some(c => c.x >= width || c.y >= height)) return doc;

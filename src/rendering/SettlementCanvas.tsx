@@ -1,7 +1,11 @@
+import { InfrastructureActions } from '../ui/InfrastructurePanel';
+import { closestSegment, deleteSegment, isBridge, putInfrastructure, snapConnection, distance } from '../model/infrastructure';
+import { infrastructureStrokes } from './infrastructureGeometry';
+import type { Cell, Road } from '../model/document';
 import { roadContext, roadGeometry } from './roadGeometry';
 import { entrance } from '../generator/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Rect, Line, Group, Path } from 'react-konva';
+import { Stage, Layer, Rect, Line, Group, Path, Circle } from 'react-konva';
 import type Konva from 'konva';
 import { useStudio } from '../ui/store';
 import { eraseCell, paintTerrain, placeBuilding } from '../model/operations';
@@ -11,21 +15,22 @@ import { buildingWarnings, footprint, snapPosition, updateBuilding } from '../mo
 import { symbolPaths } from './symbols';
 const colors = { grass: '#536447', water: '#355d69', forest: '#294c3e', stone: '#737775' };
 type View = { x: number; y: number; scale: number };
-type Gesture = { start: { x: number; y: number }; view: View; id?: string; x?: number; y?: number; moved: boolean };
+type Gesture = { start: { x: number; y: number }; view: View; id?: string; x?: number; y?: number; moved: boolean; roadId?:string; pointIndex?:number; trace?:Cell[] };
 export function SettlementCanvas() {
   const host = useRef<HTMLDivElement>(null), stage = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [view, setView] = useState<View>({ x: 40, y: 40, scale: .45 });
+  const [roadPreview,setRoadPreview]=useState<Road|null>(null);
   const [notice, setNotice] = useState('');
   const [preview, setPreview] = useState<{ id: string; x: number; y: number } | null>(null);
   const gesture = useRef<Gesture | null>(null), pinch = useRef<{ distance: number; x: number; y: number } | null>(null);
   const suppress = useRef(false);
-  const { present: doc, tool, edit, selectedId, select } = useStudio();
+  const { present: doc, tool, edit, selectedId, select, infrastructure:infra, setInfrastructure } = useStudio();
   useEffect(() => { const observer = new ResizeObserver(([entry]) => setSize({ width: entry.contentRect.width, height: entry.contentRect.height })); observer.observe(host.current!); return () => observer.disconnect(); }, []);
-  useEffect(() => { setPreview(null); gesture.current = null; }, [tool, doc]);
+  useEffect(() => { setPreview(null); setRoadPreview(null); gesture.current = null; }, [tool, doc]);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const terrainPaths = useMemo(() => (Object.keys(colors) as TerrainKind[]).map(kind => ({ kind, data: doc.terrain.filter(t => t.kind === kind).map(t => `M${t.x * cell} ${t.y * cell}h${cell}v${cell}h-${cell}Z`).join('') })), [doc.terrain, cell]);
-  const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.buildings]);
+  const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ road:r, id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.buildings]);
   const openGround = useMemo(() => { const tiles=new Map(doc.terrain.map(t=>[`${t.x},${t.y}`,t.kind])); return (doc.planning?.openSpaces ?? []).filter(s => s.kind !== 'expansion').map((s,i) => ({ id: i, kind: s.kind, data: s.cells.filter(c=>(tiles.get(`${c.x},${c.y}`)??'grass')==='grass').map(c=>`M${c.x*cell} ${c.y*cell}h${cell}v${cell}h-${cell}Z`).join('') })); }, [doc.planning, doc.terrain, cell]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
@@ -33,9 +38,34 @@ export function SettlementCanvas() {
     setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * factor)); return { scale, x: anchor.x - (anchor.x - v.x) * scale / v.scale, y: anchor.y - (anchor.y - v.y) * scale / v.scale }; });
   }
   function fit() { const scale = Math.min((size.width - 64) / width, (size.height - 64) / height); setView({ scale, x: (size.width - width * scale) / 2, y: (size.height - height * scale) / 2 }); }
+  const selectedRoad=roadPreview??doc.roads.find(r=>r.id===infra.roadId);
+  const infrastructureActive=tool==='infrastructure';
+  const worldPoint=(p:{x:number;y:number},exclude?:string):Cell=>{
+    const q={x:snapPosition((p.x-view.x)/view.scale/cell-.5,doc.grid.snap),y:snapPosition((p.y-view.y)/view.scale/cell-.5,doc.grid.snap)};
+    const surface=infra.mode==='draw'?infra.surface:doc.roads.find(r=>r.id===infra.roadId)?.surface;
+    return snapConnection(doc,q,exclude,surface==='gate');
+  };
+  const safeEdit=(fn:()=>void)=>{try{fn();setNotice('');}catch(e){setNotice(e instanceof Error?e.message:String(e));}};
+  function finishInfrastructure(g:Gesture,p:{x:number;y:number}) {
+    if(infra.mode==='draw'){
+      const points=g.trace??[],end=worldPoint(p);
+      if(!points.length||distance(points[points.length-1],end)>.05)points.push(end);
+      const combined=[...infra.draft,...points].filter((p,n,a)=>n===0||distance(p,a[n-1])>.05);
+      setInfrastructure({draft:isBridge({surface:infra.surface} as Road)&&combined.length>1?[combined[0],combined[combined.length-1]]:combined});setRoadPreview(null);return;
+    }
+    const r=doc.roads.find(r=>r.id===g.roadId);
+    if(!r){setInfrastructure({roadId:null,point:null});return;}
+    setInfrastructure({roadId:r.id,point:g.pointIndex??null});
+    if(r.locked){setNotice('Infrastructure locked · unlock in the Roads panel.');setRoadPreview(null);return;}
+    if(g.pointIndex!==undefined){if(g.moved&&roadPreview)safeEdit(()=>edit(d=>putInfrastructure(d,roadPreview)));setRoadPreview(null);return;}
+    const hit=closestSegment(r,worldPoint(p,r.id));
+    if(infra.mode==='add-point'&&!isBridge(r))safeEdit(()=>{edit(d=>putInfrastructure(d,{...r,editVersion:1,points:[...r.points.slice(0,hit.index+1),hit.point,...r.points.slice(hit.index+1)]}));setInfrastructure({point:hit.index+1});});
+    if(infra.mode==='delete-segment')safeEdit(()=>edit(d=>deleteSegment(d,r.id,hit.index,crypto.randomUUID())));
+  }
   function finish() {
     const g = gesture.current; gesture.current = null;
-    if (!g || suppress.current) { setPreview(null); return; }
+    if (!g || suppress.current) { setPreview(null);setRoadPreview(null); return; }
+    if(tool==='infrastructure'){const p=stage.current!.getPointerPosition();if(p)finishInfrastructure(g,p);return;}
     if (g.moved) { if (preview) edit(d => updateBuilding(d, preview.id, { x: preview.x, y: preview.y })); setPreview(null); return; }
     const p = stage.current!.getPointerPosition(); if (!p) return;
     if (tool === 'select') { select(g.id ?? null); return; }
@@ -54,23 +84,29 @@ export function SettlementCanvas() {
         (e.evt.target as Element).setPointerCapture?.(e.evt.pointerId);
         const id = e.target.findAncestor('.building', true)?.getAttr('buildingId') as string | undefined;
         const b = doc.buildings.find(b => b.id === id);
-        gesture.current = { start: stage.current!.getPointerPosition()!, view, id, x: b?.x, y: b?.y, moved: false };
+        const roadId=(e.target as Konva.Node).getAttr('roadId') as string|undefined,pointIndex=(e.target as Konva.Node).getAttr('pointIndex') as number|undefined;
+        gesture.current = { start: stage.current!.getPointerPosition()!, view, id, x: b?.x, y: b?.y, moved: false,roadId,pointIndex,trace:tool==='infrastructure'&&infra.mode==='draw'?[worldPoint(stage.current!.getPointerPosition()!)]:undefined };
       }}
       onPointerMove={() => { const g = gesture.current, p = stage.current!.getPointerPosition(); if (!g || !p || suppress.current) return;
         const dx = p.x - g.start.x, dy = p.y - g.start.y;
         if (Math.hypot(dx, dy) < 6 && !g.moved) return; g.moved = true;
+        if(tool==='infrastructure'){
+          if(infra.mode==='draw'){const q=worldPoint(p);if(g.trace&&distance(q,g.trace[g.trace.length-1])>.65){g.trace.push(q);setRoadPreview({id:'trace',layerId:doc.layers[0].id,points:[...infra.draft,...g.trace],surface:infra.surface,width:infra.width,style:infra.smooth?'organic':'planned',editVersion:1});}}
+          else if(g.pointIndex!==undefined){const r=doc.roads.find(r=>r.id===g.roadId);if(r&&!r.locked){const q=worldPoint(p,r.id);setRoadPreview({...r,editVersion:1,points:r.points.map((point,n)=>n===g.pointIndex?q:point)});}}
+          return;
+        }
         if (tool === 'pan') setView({ ...g.view, x: g.view.x + dx, y: g.view.y + dy });
         if (tool === 'select' && g.id) select(g.id);
         if (tool === 'select' && g.id && !doc.buildings.find(b => b.id === g.id)?.locked) setPreview({ id: g.id, x: snapPosition(g.x! + dx / g.view.scale / cell, doc.grid.snap), y: snapPosition(g.y! + dy / g.view.scale / cell, doc.grid.snap) });
-      }} onPointerUp={finish} onPointerCancel={() => { gesture.current = null; setPreview(null); }}
-      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; setPreview(null); pinch.current = null; } }}
+      }} onPointerUp={finish} onPointerCancel={() => { gesture.current = null; setPreview(null); setRoadPreview(null); }}
+      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; setPreview(null); setRoadPreview(null); pinch.current = null; } }}
       onTouchMove={e => { const t = e.evt.touches; if (t.length !== 2) return; e.evt.preventDefault(); const rect = host.current!.getBoundingClientRect(); const point = { x: (t[0].clientX + t[1].clientX) / 2 - rect.left, y: (t[0].clientY + t[1].clientY) / 2 - rect.top }; const distance = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); if (pinch.current) { const old = pinch.current; setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * distance / old.distance)); return { scale, x: point.x - (old.x - v.x) * scale / v.scale, y: point.y - (old.y - v.y) * scale / v.scale }; }); } pinch.current = { ...point, distance }; }}
       onTouchEnd={() => { pinch.current = null; }}>
       <Layer><Rect width={width} height={height} fill="#344536" stroke="#728062" strokeWidth={2}/>
         {terrainPaths.map(t => <Path key={t.kind} data={t.data} fill={colors[t.kind]} listening={false}/>)}
         {openGround.map(s => <Path key={s.id} data={s.data} fill={s.kind === 'field' ? '#71734d' : s.kind === 'yard' ? '#59694b' : '#777052'} opacity={.65} listening={false}/>)}
         {doc.grid.visible && <Group listening={false}>{Array.from({ length: doc.grid.width + 1 }, (_, i) => <Line key={`x${i}`} points={[i * cell, 0, i * cell, height]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}{Array.from({ length: doc.grid.height + 1 }, (_, i) => <Line key={`y${i}`} points={[0, i * cell, width, i * cell]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
-        <Group listening={false}>{roads.map(r => <Path key={r.id} data={r.data} scaleX={cell} scaleY={cell} stroke="#b79e72" strokeWidth={r.width} lineCap="round" lineJoin="round"/>)}</Group>
+        <Group>{roads.map(r => <Group key={r.id}>{infrastructureStrokes(r.road,r).map((stroke,n)=><Path key={n} roadId={r.id} data={stroke.data} scaleX={cell} scaleY={cell} stroke={infra.roadId===r.id&&n===0?'#ffe2a0':stroke.color} strokeWidth={stroke.width} dash={stroke.dash} hitStrokeWidth={Math.max(stroke.width,24/view.scale/cell)} listening={infrastructureActive&&infra.mode!=='draw'} lineCap="round" lineJoin="round"/>)}</Group>)}</Group>
         {doc.buildings.filter(b => doc.layers.find(l => l.id === b.layerId)?.visible).map(original => {
           const b = preview?.id === original.id ? { ...original, ...preview } : original;
           const f = footprint(b), w = b.width * cell, h = b.height * cell;
@@ -82,10 +118,20 @@ export function SettlementCanvas() {
             {b.locked && <Rect listening={false} x={3} y={3} width={8} height={8} fill="#c8d4de"/>}
           </Group>;
         })}
+        {(infrastructureActive||infra.preview)&&<Group>
+          {[infra.preview,roadPreview,infra.draft.length?{id:'draft',layerId:doc.layers[0].id,points:infra.draft,surface:infra.surface,width:infra.width,style:infra.smooth?'organic':'planned',editVersion:1} as Road:null].filter((r):r is Road=>!!r).map(r=>{const g=roadGeometry(doc,r);return <Path key={r.id} listening={false} data={g.data} scaleX={cell} scaleY={cell} stroke="#ffe2a0" strokeWidth={g.width} opacity={.8} dash={[.3,.2]}/>;})}
+          {infrastructureActive&&infra.mode==='select'&&selectedRoad?.points.map((p,n,points)=>{
+            // Dense generated navigation paths keep all points; show spaced handles at low zoom.
+            const stride=Math.max(1,Math.ceil(32/(cell*view.scale)));
+            if(n!==0&&n!==points.length-1&&n!==infra.point&&n%stride!==0)return null;
+            return <Circle key={n} roadId={selectedRoad.id} pointIndex={n} x={(p.x+.5)*cell} y={(p.y+.5)*cell} radius={(n===infra.point?9:6)/view.scale} hitStrokeWidth={32/view.scale} fill={selectedRoad.locked?'#84948c':n===infra.point?'#ffe2a0':'#e2ede0'} stroke="#26382b" strokeWidth={2/view.scale}/>;
+          })}
+        </Group>}
       </Layer>
     </Stage>
     {(warnings.length > 0 || notice) && <div role="alert" className="canvas-warning">{notice || warnings.join(' · ')}</div>}
-    <div className="canvas-hint">{tool === 'pan' ? 'Drag to explore · Scroll or pinch to zoom' : tool === 'select' ? 'Tap to select · Drag to move · Properties to edit' : 'Tap to place · Select to edit · Pan to explore'}</div>
+    {(infrastructureActive||(infra.camera||infra.roadId||infra.draft.length>0)&&tool==='pan')&&<InfrastructureActions/>}
+    <div className="canvas-hint">{tool==='infrastructure'?'Tap or trace · Finish path · Two fingers pan/zoom · Roads panel to edit':null}{tool==='infrastructure'?null:tool === 'pan' ? 'Drag to explore · Scroll or pinch to zoom' : tool === 'select' ? 'Tap to select · Drag to move · Properties to edit' : 'Tap to place · Select to edit · Pan to explore'}</div>
     <div className="zoom-controls"><button aria-label="Zoom out" onClick={() => zoom(1 / 1.25)}>−</button><span>{Math.round(view.scale * 100)}%</span><button aria-label="Zoom in" onClick={() => zoom(1.25)}>+</button><button onClick={fit}>Fit</button></div>
   </div>;
 }

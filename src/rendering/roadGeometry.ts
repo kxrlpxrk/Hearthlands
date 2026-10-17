@@ -1,3 +1,4 @@
+import { manualGeometry } from './infrastructureGeometry';
 import type { Cell, Road, SettlementDocument } from '../model/document';
 import { seededRandom } from '../generator/random';
 import { occupiedCells, cellKey, terrainMap } from '../generator/navigation';
@@ -6,7 +7,7 @@ export function roadContext(doc: SettlementDocument) {
   const blocked=occupiedCells(doc.buildings),terrain=terrainMap(doc), junctions=new Set<string>();
   const edges=new Map<string,Set<string>>();
   for(const road of doc.roads){
-    if(road.points.length){junctions.add(cellKey(road.points[0]));junctions.add(cellKey(road.points[road.points.length-1]));}
+    if(road.points.length)for(const p of road.editVersion===1?road.points:[road.points[0],road.points[road.points.length-1]]){junctions.add(cellKey(p));for(const x of [Math.floor(p.x),Math.ceil(p.x)])for(const y of [Math.floor(p.y),Math.ceil(p.y)])junctions.add(`${x},${y}`);}
     for(let i=1;i<road.points.length;i++)for(const[a,b]of[[road.points[i-1],road.points[i]],[road.points[i],road.points[i-1]]]){const k=cellKey(a);if(!edges.has(k))edges.set(k,new Set());edges.get(k)!.add(cellKey(b));}
   }
   for(const[k,values]of edges)if(values.size>2)junctions.add(k);
@@ -25,6 +26,7 @@ const interpolate=(a:Cell,b:Cell,t:number):Cell=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-
 function lineSamples(a:Cell,b:Cell):Cell[]{const n=Math.max(1,Math.ceil(Math.hypot(a.x-b.x,a.y-b.y)*12));return Array.from({length:n},(_,i)=>interpolate(a,b,(i+1)/n));}
 /** Pure visual geometry. Never replace or mutate the integer navigation points. */
 export function roadGeometry(doc: SettlementDocument, road: Road, context=roadContext(doc)): RoadGeometry {
+  if(road.editVersion===1)return manualGeometry(doc,road);
   const width=road.kind==='primary'?.42:road.kind==='secondary'?.3:road.kind==='access'?.2:.55;
   const organic=road.style==='organic'||road.style==='contextual';
   let points=road.points.map(c=>{
