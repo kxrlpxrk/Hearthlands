@@ -13,7 +13,7 @@ npm test
 
 Open the Vite development server. Choose Pan and drag to move the world, scroll or pinch to zoom, or use the zoom buttons and Fit. Search the grouped building library or select a terrain tile, then tap the map to place it. Buildings use catalogue footprints and original top-down plan symbols. Erase removes content from a tile. Undo/redo supports toolbar buttons and Ctrl/Cmd+Z / Shift+Z. World dimensions can be configured from 8 to 192 tiles per side; shrinking cannot discard placed content.
 
-Save settlement writes to IndexedDB on this device. Export JSON downloads the versioned document. Saving is explicit, not automatic. Mobile Library and Properties open bottom sheets; Explore closes them and activates pan. No credentials or external services are required.
+Edits autosave to IndexedDB on this device; Save settlement flushes pending changes immediately. Export downloads a versioned project document or a complete PNG map. Mobile Library and Properties open bottom sheets; Explore closes them and activates pan. No credentials or external services are required.
 
 ## Architecture
 
@@ -49,7 +49,7 @@ The workflow uses Node.js 24, installs locked dependencies with `npm ci`, runs `
 
 Vite uses `/Hearthlands/` as its base path for this repository. Local development is served under that same path.
 
-After enabling Pages and pushing to `main`, check **Actions > Deploy GitHub Pages**. Wait for both jobs to succeed, then open the URL reported by the deployment's `github-pages` environment and verify the studio loads, assets load, and pan/zoom work. Configuration alone does not mean the site is published; no deployment or public URL has been verified yet.
+After enabling Pages and pushing to `main`, check **Actions > Deploy GitHub Pages**. Wait for both jobs to succeed, then open the URL reported by the deployment's `github-pages` environment and verify the studio loads, assets load, and pan/zoom work. Configuration alone does not mean the site is published; check the Actions run for the commit being deployed before assuming that version is published.
 
 ## Phase 2: settlement generation
 
@@ -57,7 +57,7 @@ Choose **New** in the top toolbar. The mobile-friendly dialog creates an indepen
 
 **Generate complete settlement** runs all steps. Alternatively use **1. Terrain**, **2. Buildings**, and **3. Roads** in order; each updates the draft preview. Terrain discards draft buildings and paths, buildings discards draft paths, and changing settings discards the draft. Generation runs in a worker so the interface remains responsive. The same settings give identical terrain, placements, IDs and paths, including through the staged workflow.
 
-Applying any draft requires the replacement checkbox and **Replace current project with draft**. No automatic save occurs. The current session can undo replacement; saving afterward intentionally replaces the existing local saved project. Canceling or failed generation leaves the current project and saved copy unchanged. Save or export work you want to keep before confirming replacement.
+A generated draft defaults to **Create project from draft**, preserving the current project separately. Replacing the current project remains an explicit destination choice with confirmation and an automatic restore point; autosave persists the committed result. Previewing or canceling generation never changes a saved project.
 
 The generator uses coherent woodland, meandering rivers/coastlines and an open settlement clearing. It develops one connected land area, places waterfront structures within three tiles of water, sawmills within three tiles of woodland, and other footprints on open grass. Buildings keep at least one tile of spacing. Layout rules score central civic/housing placement, resource access, regular alignment or organic variation. Roads connect the south-facing entrance marker of each world footprint to the same accessible land network without crossing buildings, forests or water. Waterfront catalogue structures are placed on usable banks; automatic bridges across water and development across multiple banks are outside this phase.
 
@@ -74,3 +74,32 @@ Organic and Contextual layouts vary household pockets, quarter-turn orientation 
 Logical roads remain the existing connected `points` arrays. Optional `kind` and `style` fields add hierarchy. Rendering simplifies and rounds only where the full stroke clears terrain and footprints, pins junctions, and never mutates navigation data. Existing roads without these fields keep their original visual treatment. Optional `planning` metadata has its own `version: 1` inside the existing v2 document; saves, exports and v1/v2 loading remain compatible. Planning reservations guide initial generation, not later manual editing; saved geometry does not regenerate on reopen.
 
 See [the original/improved reference maps and reproduction instructions](docs/generation-comparison.md). Automated checks include the 1847 reference map, full-stroke visual clearance, junction preservation, legacy roads, and a 32-case matrix covering four seeds, four environments, both presets and 20/35/60-building targets. Manual checks use Chromium desktop and touch emulation; physical iPhone testing remains a user-side check.
+
+## Phase 3: projects, autosave, restore points and files
+
+**Projects** opens the responsive local project library. Create a blank project, rename, open, duplicate or delete a settlement there. Each project has its own identity and document; duplicate/import operations create new identities while preserving building IDs and geometry. Deletion explicitly confirms removal of that project's restore points. The last open project is remembered. The previous single `hearthlands-local` save is migrated into the library automatically, retaining its ID and original document. Data stays in the same `hearthlands` IndexedDB database; no account or backend is used.
+
+Edits autosave after about 650 ms. The footer shows **Saving**, **Saved on this device**, or a visible storage error with **Retry save** and **Export backup**. Writes are serialized and checked against the revision originally loaded, with an additional project-identity guard. A late write cannot overwrite a newer revision or another project. Switching, duplicating, taking a snapshot and generating a new project flush pending edits first; write failures block the transition rather than discard the current document. On a conflict with another tab, export your current edits and reload to read the other writer's latest saved document.
+
+The app attempts a flush when hidden or leaving and warns about pending changes where the browser supports it. Wait for **Saved** before closing Safari. No browser can guarantee completion if iOS forcibly terminates a tab during a pending write. Clearing browser/site data or using private browsing can remove local projects; keep JSON backups for work you want to retain.
+
+Under **Projects → Restore points**, create named snapshots of the active project, browse them, and confirm restoration. Restoration saves the current state as an automatic backup in the same transaction before restoring exact document geometry. The generator now defaults to **New separate project**. Preview generation never autosaves over the current document. Explicit replacement remains available with confirmation, an automatic restore point and editor undo/redo.
+
+**Export → Download project JSON** exports the complete current v2 document, including in-memory edits, building IDs, terrain, roads, layers, districts and planning metadata. **Import JSON as a new project** validates v1/v2 files up to 20 MB, checks types, IDs/references and complexity, and creates a separate project. Import never writes over the file's existing ID. V1 geometry migrates to its original one-tile footprints. Unsupported versions, corrupt data and unsafe input display errors without changing any project. Restore-point history is local library data and is not bundled into a document JSON file.
+
+**Export → Complete map PNG** prepares the full map at 1024, 2048 or 4096 pixels on its longest edge, independently of camera pan/zoom, with grid and building-name options. It uses visible document layers and the existing terrain, building and road geometry, without external images or fonts. Rectangular maps retain their aspect ratio; objects outside map bounds are clipped. Select **Prepare PNG**, then tap the download link after preparation. On iPhone use Safari Downloads / Files; if the image opens instead, use **Share → Save to Files**. A smaller resolution can recover from image-memory/encoding failures. Temporary download URLs remain available long enough for delayed mobile downloads.
+
+Project switching/restoring starts a fresh editor undo history; autosaving ordinary edits does not clear undo/redo. Named restore points persist across browser restarts. Snapshot browsing loads lightweight summaries instead of retaining every full document in the dashboard.
+
+### Storage/export implementation and validation
+
+- `src/persistence/database.ts`: additive Dexie v2 upgrade, project metadata, revision-checked document transactions, restore points and active-project preference.
+- `src/persistence/autosave.ts`: debounced serialized writes, coalescing, retries and save states.
+- `src/persistence/session.ts`: safe project transitions and subscription ownership.
+- `src/model/validation.ts`, `src/exports/json.ts`: bounded v1/v2 import validation and lossless document serialization.
+- `src/exports/png.ts`: full-map SVG scene and browser PNG encoding, with bounded image dimensions and failure cleanup.
+- `src/ui/ProjectLibrary.tsx`, `ExportPanel.tsx`: mobile project/snapshot/file screens.
+
+Tests use `fake-indexeddb` only as a development dependency to exercise real Dexie transactions and upgrades. Browser checks cover two generated Viking settlements, isolated autosaves across a full browser close/reopen, confirmed restore with backup, JSON round trips, corrupt-file rejection, duplicate/delete, quota and concurrent-writer errors, camera-independent PNG output, 4096px dimensions and encoding-failure retry. Mobile checks use Chromium touch emulation; physical iPhone/Safari validation remains a user-side check.
+
+One additional production-preview test—downloading a blob immediately after restarting the system Chromium persistent profile—aborted the test browser. The same failure reproduced on a plain HTTP page with all Hearthlands scripts blocked. Production generation, project/snapshot operations, imports, initial JSON/PNG downloads and post-restart project identity/building counts passed; the full development-browser workflow also passed. This is a remaining browser-test-runtime limitation, not a verified Safari outcome. Confirm the download/reopen flow on your physical iPhone before relying on it as your only backup route.
