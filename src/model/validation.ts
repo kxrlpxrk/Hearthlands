@@ -18,25 +18,29 @@ export function validateDocument(value: unknown): SettlementDocument {
   }
   safe(value);
   const d = record(value,'document');
-  if (d.version !== 1 && d.version !== 2) throw new Error('Unsupported Hearthlands document version. Supported versions: 1 and 2.');
+  if (d.version !== 1 && d.version !== 2 && d.version !== 3) throw new Error('Unsupported Hearthlands document version. Supported versions: 1, 2 and 3.');
   text(d.id,'project id'); text(d.name,'name',true); number(d.seed,'seed',-Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER);
   const grid = record(d.grid,'grid');
   number(grid.width,'grid width',8,192); number(grid.height,'grid height',8,192);
   if (!Number.isInteger(grid.width) || !Number.isInteger(grid.height)) fail('grid dimensions must be integers');
-  number(grid.cellSize,'cell size',1,256); boolean(grid.visible,'grid visibility'); if (d.version === 2 || grid.snap !== undefined) boolean(grid.snap,'grid snapping');
+  number(grid.cellSize,'cell size',1,256); boolean(grid.visible,'grid visibility'); if ((d.version === 2 || d.version === 3) || grid.snap !== undefined) boolean(grid.snap,'grid snapping');
   const layerIds = new Set<string>();
   for (const value of list(d.layers,'layers',100)) { const l = record(value,'layer'); text(l.id,'layer id'); if (layerIds.has(l.id)) fail('duplicate layer id'); layerIds.add(l.id); text(l.name,'layer name',true); boolean(l.visible,'layer visibility'); }
   if (!layerIds.size) fail('at least one layer is required');
   const ids = (values: unknown[], path: string) => { const seen = new Set<string>(); for (const v of values) { const r=record(v,path); text(r.id,`${path} id`); if (seen.has(r.id)) fail(`duplicate ${path} id`); seen.add(r.id); text(r.layerId,`${path} layer`); if (!layerIds.has(r.layerId)) fail(`${path} refers to a missing layer`); } };
   const terrain = list(d.terrain,'terrain',192*192), seenTiles = new Set<string>();
   for (const t of terrain) { cell(t,'terrain tile',true); const tile=record(t,'terrain tile'); oneOf(tile.kind,['grass','forest','water','stone'],'terrain kind'); const key=`${tile.x},${tile.y}`; if (seenTiles.has(key)) fail('duplicate terrain tile'); seenTiles.add(key); }
+  if(d.version===3||d.landscape!==undefined){
+    const landscape=record(d.landscape,'landscape');if(landscape.version!==1)fail('unsupported landscape version');boolean(landscape.contours,'contour visibility');boolean(landscape.detail,'terrain detail');const seen=new Set<string>();
+    for(const value of list(landscape.cells,'landscape cells',192*192)){cell(value,'landscape cell',true);const t=record(value,'landscape cell');if((t.x as number)<0||(t.y as number)<0||(t.x as number)>=(grid.width as number)||(t.y as number)>=(grid.height as number))fail('landscape cell outside map');const k=`${t.x},${t.y}`;if(seen.has(k))fail('duplicate landscape cell');seen.add(k);number(t.elevation,'elevation',-16,32);oneOf(t.ground,['grass','dirt','sand','rock','soil'],'ground material');for(const key of ['water','vegetation','rocks'])number(t[key],key,0,1);}
+  }
   const buildings = list(d.buildings,'buildings',10_000); ids(buildings,'building');
   let footprintBudget=0;
   for (const value of buildings) { const b=record(value,'building'); cell(b,'building position'); oneOf(b.kind,catalogue.map(b=>b.kind),'building kind');
-    for (const key of ['width','height']) if (d.version===2||b[key]!==undefined) number(b[key],`building ${key}`,1,192);
+    for (const key of ['width','height']) if ((d.version===2||d.version===3)||b[key]!==undefined) number(b[key],`building ${key}`,1,192);
     footprintBudget+=Number(b.width??1)*Number(b.height??1);if(footprintBudget>1_000_000)fail('building footprints exceed the safe import complexity limit');
-    if (d.version===2||b.rotation!==undefined) { number(b.rotation,'building rotation',0,270); if ((b.rotation as number)%90) fail('rotation must be a quarter turn'); }
-    if (d.version===2||b.name!==undefined) text(b.name,'building name',true); if (d.version===2||b.locked!==undefined) boolean(b.locked,'building lock');
+    if ((d.version===2||d.version===3)||b.rotation!==undefined) { number(b.rotation,'building rotation',0,270); if ((b.rotation as number)%90) fail('rotation must be a quarter turn'); }
+    if ((d.version===2||d.version===3)||b.name!==undefined) text(b.name,'building name',true); if ((d.version===2||d.version===3)||b.locked!==undefined) boolean(b.locked,'building lock');
   }
   const roads=list(d.roads,'roads',10_000); ids(roads,'road'); let totalPoints=0;
   for (const value of roads) { const r=record(value,'road'); cells(r.points,'road points'); totalPoints+=(r.points as unknown[]).length; if (totalPoints>500_000) fail('too many road points'); if(r.editVersion===1){if((r.points as unknown[]).length>5000)fail('too many infrastructure control points');for(const p of r.points as {x:number;y:number}[])if(p.x<-.5||p.y<-.5||p.x>(grid.width as number)-.5||p.y>(grid.height as number)-.5)fail('infrastructure points outside map');}if(r.editVersion!==undefined&&r.editVersion!==1)fail('unsupported infrastructure version'); if(r.surface!==undefined)oneOf(r.surface,Object.keys(surfaces),'infrastructure material');if(r.width!==undefined)number(r.width,'infrastructure width',.15,3);if(r.locked!==undefined)boolean(r.locked,'infrastructure lock');if(r.name!==undefined)text(r.name,'infrastructure name',true); if(r.kind!==undefined)oneOf(r.kind,['primary','secondary','access'],'road kind');if(r.style!==undefined)oneOf(r.style,['organic','planned','contextual'],'road style'); }

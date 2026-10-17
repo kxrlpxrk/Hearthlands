@@ -1,3 +1,4 @@
+import { emptyLandscape, type Landscape } from './terrain';
 export type TerrainKind = 'grass' | 'water' | 'forest' | 'stone';
 import { buildingDefinition, type BuildingKind } from './catalogue';
 export type { BuildingKind } from './catalogue';
@@ -17,7 +18,8 @@ export interface SettlementPlan {
   primaryRoutes: Cell[][];
 }
 export interface SettlementDocument {
-  version: 2;
+  version: 3;
+  landscape: Landscape;
   id: string;
   name: string;
   seed: number;
@@ -30,7 +32,7 @@ export interface SettlementDocument {
   layers: { id: string; name: string; visible: boolean }[];
 }
 export function createDocument(): SettlementDocument {
-  return { version: 2, id: 'hearthlands-local', name: 'Ravenfjord', seed: 1847,
+  return { version: 3, landscape:emptyLandscape(), id: 'hearthlands-local', name: 'Ravenfjord', seed: 1847,
     grid: { width: 96, height: 96, cellSize: 32, visible: true, snap: true }, terrain: [], buildings: [], roads: [], districts: [],
     layers: [{ id: 'settlement', name: 'Settlement', visible: true }] };
 }
@@ -38,11 +40,11 @@ export function isInside(doc: SettlementDocument, cell: Cell) {
   return Number.isInteger(cell.x) && Number.isInteger(cell.y) && cell.x >= 0 && cell.y >= 0 && cell.x < doc.grid.width && cell.y < doc.grid.height;
 }
 
-/** Upgrade saved v1 documents without dropping their original content or placement. */
+/** Lazily upgrade v1/v2 documents; retain original terrain, objects and optional metadata. */
 export function migrateDocument(value: unknown): SettlementDocument {
   const doc = value as SettlementDocument;
-  if (!doc || ![1, 2].includes(doc.version)) throw new Error('Unsupported document version');
-  return { ...doc, version: 2, grid: { ...doc.grid, snap: doc.grid.snap ?? true }, buildings: doc.buildings.map(b => ({
+  if (!doc || ![1, 2, 3].includes(doc.version)) throw new Error('Unsupported document version');
+  return { ...doc, version: 3, landscape:doc.landscape??emptyLandscape(), grid: { ...doc.grid, snap: doc.grid.snap ?? true }, buildings: doc.buildings.map(b => ({
     ...b, name: b.name ?? buildingDefinition(b.kind).name, width: b.width ?? 1, height: b.height ?? 1, rotation: b.rotation ?? 0, locked: b.locked ?? false,
   })) };
 }

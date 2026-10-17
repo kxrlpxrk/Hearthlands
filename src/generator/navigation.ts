@@ -1,3 +1,4 @@
+import { terrainQuery } from '../model/terrain';
 import { connect } from './routing';
 import type { Building, Cell, SettlementDocument } from '../model/document';
 import { footprint } from '../model/buildings';
@@ -12,8 +13,8 @@ export function occupiedCells(buildings: Building[], margin=0): Set<string> {
   return set;
 }
 export function landCells(doc: SettlementDocument): Set<string> {
-  const terrain=terrainMap(doc), set = new Set<string>();
-  for(let y=0;y<doc.grid.height;y++) for(let x=0;x<doc.grid.width;x++) if ((terrain.get(`${x},${y}`) ?? 'grass') === 'grass') set.add(`${x},${y}`);
+  const terrain=terrainQuery(doc), set = new Set<string>();
+  for(let y=0;y<doc.grid.height;y++) for(let x=0;x<doc.grid.width;x++) if (terrain.walkable({x,y})) set.add(`${x},${y}`);
   return set;
 }
 /** Pick the largest land component, ensuring all development shares a usable bank. */

@@ -42,6 +42,7 @@ class ProjectSession {
     await this.saver.flush();
   }
   private async transition<T>(action: () => Promise<T>): Promise<T> {
+    if(useStudio.getState().terrainEditor.pending)throw new Error('Apply or cancel the terrain preview before switching projects, renaming, generating or restoring. The preview is not saved.');
     if (this.transitioning) throw new Error('A project operation is already in progress.');
     this.transitioning = true;
     try { await this.flush(); return await action(); } finally { this.transitioning = false; }

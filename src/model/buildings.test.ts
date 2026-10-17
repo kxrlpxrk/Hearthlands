@@ -56,6 +56,6 @@ it('undoes and redoes each building action in a single command', () => {
 });
 it('preserves one-tile v1 buildings when upgrading and keeps v2 footprints', () => {
   const legacy = { ...createDocument(), version: 1, buildings: [{ id:'old',x:5,y:5,kind:'longhouse',layerId:'settlement' }] };
-  const migrated = migrateDocument(legacy); expect(migrated.version).toBe(2); expect(migrated.buildings[0]).toMatchObject({width:1,height:1,rotation:0,locked:false,name:'Longhouse'}); expect(migrateDocument(base())).toEqual(base());
+  const migrated = migrateDocument(legacy); expect(migrated.version).toBe(3); expect(migrated.buildings[0]).toMatchObject({width:1,height:1,rotation:0,locked:false,name:'Longhouse'}); expect(migrateDocument(base())).toEqual(base());
 });
 it('contains every requested catalogue family with valid footprints', () => { expect(catalogue).toHaveLength(19); expect(catalogue.every(b => b.width > 0 && b.height > 0)).toBe(true); expect(new Set(catalogue.map(b => b.kind)).size).toBe(catalogue.length); });

@@ -1,3 +1,4 @@
+import { footprintTerrainWarnings } from './terrain';
 import type { Building, SettlementDocument } from './document';
 export function footprint(b: Building) { return b.rotation % 180 === 0 ? { width: b.width, height: b.height } : { width: b.height, height: b.width }; }
 export function overlaps(a: Building, b: Building) {
@@ -8,7 +9,7 @@ export function buildingWarnings(doc: SettlementDocument, b: Building): string[]
   const f = footprint(b), warnings: string[] = [];
   if (b.x < 0 || b.y < 0 || b.x + f.width > doc.grid.width || b.y + f.height > doc.grid.height) warnings.push('Outside map bounds');
   if (doc.buildings.some(other => other.id !== b.id && overlaps(b, other))) warnings.push('Overlaps another building');
-  return warnings;
+  return [...warnings,...footprintTerrainWarnings(doc,b)];
 }
 export function updateBuilding(doc: SettlementDocument, id: string, patch: Partial<Omit<Building, 'id' | 'kind' | 'layerId'>>): SettlementDocument {
   const b = doc.buildings.find(b => b.id === id);

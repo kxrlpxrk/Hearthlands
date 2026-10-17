@@ -1,11 +1,12 @@
+import { terrainQuery } from '../model/terrain';
 import type { Cell, SettlementDocument, SettlementPlan } from '../model/document';
-import { cellKey, roadRoot, settlementLand, terrainMap } from './navigation';
+import { cellKey, roadRoot, settlementLand } from './navigation';
 import { connect } from './routing';
 import { landscape, noise } from './noise';
 import type { GenerationSettings } from './settings';
 import { GenerationError } from './settings';
 export function planSettlement(doc: SettlementDocument, s: GenerationSettings): SettlementPlan {
-  const land = settlementLand(doc), tiles = terrainMap(doc), scale = Math.min(s.width, s.height) / 96;
+  const land = settlementLand(doc), tiles = terrainQuery(doc), scale = Math.min(s.width, s.height) / 96;
   const open = (target: Cell, radius = 2): Cell => {
     let best: Cell | undefined, score = Infinity;
     for (const k of land) {
@@ -21,7 +22,7 @@ export function planSettlement(doc: SettlementDocument, s: GenerationSettings): 
   let waterfront: Cell | undefined, waterScore = Infinity;
   for (const k of land) {
     const [x, y] = k.split(',').map(Number);
-    if (![[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy]) => tiles.get(`${x+dx},${y+dy}`) === 'water')) continue;
+    if (![[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy]) => tiles.water({x:x+dx,y:y+dy}))) continue;
     const d = Math.abs(y - s.height * .5) + Math.abs(x - s.width * .69) * .2;
     if (d < waterScore) { waterfront = { x, y }; waterScore = d; }
   }
@@ -34,7 +35,7 @@ export function planSettlement(doc: SettlementDocument, s: GenerationSettings): 
   let workshopTarget: Cell = roadRoot(doc,land), workshopScore = Infinity;
   for (const k of land) {
     const [x,y] = k.split(',').map(Number);
-    if (![[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy]) => tiles.get(`${x+dx},${y+dy}`) === 'forest')) continue;
+    if (![[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy]) => tiles.woodland({x:x+dx,y:y+dy}))) continue;
     const d = Math.hypot(x-centre.x,y-centre.y) + Math.abs(y-centre.y)*.5;
     if (d < workshopScore) { workshopTarget={x,y}; workshopScore=d; }
   }

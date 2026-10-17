@@ -15,3 +15,16 @@
 .infrastructure-actions button { min-height:44px; padding:6px 10px; }
 .infrastructure-actions p { flex-basis:100%; color:#ffb49a; margin:2px; }
 @media(max-width:650px) { .mobile-nav button { font-size:10px; padding:5px 2px; } .toolbar .tool-group { gap:2px; } .infrastructure-actions { top:30px; } }
+
+.terrain-panel { padding:0 0 20px; }
+.terrain-tabs,.terrain-brushes { display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:12px 0; }
+.terrain-tabs button,.terrain-brushes button,.terrain-panel details button { min-height:44px;border:1px solid #43523c; }
+.terrain-tabs [aria-selected=true],.terrain-brushes .active { color:#f1d698;background:#354431; }
+.terrain-panel select { width:100%;min-height:44px;background:#202a26;color:#ece4d2;border:1px solid #52604e;padding:8px; }
+.terrain-panel input[type=range] { min-height:44px;padding:0;accent-color:#c3a66d; }
+.terrain-actions { position:absolute;z-index:5;top:40px;left:10px;right:10px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px;background:#202b25f2;border:1px solid #6a7058;border-radius:6px;font-size:12px;max-height:33%;overflow:auto; }
+.terrain-actions button { min-height:44px;padding:6px 10px; }
+.terrain-actions details { flex-basis:100%; }
+.terrain-actions summary { cursor:pointer;padding:6px;color:#f3b69a; }
+.terrain-actions ul { margin:6px 0;padding-left:20px; }
+@media(max-width:650px){.mobile-nav button { font-size:10px;padding:5px 1px; }.terrain-actions{top:28px}.toolbar{overflow-x:auto}.toolbar>.tool-group{flex-shrink:0}.terrain-panel input{font-size:16px}}

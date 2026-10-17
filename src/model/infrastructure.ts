@@ -1,3 +1,4 @@
+import { terrainQuery } from './terrain';
 import type { Cell, Road, SettlementDocument } from './document';
 import { footprint } from './buildings';
 import { entrance } from '../generator/navigation';
@@ -32,24 +33,27 @@ export function sampledPath(points:Cell[],step=.2):Cell[]{
 }
 /** Full-width checks use tile-centred document coordinates, never canvas pixels. */
 export function infrastructureWarnings(doc:SettlementDocument,r:Road):string[]{
-  const warnings=new Set<string>(),tiles=new Map(doc.terrain.map(t=>[`${t.x},${t.y}`,t.kind])),w=infrastructureWidth(r);
+  const warnings=new Set<string>(),tiles=terrainQuery(doc),w=infrastructureWidth(r);
   if(r.points.length<2||r.points.every(p=>distance(p,r.points[0])<.01))warnings.add('Draw at least two distinct points.');
-  const samples=sampledPath(r.points),kind=(p:Cell)=>tiles.get(`${Math.floor(p.x+.5)},${Math.floor(p.y+.5)}`)??'grass';
+  const samples=sampledPath(r.points),bank=(p:Cell)=>({x:Math.floor(p.x+.5),y:Math.floor(p.y+.5)});
   const blocked=new Set<string>();for(const b of doc.buildings){const f=footprint(b);for(let y=Math.floor(b.y);y<Math.ceil(b.y+f.height);y++)for(let x=Math.floor(b.x);x<Math.ceil(b.x+f.width);x++)blocked.add(`${x},${y}`);}
   for(const p of samples){
     const world={x:p.x+.5,y:p.y+.5};
     if(world.x-w/2<0||world.y-w/2<0||world.x+w/2>doc.grid.width||world.y+w/2>doc.grid.height)warnings.add('Infrastructure extends outside the map.');
     for(let y=Math.floor(world.y-w/2+.001);y<=Math.floor(world.y+w/2-.001);y++)for(let x=Math.floor(world.x-w/2+.001);x<=Math.floor(world.x+w/2-.001);x++){
-      const k=`${x},${y}`,t=tiles.get(k)??'grass';
+      const k=`${x},${y}`,t=tiles.at({x,y});
       if(blocked.has(k))warnings.add('Infrastructure crosses a building footprint.');
-      if(t==='water'&&!isBridge(r))warnings.add('Water crossing requires a bridge.');
-      if((t==='forest'||t==='stone')&&!isDefense(r))warnings.add('Path crosses impassable forest or rock.');
+      if(t.water>=.5&&!isBridge(r))warnings.add('Water crossing requires a bridge.');
+      if(!isDefense(r)&&!isBridge(r)&&t.water<.5&&!tiles.walkable({x,y}))warnings.add('Path crosses impassable forest, rock or slope.');
+      if(isBridge(r)&&t.water<.5&&(t.vegetation>=.6||t.rocks>=.6))warnings.add('Path crosses impassable forest or rock.');
+      if(isDefense(r)&&tiles.slope({x,y})>4)warnings.add('Defenses cross a cliff.');
     }
   }
   if(isBridge(r)){
     if(r.points.length!==2)warnings.add('A bridge needs exactly two bank endpoints.');
-    if(r.points.length&&[r.points[0],r.points[r.points.length-1]].some(p=>kind(p)!=='grass'))warnings.add('Both bridge endpoints must be on accessible land.');
-    const water=samples.map(p=>kind(p)==='water'),first=water.indexOf(true),last=water.lastIndexOf(true);
+    if(r.points.length&&[r.points[0],r.points[r.points.length-1]].some(p=>!tiles.walkable(bank(p))))warnings.add('Both bridge endpoints must be on accessible land.');
+    if(r.points.length===2&&Math.abs(tiles.at(bank(r.points[0])).elevation-tiles.at(bank(r.points[1])).elevation)>2)warnings.add('Bridge bank elevations differ by more than 2 m.');
+    const water=samples.map(p=>tiles.water(bank(p))),first=water.indexOf(true),last=water.lastIndexOf(true);
     if(first<0)warnings.add('A bridge must cross water between two banks.');
     else if(water.slice(first,last+1).some(v=>!v))warnings.add('Bridge must span one continuous waterway.');
   }
@@ -74,13 +78,13 @@ export function connectionProposal(doc:SettlementDocument,buildingId:string):Roa
   const start={x:Math.floor(entrance(b).x),y:Math.floor(entrance(b).y)},roads=doc.roads.filter(r=>!isDefense(r));if(!roads.length)return null;
   const key=(p:Cell)=>`${p.x},${p.y}`,targets=new Set(roads.flatMap(r=>sampledPath(r.points,.4).map(p=>`${Math.round(p.x)},${Math.round(p.y)}`)));
   if(targets.has(key(start)))return null;
-  const tiles=new Map(doc.terrain.map(t=>[key(t),t.kind])),blocked=new Set<string>();
+  const tiles=terrainQuery(doc),blocked=new Set<string>();
   for(const building of doc.buildings){const f=footprint(building);for(let y=Math.floor(building.y);y<Math.ceil(building.y+f.height);y++)for(let x=Math.floor(building.x);x<Math.ceil(building.x+f.width);x++)blocked.add(`${x},${y}`);}
   const walls=new Set<string>();for(const r of doc.roads.filter(r=>isDefense(r)&&r.surface!=='gate'))for(const p of sampledPath(r.points,.3))walls.add(`${Math.round(p.x)},${Math.round(p.y)}`);
   for(const r of doc.roads.filter(r=>r.surface==='gate'))for(const p of sampledPath(r.points,.3))walls.delete(`${Math.round(p.x)},${Math.round(p.y)}`);
   for(const k of walls)blocked.add(k);
   const queue=[start],prev=new Map<string,Cell|null>([[key(start),null]]);let end:Cell|undefined;
-  for(let i=0;i<queue.length;i++){const p=queue[i];if(targets.has(key(p))){end=p;break;}for(const q of [{x:p.x+1,y:p.y},{x:p.x-1,y:p.y},{x:p.x,y:p.y+1},{x:p.x,y:p.y-1}]){const k=key(q);if(q.x<0||q.y<0||q.x>=doc.grid.width||q.y>=doc.grid.height||prev.has(k)||blocked.has(k)||(tiles.get(k)??'grass')!=='grass')continue;prev.set(k,p);queue.push(q);}}
+  for(let i=0;i<queue.length;i++){const p=queue[i];if(targets.has(key(p))){end=p;break;}for(const q of [{x:p.x+1,y:p.y},{x:p.x-1,y:p.y},{x:p.x,y:p.y+1},{x:p.x,y:p.y-1}]){const k=key(q);if(q.x<0||q.y<0||q.x>=doc.grid.width||q.y>=doc.grid.height||prev.has(k)||blocked.has(k)||!tiles.walkable(q))continue;prev.set(k,p);queue.push(q);}}
   if(!end)return null;
   const points:Cell[]=[];let p:Cell|null=end;while(p){points.push(p);p=prev.get(key(p))??null;}points.reverse();
   const r:Road={id:`connection-${buildingId}`,layerId:b.layerId,points,surface:'dirt',width:.3,style:'organic',editVersion:1};

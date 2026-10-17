@@ -1,21 +1,22 @@
+import { allTerrain, terrainQuery } from '../model/terrain';
 import { planSettlement } from './planning';
 import { noise } from './noise';
 import { catalogue, buildingDefinition, type BuildingKind } from '../model/catalogue';
 import type { Building, Cell, SettlementDocument } from '../model/document';
 import { footprint } from '../model/buildings';
 import { seededRandom } from './random';
-import { cellKey, entrance, flood, neighbors, occupiedCells, roadRoot, settlementLand, terrainMap, trace } from './navigation';
+import { cellKey, entrance, flood, neighbors, occupiedCells, roadRoot, settlementLand, trace } from './navigation';
 import { GenerationError, validateSettings, type GenerationSettings } from './settings';
 const waterfront: BuildingKind[]=['fishinghut','harbour','shipyard','bridge'];
 export function resourceDistance(doc: SettlementDocument, b: Building, kind: 'water'|'forest'): number {
   const f=footprint(b);let distance=Infinity;
-  for(const t of doc.terrain)if(t.kind===kind){const dx=Math.max(b.x-t.x,0,t.x-(b.x+f.width-1)),dy=Math.max(b.y-t.y,0,t.y-(b.y+f.height-1));distance=Math.min(distance,dx+dy);}
+  for(const t of allTerrain(doc))if(kind==='water'?t.water>=.5:t.water<.5&&t.vegetation>=.6){const dx=Math.max(b.x-t.x,0,t.x-(b.x+f.width-1)),dy=Math.max(b.y-t.y,0,t.y-(b.y+f.height-1));distance=Math.min(distance,dx+dy);}
   return distance;
 }
 function resourceDistances(doc: SettlementDocument, kind: 'water'|'forest') {
-  const distances=new Map<string,number>(),queue: Cell[]=[],tiles=terrainMap(doc);
-  for(const t of doc.terrain)if(t.kind===kind){distances.set(cellKey(t),0);queue.push(t);}
-  for(let i=0;i<queue.length;i++){const c=queue[i],distance=distances.get(cellKey(c))!;for(const n of neighbors(c)){const k=cellKey(n);if(n.x>=0&&n.y>=0&&n.x<doc.grid.width&&n.y<doc.grid.height&&((tiles.get(k)??'grass')==='grass'||tiles.get(k)===kind)&&!distances.has(k)){distances.set(k,distance+1);queue.push(n);}}}
+  const distances=new Map<string,number>(),queue: Cell[]=[],tiles=terrainQuery(doc);
+  for(const t of allTerrain(doc))if(kind==='water'?t.water>=.5:t.water<.5&&t.vegetation>=.6){distances.set(cellKey(t),0);queue.push(t);}
+  for(let i=0;i<queue.length;i++){const c=queue[i],distance=distances.get(cellKey(c))!;for(const n of neighbors(c)){const k=cellKey(n);if(n.x>=0&&n.y>=0&&n.x<doc.grid.width&&n.y<doc.grid.height&&(tiles.walkable(n)||(kind==='water'?tiles.water(n):tiles.woodland(n)))&&!distances.has(k)){distances.set(k,distance+1);queue.push(n);}}}
   return distances;
 }
 export function generateBuildings(terrain: SettlementDocument, s: GenerationSettings): SettlementDocument {
@@ -24,7 +25,7 @@ export function generateBuildings(terrain: SettlementDocument, s: GenerationSett
   const planning=planSettlement(terrain,s);
   const doc={...terrain,planning,buildings:[] as Building[],roads:[]},random=seededRandom(s.seed+137),land=settlementLand(doc),root=roadRoot(doc,land);
   const reserved=new Set(planning.openSpaces.flatMap(space=>space.cells.map(cellKey)));
-  const water=resourceDistances(doc,'water'),forest=resourceDistances(doc,'forest'),tiles=terrainMap(doc);
+  const water=resourceDistances(doc,'water'),forest=resourceDistances(doc,'forest'),tiles=terrainQuery(doc);
   const network=new Map([[cellKey(root),root]]);
   for(const path of planning.primaryRoutes)for(const c of path)network.set(cellKey(c),c);
   const required:BuildingKind[]=[];
@@ -62,12 +63,12 @@ export function generateBuildings(terrain: SettlementDocument, s: GenerationSett
       let valid=true,resource=Infinity;
       for(let yy=y;yy<y+f.height&&valid;yy++)for(let xx=x;xx<x+f.width;xx++){
         const k=`${xx},${yy}`;
-        if(!land.has(k)||spaced.has(k)||network.has(k)||reserved.has(k)){valid=false;break;}
+        if(!land.has(k)||!tiles.buildable({x:xx,y:yy})||spaced.has(k)||network.has(k)||reserved.has(k)){valid=false;break;}
         resource=Math.min(resource,(waterfront.includes(kind)?water:forest).get(k)??Infinity);
       }
       if(!valid||(waterfront.includes(kind)&&resource>3)||(kind==='sawmill'&&resource>3))continue;
       // All footprints are open grass; farms never occupy woodland or water.
-      if(kind==='farm'&&tiles.get(cellKey(candidate))!=='grass')continue;
+      if(!tiles.buildable(candidate))continue;
       const centre = Math.hypot(x-target.x,y-target.y);
       // Different households seek different pockets of space, rather than filling rings.
       const jitter = s.layout==='planned'?0:(noise(s.seed+index*83,x/6,y/6)-.5)*12;
