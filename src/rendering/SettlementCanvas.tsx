@@ -1,3 +1,4 @@
+import { roadContext, roadGeometry } from './roadGeometry';
 import { entrance } from '../generator/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Stage, Layer, Rect, Line, Group, Path } from 'react-konva';
@@ -24,6 +25,8 @@ export function SettlementCanvas() {
   useEffect(() => { setPreview(null); gesture.current = null; }, [tool, doc]);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const terrainPaths = useMemo(() => (Object.keys(colors) as TerrainKind[]).map(kind => ({ kind, data: doc.terrain.filter(t => t.kind === kind).map(t => `M${t.x * cell} ${t.y * cell}h${cell}v${cell}h-${cell}Z`).join('') })), [doc.terrain, cell]);
+  const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.buildings]);
+  const openGround = useMemo(() => { const tiles=new Map(doc.terrain.map(t=>[`${t.x},${t.y}`,t.kind])); return (doc.planning?.openSpaces ?? []).filter(s => s.kind !== 'expansion').map((s,i) => ({ id: i, kind: s.kind, data: s.cells.filter(c=>(tiles.get(`${c.x},${c.y}`)??'grass')==='grass').map(c=>`M${c.x*cell} ${c.y*cell}h${cell}v${cell}h-${cell}Z`).join('') })); }, [doc.planning, doc.terrain, cell]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
   function zoom(factor: number, anchor = { x: size.width / 2, y: size.height / 2 }) {
@@ -65,8 +68,9 @@ export function SettlementCanvas() {
       onTouchEnd={() => { pinch.current = null; }}>
       <Layer><Rect width={width} height={height} fill="#344536" stroke="#728062" strokeWidth={2}/>
         {terrainPaths.map(t => <Path key={t.kind} data={t.data} fill={colors[t.kind]} listening={false}/>)}
+        {openGround.map(s => <Path key={s.id} data={s.data} fill={s.kind === 'field' ? '#71734d' : s.kind === 'yard' ? '#59694b' : '#777052'} opacity={.65} listening={false}/>)}
         {doc.grid.visible && <Group listening={false}>{Array.from({ length: doc.grid.width + 1 }, (_, i) => <Line key={`x${i}`} points={[i * cell, 0, i * cell, height]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}{Array.from({ length: doc.grid.height + 1 }, (_, i) => <Line key={`y${i}`} points={[0, i * cell, width, i * cell]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
-        <Group listening={false}>{doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => <Line key={r.id} points={r.points.flatMap(p => [(p.x + .5) * cell, (p.y + .5) * cell])} stroke="#c2a270" strokeWidth={cell * .55} lineCap="round" lineJoin="round"/> )}</Group>
+        <Group listening={false}>{roads.map(r => <Path key={r.id} data={r.data} scaleX={cell} scaleY={cell} stroke="#b79e72" strokeWidth={r.width} lineCap="round" lineJoin="round"/>)}</Group>
         {doc.buildings.filter(b => doc.layers.find(l => l.id === b.layerId)?.visible).map(original => {
           const b = preview?.id === original.id ? { ...original, ...preview } : original;
           const f = footprint(b), w = b.width * cell, h = b.height * cell;

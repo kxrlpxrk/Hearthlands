@@ -1,3 +1,4 @@
+import { connect } from './routing';
 import type { Building, Cell, SettlementDocument } from '../model/document';
 import { footprint } from '../model/buildings';
 import { GenerationError } from './settings';
@@ -22,6 +23,7 @@ export function settlementLand(doc: SettlementDocument): Set<string> {
   return largest;
 }
 export function roadRoot(doc: SettlementDocument, land=settlementLand(doc)): Cell {
+  if (doc.planning && land.has(cellKey(doc.planning.centre))) return doc.planning.centre;
   let result: Cell | undefined, score=Infinity;
   for(const k of land){const [x,y]=k.split(',').map(Number), d=(x-doc.grid.width*.38)**2+(y-doc.grid.height*.5)**2;if(d<score){score=d;result={x,y};}}
   if(!result)throw new GenerationError('No accessible open land for a settlement centre.');return result;
@@ -41,7 +43,19 @@ export function generateRoads(doc: SettlementDocument): SettlementDocument {
   if(!doc.buildings.length)throw new GenerationError('Generate buildings before roads.');
   const land=settlementLand(doc), root=roadRoot(doc,land), blocked=occupiedCells(doc.buildings);
   if(blocked.has(cellKey(root)))throw new GenerationError('The settlement centre is blocked. Generate buildings again.');
-  const network=new Map([[cellKey(root),root]]), roads:SettlementDocument['roads']=[];
-  for(const b of doc.buildings){const points=trace(flood(land,blocked,[...network.values()]),entrance(b));for(const c of points)network.set(cellKey(c),c);roads.push({id:`road-${b.id}`,points,layerId:'settlement'});}
-  return {...doc,roads};
+  const network = new Map([[cellKey(root), root]]), roads: SettlementDocument['roads'] = [];
+  const style = doc.planning?.layout ?? 'planned';
+  for (const [i, points] of (doc.planning?.primaryRoutes ?? []).entries()) {
+    if (points.some(c => !land.has(cellKey(c)) || blocked.has(cellKey(c)))) throw new GenerationError('A primary route is blocked. Generate buildings again.');
+    roads.push({ id: `primary-${i}`, points, layerId: 'settlement', kind: 'primary', style });
+    for (const c of points) network.set(cellKey(c), c);
+  }
+  // Important destinations establish secondary tracks before individual access paths.
+  const priority = (b: Building) => ['longhouse','townhall','harbour','market','farm','sawmill'].includes(b.kind) ? 0 : 1;
+  for (const b of [...doc.buildings].sort((a,b) => priority(a)-priority(b))) {
+    const points = doc.planning ? connect(entrance(b), network, land, blocked, style) : trace(flood(land, blocked, [...network.values()]), entrance(b));
+    for (const c of points) network.set(cellKey(c), c);
+    roads.push({ id: `road-${b.id}`, points, layerId: 'settlement', ...(doc.planning ? { kind: priority(b) === 0 && points.length > 5 ? 'secondary' as const : 'access' as const, style } : {}) });
+  }
+  return { ...doc, roads };
 }

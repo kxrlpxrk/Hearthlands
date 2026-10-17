@@ -1,23 +1,30 @@
 import { createDocument, type SettlementDocument, type TerrainKind } from '../model/document';
 import { seededRandom } from './random';
+import { landscape, noise } from './noise';
 import { validateSettings, type GenerationSettings } from './settings';
 export function generateTerrain(s: GenerationSettings): SettlementDocument {
   validateSettings(s);
-  const random = seededRandom(s.seed), phase = random() * Math.PI * 2;
-  const patches = Array.from({length: s.environment === 'forest' ? 24 : 8}, () => ({x: 2 + random() * (s.width - 4), y: 2 + random() * (s.height - 4), r: 2 + random() * (s.environment === 'forest' ? 7 : 4)}));
+  const phase = seededRandom(s.seed)() * Math.PI * 2;
   const doc = createDocument();
   doc.name = s.preset === 'viking' ? 'Ravenfjord' : 'Willowmere'; doc.seed = s.seed;
   doc.grid = { ...doc.grid, width: s.width, height: s.height };
-  for (let y=0;y<s.height;y++) for (let x=0;x<s.width;x++) {
-    const wave = Math.sin(y / 9 + phase) * 2 + Math.sin(y / 19 + phase) * 2;
-    const water = s.environment === 'river' ? Math.abs(x - (s.width * .72 + wave)) < 2.5 : s.environment === 'coastal' && x > s.width * .76 + wave;
-    let kind: TerrainKind = water ? 'water' : 'grass';
-    // A generous central clearing keeps the village usable; woodland has coherent edges.
-    const clearing = Math.hypot((x-s.width*.38)/(s.width*.25),(y-s.height*.5)/(s.height*.28)) < 1;
-    if (!water && !clearing && patches.some(p => Math.hypot(x-p.x,y-p.y) < p.r)) kind = 'forest';
-    // Guaranteed accessible woodland resource even when random patches land in water.
-    if (!water && x >= 3 && x <= 7 && y >= 3 && y <= Math.min(11,s.height-4)) kind = 'forest';
-    doc.terrain.push({x,y,kind});
+  for (let y = 0; y < s.height; y++) for (let x = 0; x < s.width; x++) {
+    const bend = Math.sin(y / s.height * 6 + phase) * s.width * .045 + Math.sin(y / 13 + phase) * 1.8;
+    const riverCentre = s.width * .74 + bend;
+    const riverWidth = 1.8 + noise(s.seed + 4, 0, y / 18) * 1.7;
+    const coast = s.width * .77 + bend + (noise(s.seed + 3, 0, y / 12) - .5) * 5;
+    const water = s.environment === 'river' ? Math.abs(x - riverCentre) <= riverWidth : s.environment === 'coastal' && x > coast;
+    const field = landscape(s.seed + 13, x, y);
+    // An irregular east-west clearing corridor, rather than a circular central lawn.
+    const corridorY = s.height * .49 + Math.sin(x / 14 + phase) * s.height * .065;
+    const corridor = Math.max(0, 1 - Math.abs(y - corridorY) / (s.height * .22));
+    const threshold = (s.environment === 'forest' ? .48 : .59) + corridor * .16;
+    // A noisy woodland edge at the western boundary guarantees workshop resources.
+    const woodlandEdge = s.width * (.12 + .07 * Math.sin(y / 16 + phase)) + noise(s.seed + 37, y / 7, 0) * 6;
+    const woods = field > threshold || (x < woodlandEdge && field > .36 && y > 1);
+    let kind: TerrainKind = water ? 'water' : woods ? 'forest' : 'grass';
+    if (!water && !woods && corridor < .4 && noise(s.seed + 701, x / 6, y / 6) > .79 && field > .5) kind = 'stone';
+    doc.terrain.push({ x, y, kind });
   }
   return doc;
 }

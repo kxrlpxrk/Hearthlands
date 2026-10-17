@@ -1,3 +1,4 @@
+import { roadContext, roadGeometry } from '../rendering/roadGeometry';
 import { useEffect, useRef, useState } from 'react';
 import { catalogue, type BuildingKind } from '../model/catalogue';
 import type { SettlementDocument } from '../model/document';
@@ -5,7 +6,8 @@ import { defaultSettings, type GenerationSettings } from '../generator/settings'
 import type { GenerationRequest, GenerationResponse } from '../generator/generator.worker';
 import { useStudio } from './store';
 function DraftPreview({ doc }: { doc: SettlementDocument }) {
-  return <svg className="generation-preview" viewBox={`0 0 ${doc.grid.width} ${doc.grid.height}`} role="img" aria-label="Generated settlement draft preview"><rect width={doc.grid.width} height={doc.grid.height} fill="#536447"/>{(['forest','water','stone'] as const).map(kind=><path key={kind} fill={{forest:'#294c3e',water:'#355d69',stone:'#737775'}[kind]} d={doc.terrain.filter(t=>t.kind===kind).map(t=>`M${t.x} ${t.y}h1v1h-1z`).join('')}/>)}{doc.roads.map(r=><polyline key={r.id} points={r.points.map(p=>`${p.x+.5},${p.y+.5}`).join(' ')} stroke="#dfbc7f" strokeWidth=".7" fill="none"/>)}{doc.buildings.map(b=><rect key={b.id} x={b.x} y={b.y} width={b.rotation%180?b.height:b.width} height={b.rotation%180?b.width:b.height} fill="#bc8c51" stroke="#efd19a" strokeWidth=".2"/>)}</svg>;
+  const context=roadContext(doc);
+  return <svg className="generation-preview" viewBox={`0 0 ${doc.grid.width} ${doc.grid.height}`} role="img" aria-label="Generated settlement draft preview"><rect width={doc.grid.width} height={doc.grid.height} fill="#536447"/>{(['forest','water','stone'] as const).map(kind=><path key={kind} fill={{forest:'#294c3e',water:'#355d69',stone:'#737775'}[kind]} d={doc.terrain.filter(t=>t.kind===kind).map(t=>`M${t.x} ${t.y}h1v1h-1z`).join('')}/>)}{doc.planning?.openSpaces.filter(s=>s.kind!=='expansion').map((s,i)=><path key={`space-${i}`} fill={s.kind==='field'?'#71734d':'#777052'} d={s.cells.map(c=>`M${c.x} ${c.y}h1v1h-1z`).join('')}/>)}{doc.roads.map(r=>{const geometry=roadGeometry(doc,r,context);return <path key={r.id} d={geometry.data} stroke="#dfbc7f" strokeWidth={geometry.width} strokeLinecap="round" strokeLinejoin="round" fill="none"/>;})}{doc.buildings.map(b=><rect key={b.id} x={b.x} y={b.y} width={b.rotation%180?b.height:b.width} height={b.rotation%180?b.width:b.height} fill="#bc8c51" stroke="#efd19a" strokeWidth=".2"/>)}</svg>;
 }
 export function GeneratorPanel({ onClose, onApplied }: { onClose: () => void; onApplied: (doc: SettlementDocument) => void }) {
   const [settings,setSettings]=useState<GenerationSettings>({...defaultSettings,required:{...defaultSettings.required}});

@@ -3,6 +3,19 @@ import { buildingDefinition, type BuildingKind } from './catalogue';
 export type { BuildingKind } from './catalogue';
 export interface Building extends Cell { id: string; kind: BuildingKind; layerId: string; name: string; width: number; height: number; rotation: number; locked: boolean }
 export interface Cell { x: number; y: number }
+export type RoadStyle = 'organic' | 'planned' | 'contextual';
+export interface Road { id: string; points: Cell[]; layerId: string; kind?: 'primary' | 'secondary' | 'access'; style?: RoadStyle }
+export interface SettlementPlan {
+  version: 1;
+  layout: RoadStyle;
+  centre: Cell;
+  clusters: { id: string; role: 'civic' | 'residential' | 'waterfront' | 'farming' | 'workshop'; centre: Cell; radius: number }[];
+  waterfront?: Cell;
+  workshop: Cell;
+  farming: Cell;
+  openSpaces: { kind: 'gathering' | 'working' | 'yard' | 'field' | 'expansion'; cells: Cell[] }[];
+  primaryRoutes: Cell[][];
+}
 export interface SettlementDocument {
   version: 2;
   id: string;
@@ -11,7 +24,8 @@ export interface SettlementDocument {
   grid: { width: number; height: number; cellSize: number; visible: boolean; snap: boolean };
   terrain: (Cell & { kind: TerrainKind })[];
   buildings: Building[];
-  roads: { id: string; points: Cell[]; layerId: string }[];
+  roads: Road[];
+  planning?: SettlementPlan;
   districts: { id: string; name: string; cells: Cell[]; color: string; layerId: string }[];
   layers: { id: string; name: string; visible: boolean }[];
 }
