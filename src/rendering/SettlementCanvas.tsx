@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { entrance } from '../generator/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Stage, Layer, Rect, Line, Group, Path } from 'react-konva';
 import type Konva from 'konva';
 import { useStudio } from '../ui/store';
@@ -22,6 +23,7 @@ export function SettlementCanvas() {
   useEffect(() => { const observer = new ResizeObserver(([entry]) => setSize({ width: entry.contentRect.width, height: entry.contentRect.height })); observer.observe(host.current!); return () => observer.disconnect(); }, []);
   useEffect(() => { setPreview(null); gesture.current = null; }, [tool, doc]);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
+  const terrainPaths = useMemo(() => (Object.keys(colors) as TerrainKind[]).map(kind => ({ kind, data: doc.terrain.filter(t => t.kind === kind).map(t => `M${t.x * cell} ${t.y * cell}h${cell}v${cell}h-${cell}Z`).join('') })), [doc.terrain, cell]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
   function zoom(factor: number, anchor = { x: size.width / 2, y: size.height / 2 }) {
@@ -62,8 +64,9 @@ export function SettlementCanvas() {
       onTouchMove={e => { const t = e.evt.touches; if (t.length !== 2) return; e.evt.preventDefault(); const rect = host.current!.getBoundingClientRect(); const point = { x: (t[0].clientX + t[1].clientX) / 2 - rect.left, y: (t[0].clientY + t[1].clientY) / 2 - rect.top }; const distance = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); if (pinch.current) { const old = pinch.current; setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * distance / old.distance)); return { scale, x: point.x - (old.x - v.x) * scale / v.scale, y: point.y - (old.y - v.y) * scale / v.scale }; }); } pinch.current = { ...point, distance }; }}
       onTouchEnd={() => { pinch.current = null; }}>
       <Layer><Rect width={width} height={height} fill="#344536" stroke="#728062" strokeWidth={2}/>
-        {doc.terrain.map(t => <Rect key={`${t.x}:${t.y}`} x={t.x * cell} y={t.y * cell} width={cell} height={cell} fill={colors[t.kind]}/>)}
+        {terrainPaths.map(t => <Path key={t.kind} data={t.data} fill={colors[t.kind]} listening={false}/>)}
         {doc.grid.visible && <Group listening={false}>{Array.from({ length: doc.grid.width + 1 }, (_, i) => <Line key={`x${i}`} points={[i * cell, 0, i * cell, height]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}{Array.from({ length: doc.grid.height + 1 }, (_, i) => <Line key={`y${i}`} points={[0, i * cell, width, i * cell]} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
+        <Group listening={false}>{doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => <Line key={r.id} points={r.points.flatMap(p => [(p.x + .5) * cell, (p.y + .5) * cell])} stroke="#c2a270" strokeWidth={cell * .55} lineCap="round" lineJoin="round"/> )}</Group>
         {doc.buildings.filter(b => doc.layers.find(l => l.id === b.layerId)?.visible).map(original => {
           const b = preview?.id === original.id ? { ...original, ...preview } : original;
           const f = footprint(b), w = b.width * cell, h = b.height * cell;
@@ -71,6 +74,7 @@ export function SettlementCanvas() {
           return <Group key={b.id} name="building" buildingId={b.id} x={b.x * cell} y={b.y * cell}>
             <Rect width={f.width * cell} height={f.height * cell} fill={b.locked ? '#625f4d' : '#997343'} stroke={warn ? '#ef927b' : active ? '#ffe2a0' : '#292d24'} strokeWidth={active ? 4 : 2}/>
             <Group listening={false} x={f.width * cell / 2} y={f.height * cell / 2} rotation={b.rotation}><Path data={symbolPaths[buildingDefinition(b.kind).symbol]} x={-w / 2 + 4} y={-h / 2 + 4} scaleX={(w - 8) / 64} scaleY={(h - 8) / 64} stroke="#efd19a" strokeWidth={2} fill="#725535"/></Group>
+            <Rect listening={false} x={(entrance(b).x-b.x)*cell} y={(entrance(b).y-b.y)*cell-4} width={cell*.6} height={5} fill="#f7dda5"/>
             {b.locked && <Rect listening={false} x={3} y={3} width={8} height={8} fill="#c8d4de"/>}
           </Group>;
         })}
