@@ -1,0 +1,6 @@
+import {useVisualPreferences} from './visualPreferences';
+import type { VisualStyle,DetailPreference } from '../rendering/styles';
+export function StyleSwitcher({compact=false}:{compact?:boolean}){
+ const v=useVisualPreferences();
+ return <div className={compact?'style-switcher compact':'style-switcher'}><label>{compact?<span className="sr-only">Map style</span>:'Map style'}<select aria-label={compact?'Map style':'Map style settings'} value={v.style} onChange={e=>v.change({style:e.target.value as VisualStyle})}><option value="planning">Planning</option><option value="illustrated">Illustrated</option></select></label>{!compact&&<><label>Visual detail<select value={v.detail} onChange={e=>v.change({detail:e.target.value as DetailPreference})}><option value="auto">Automatic · adapts to zoom</option><option value="reduced">Reduced · lighter rendering</option></select></label><label className="checkbox-label"><input type="checkbox" checked={v.labels} onChange={e=>v.change({labels:e.target.checked})}/>Show building names on map</label><p className="field-note">Visual preferences apply across projects on this browser. Settlement data, JSON and undo history stay unchanged. PNG has its own style and visibility options.</p></>}{v.error&&<p role="status" className="warning">{v.error}</p>}</div>;
+}

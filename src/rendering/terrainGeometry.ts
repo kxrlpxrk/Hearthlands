@@ -1,17 +1,23 @@
+import {noise} from '../generator/noise';
+import type { VisualStyle, TerrainLayer } from './styles';
 import type { Cell, SettlementDocument } from '../model/document';
 import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 export const groundColors={grass:'#536447',dirt:'#806b4b',sand:'#b4a375',rock:'#737775',soil:'#66523b'};
-export interface TerrainPath { data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
-export interface TerrainView { contours:boolean; detail:boolean }
+export interface TerrainPath { layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
+export interface TerrainView { contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean }
 const tile=(x:number,y:number)=>`M${x} ${y}h1v1h-1Z`;
 const n=(v:number)=>Math.round(v*1000)/1000;
 function hash(seed:number,x:number,y:number){let h=seed^Math.imul(x,374761393)^Math.imul(y,668265263);h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967296;}
 /** Shared world-space scene, batched by style; no per-tile React nodes or external textures. */
 export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.landscape??{contours:true,detail:true}):TerrainPath[]{
+  const illustrated=options.style==='illustrated',fine=options.detail&&!options.reduced;
+  const palette=illustrated?{grass:'#788558',dirt:'#98815c',sand:'#c8b685',rock:'#898b7a',soil:'#795d40'}:groundColors;
+  let layer:TerrainLayer='base';
   const q=terrainQuery(doc),groups=new Map<string,{path:TerrainPath;parts:string[]}>();
-  const add=(data:string,fill?:string,stroke?:string,width?:number,opacity=1)=>{if(!data)return;const key=`${fill}:${stroke}:${width}:${opacity}`;let group=groups.get(key);if(!group){group={path:{data:'',fill,stroke,width,opacity},parts:[]};groups.set(key,group);}group.parts.push(data);};
+  const add=(data:string,fill?:string,stroke?:string,width?:number,opacity=1)=>{if(!data)return;const key=`${layer}:${fill}:${stroke}:${width}:${opacity}`;let group=groups.get(key);if(!group){group={path:{layer,data:'',fill,stroke,width,opacity},parts:[]};groups.set(key,group);}group.parts.push(data);};
   const cells:LandscapeCell[]=[];
-  for(let y=0;y<doc.grid.height;y++)for(let x=0;x<doc.grid.width;x++){const t=q.at({x,y});cells.push(t);add(tile(x,y),groundColors[t.ground]);}
+  for(let y=0;y<doc.grid.height;y++)for(let x=0;x<doc.grid.width;x++){const t=q.at({x,y});cells.push(t);add(tile(x,y),palette[t.ground]);}
+  if(illustrated)for(const t of cells){const tone=noise(doc.seed+951,t.x/11,t.y/11);if(tone>.56)add(tile(t.x,t.y),'#cfcc8a',undefined,undefined,.09);else if(tone<.39)add(tile(t.x,t.y),'#294632',undefined,undefined,.08);}
   const edited=new Set(doc.landscape?.cells.map(terrainKey));
   for(const s of doc.planning?.openSpaces??[])if(s.kind!=='expansion')for(const p of s.cells)if(q.inside(p)&&!edited.has(terrainKey(p))&&!q.water(p)&&!q.woodland(p))add(tile(p.x,p.y),s.kind==='field'?'#71734d':s.kind==='yard'?'#59694b':'#777052',undefined,undefined,.65);
   const cornerStride=doc.grid.width+1,cornerFields={water:new Float32Array(cornerStride*(doc.grid.height+1)),vegetation:new Float32Array(cornerStride*(doc.grid.height+1))};
@@ -30,22 +36,26 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
       const triangle=[{x:x+.5,y:y+.5,v:value},corners[i],corners[(i+1)%4]],poly:Cell[]=[],edge:Cell[]=[];
       for(let j=0;j<3;j++){const a=triangle[j],b=triangle[(j+1)%3];if(a.v>=.5)poly.push(a);if((a.v>=.5)!==(b.v>=.5)){const t=(.5-a.v)/(b.v-a.v),p={x:n(a.x+(b.x-a.x)*t),y:n(a.y+(b.y-a.y)*t)};poly.push(p);edge.push(p);}}
       if(poly.length>=3)add(poly.map((p,i)=>`${i?'L':'M'}${p.x} ${p.y}`).join('')+'Z',fill);
-      if(field==='water'&&edge.length===2)add(`M${edge[0].x} ${edge[0].y}L${edge[1].x} ${edge[1].y}`,undefined,'#89a69a',.045,.6);
+      if(field==='water'&&edge.length===2)add(`M${edge[0].x} ${edge[0].y}L${edge[1].x} ${edge[1].y}`,undefined,illustrated?'#b4c8a8':'#89a69a',illustrated?.13:.045,illustrated?.45:.6);
     }
     if(value>0&&value<.5)add(tile(x,y),fill,undefined,undefined,.1);
   }
-  for(const t of cells)coverage(t,'vegetation','#294c3e');
-  for(const t of cells)coverage(t,'water','#355d69');
+  layer='nature';for(const t of cells)coverage(t,'vegetation',illustrated?'#365d43':'#294c3e');
+  layer='water';for(const t of cells)coverage(t,'water',illustrated?'#477f88':'#355d69');
   // Small seeded details and material seams soften large painted surfaces without changing queries.
-  if(options.detail)for(const t of cells){
+  if(fine)for(const t of cells){
     const {x,y}=t,r=hash(doc.seed,x,y),cx=x+.3+r*.4,cy=y+.35+hash(doc.seed+51,x,y)*.3;
-    if(t.water>=.5){if(r>.72)add(`M${x+.15} ${y+.5}q.2 -.08 .4 0t.3 0`,undefined,'#7d9d9a',.025,.35);continue;}
-    if(t.vegetation>=.35&&r>.28)add(`M${n(cx-.2)} ${n(cy+.17)}Q${n(cx-.35)} ${n(cy-.05)} ${n(cx)} ${n(cy-.34)}Q${n(cx+.34)} ${n(cy-.06)} ${n(cx+.18)} ${n(cy+.17)}Z`,'#355e45','#1e4035',.035,.8);
+    if(t.water>=.5){layer='water';if(illustrated&&r>.5)add(`M${n(x+.1)} ${n(y+.28)}q.35 -.08 .75 .02`,undefined,'#244f66',.12,.12);if(r>.72)add(`M${x+.15} ${y+.5}q.2 -.08 .4 0t.3 0`,undefined,'#7d9d9a',.025,.35);continue;}
+    layer='nature';
+    if(illustrated&&r>.65)add(`M${x} ${y}h1v1h-1Z`,'#b4b878',undefined,undefined,.06);
+    if(illustrated&&t.vegetation>=.5&&r>.28)add(`M${n(cx-.23)} ${n(cy+.2)}q-.12 -.2 .23 -.52q.34 .3 .19 .52Z`,'#142f29',undefined,undefined,.25);
+    if(t.vegetation>=.35&&r>.28)add(`M${n(cx-.2)} ${n(cy+.17)}Q${n(cx-.35)} ${n(cy-.05)} ${n(cx)} ${n(cy-.34)}Q${n(cx+.34)} ${n(cy-.06)} ${n(cx+.18)} ${n(cy+.17)}Z`,illustrated?'#638151':'#355e45','#1e4035',.035,.8);
     if(t.rocks>.15&&r>.25)add(`M${x+.2} ${y+.67}l.14 -.3 .3 -.04 .16 .3-.28 .12Z`,'#92958b','#555e58',.035,t.rocks);
     if(t.ground==='soil'&&t.vegetation<.5)add(`M${x+.15} ${y+.2}l.7 .15M${x+.15} ${y+.5}l.7 .15`,undefined,'#ac9061',.04,.28);
     else if(r>.58)add(`M${n(cx-.16)} ${n(cy)}q.12 -.1 .28 0`,undefined,t.ground==='sand'?'#d3c392':t.ground==='rock'?'#aaa99b':'#acb17b',.025,.2);
-    for(const p of [{x:x+1,y},{x,y:y+1}])if(q.inside(p)&&q.at(p).ground!==t.ground)add(p.x>x?`M${x+.8} ${y+.15}l.15 .2-.1 .2.13 .25`:`M${x+.15} ${y+.8}l.2 .15 .2-.1 .25 .13`,undefined,groundColors[q.at(p).ground],.18,.18);
+    for(const p of [{x:x+1,y},{x,y:y+1}])if(q.inside(p)&&q.at(p).ground!==t.ground)add(p.x>x?`M${x+.8} ${y+.15}l.15 .2-.1 .2.13 .25`:`M${x+.15} ${y+.8}l.2 .15 .2-.1 .25 .13`,undefined,palette[q.at(p).ground],.18,.18);
   }
+  layer='relief';
   const elevated=doc.landscape.cells.filter(t=>t.elevation!==0);
   const at=(x:number,y:number)=>cells[Math.max(0,Math.min(doc.grid.height-1,y))*doc.grid.width+Math.max(0,Math.min(doc.grid.width-1,x))];
   const minX=elevated.reduce((n,t)=>Math.min(n,t.x-1),doc.grid.width),maxX=elevated.reduce((n,t)=>Math.max(n,t.x+1),0),minY=elevated.reduce((n,t)=>Math.min(n,t.y-1),doc.grid.height),maxY=elevated.reduce((n,t)=>Math.max(n,t.y+1),0);

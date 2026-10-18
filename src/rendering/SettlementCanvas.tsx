@@ -1,3 +1,9 @@
+import { InfrastructureVisual } from './InfrastructureVisual';
+import { TerrainVisual } from './TerrainVisual';
+import { useVisualPreferences } from '../ui/visualPreferences';
+import { terrainScene } from './scene';
+import { reducedDetail, styleBackground, terrainCachePixels } from './styles';
+import { BuildingVisual } from './BuildingVisual';
 import { ExpansionActions } from '../ui/ExpansionPanel';
 import { ExpansionOverlay } from './ExpansionOverlay';
 import { ActionDock, ActionSlot } from '../ui/ActionDock';
@@ -7,12 +13,11 @@ import { DistrictActions } from '../ui/DistrictPanel';
 import { defaultDistrictView, insertBoundaryPoint, districtCells, districtMembership, DistrictStroke, districtTypes, key as districtKey, overlapCells, type District } from '../model/districts';
 import { districtGeometry, visibleDistricts } from './districtGeometry';
 import { TerrainActions } from '../ui/TerrainPanel';
-import { terrainGeometry, previewTerrainColor } from './terrainGeometry';
+import { previewTerrainColor } from './terrainGeometry';
 import { TerrainStroke, commitTerrain, terrainProtection } from '../model/terrainStroke';
 import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 import { InfrastructureActions } from '../ui/InfrastructurePanel';
-import { closestSegment, deleteSegment, isBridge, putInfrastructure, snapConnection, distance } from '../model/infrastructure';
-import { infrastructureStrokes } from './infrastructureGeometry';
+import { closestSegment, deleteSegment, isBridge, isDefense, putInfrastructure, snapConnection, distance } from '../model/infrastructure';
 import type { Cell, Road } from '../model/document';
 import { roadContext, roadGeometry } from './roadGeometry';
 import { entrance } from '../generator/navigation';
@@ -22,9 +27,7 @@ import type Konva from 'konva';
 import { useStudio } from '../ui/store';
 import { eraseCell, paintTerrain, placeBuilding } from '../model/operations';
 import type { BuildingKind, TerrainKind } from '../model/document';
-import { buildingDefinition } from '../model/catalogue';
 import { buildingWarnings, footprint, snapPosition, updateBuilding } from '../model/buildings';
-import { symbolPaths } from './symbols';
 const colors = { grass: '#536447', water: '#355d69', forest: '#294c3e', stone: '#737775' };
 type View = { x: number; y: number; scale: number };
 type Gesture = { start: { x: number; y: number }; view: View; id?: string; x?: number; y?: number; moved: boolean; roadId?:string; pointIndex?:number; trace?:Cell[]; districtPointIndex?:number };
@@ -48,10 +51,12 @@ export function SettlementCanvas() {
   useEffect(()=>{const cancel=()=>{districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);terrainStroke.current=null;gesture.current=null;setTerrainPatch([]);cancelAnimationFrame(frame.current);frame.current=0;};const multiTouch=(e:TouchEvent)=>{if(e.touches.length>1){suppress.current=true;cancel();}};document.addEventListener('touchstart',multiTouch,{passive:true});window.addEventListener('hearthlands-cancel-stroke',cancel);return()=>{cancel();window.removeEventListener('hearthlands-cancel-stroke',cancel);document.removeEventListener('touchstart',multiTouch);};},[]);
   const expansionActive=!!expansion.preview||expansion.busy||expansion.applying;
   const developmentActive=!!development.preview||development.busy||development.applying||expansionActive;
+  const visual=useVisualPreferences(),style=visual.style;
+  const reduced=reducedDetail(style,doc.grid.cellSize*view.scale,visual.detail);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const gridLines=useMemo(()=>[...Array.from({length:doc.grid.width+1},(_,i)=>({id:`x${i}`,points:[i*cell,0,i*cell,height]})),...Array.from({length:doc.grid.height+1},(_,i)=>({id:`y${i}`,points:[0,i*cell,width,i*cell]}))],[doc.grid.width,doc.grid.height,cell,width,height]);
   useMemo(()=>tool==='terrain-editor'?terrainProtection(doc):null,[tool,doc]);
-  const terrainPaths=useMemo(()=>terrainGeometry(doc),[doc.terrain,doc.landscape,doc.grid.width,doc.grid.height,doc.seed,doc.planning]);
+  const terrainPaths=useMemo(()=>terrainScene(doc,{...doc.landscape,style,reduced}),[doc.terrain,doc.landscape,doc.grid.width,doc.grid.height,doc.seed,doc.planning,style,reduced]);
   const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ road:r, id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.landscape, doc.buildings]);
   const districtView=doc.districtView??defaultDistrictView;
   const districtShapes=useMemo(()=>{const districts=district.detection??visibleDistricts(doc);return districts.map(d=>({district:d,...districtGeometry(doc,d)}));},[doc.districts,doc.districtView,doc.layers,doc.grid.width,doc.grid.height,district.detection]);
@@ -59,6 +64,7 @@ export function SettlementCanvas() {
   const districtBoundary=district.draft.map((p,i)=>districtCorner?.index===i?districtCorner.point:p);
   const districtPendingGeometry=useMemo(()=>district.pending?districtGeometry(doc,district.pending):null,[district.pending,doc.grid.width,doc.grid.height]);
   const districtConflicts=useMemo(()=>district.pending?overlapCells(doc,district.pending):new Set<string>(),[district.pending,doc.districts]);
+  const buildingWarningIds=useMemo(()=>new Set(doc.buildings.filter(b=>buildingWarnings(doc,b).length).map(b=>b.id)),[doc.buildings,doc.grid.width,doc.grid.height,doc.terrain,doc.landscape]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
   function zoom(factor: number, anchor = { x: size.width / 2, y: size.height / 2 }) {
@@ -109,7 +115,7 @@ export function SettlementCanvas() {
     if (tool === 'erase' || tool in colors) { const tile = { x: Math.floor((p.x - view.x) / view.scale / cell), y: Math.floor((p.y - view.y) / view.scale / cell) }; edit(d => tool === 'erase' ? eraseCell(d, tile) : paintTerrain(d, tile, tool as TerrainKind)); }
     else { const existing = doc.buildings.find(b => b.x === target.x && b.y === target.y); if (existing) { select(existing.id); setNotice('Building origin occupied · choose Select to edit or place nearby.'); return; } const id = crypto.randomUUID(); edit(d => placeBuilding(d, target, tool as BuildingKind, id)); select(id); }
   }
-  return <div className={`canvas-host ${tool === 'pan' ? 'panning' : ''}`} ref={host}>
+  return <div data-visual-style={style} data-detail={reduced?'reduced':'full'} className={`canvas-host ${tool === 'pan' ? 'panning' : ''}`} ref={host}>
     <div className="canvas-label"><span className="live-dot"/> WORLD VIEW <span> / </span> {doc.grid.width} × {doc.grid.height} TILES</div>
     <Stage ref={stage} {...size} x={view.x} y={view.y} scaleX={view.scale} scaleY={view.scale}
       onWheel={e => { e.evt.preventDefault(); zoom(e.evt.deltaY < 0 ? 1.12 : 1 / 1.12, stage.current!.getPointerPosition()!); }}
@@ -144,22 +150,22 @@ export function SettlementCanvas() {
       onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); pinch.current = null; } }}
       onTouchMove={e => { const t = e.evt.touches; if (t.length !== 2) return; e.evt.preventDefault(); const rect = host.current!.getBoundingClientRect(); const point = { x: (t[0].clientX + t[1].clientX) / 2 - rect.left, y: (t[0].clientY + t[1].clientY) / 2 - rect.top }; const distance = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); if (pinch.current) { const old = pinch.current; setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * distance / old.distance)); return { scale, x: point.x - (old.x - v.x) * scale / v.scale, y: point.y - (old.y - v.y) * scale / v.scale }; }); } pinch.current = { ...point, distance }; }}
       onTouchEnd={() => { pinch.current = null; }}>
-      <Layer><Rect width={width} height={height} fill="#344536" stroke="#728062" strokeWidth={2}/>
-        <Group listening={false} scaleX={cell} scaleY={cell}>{terrainPaths.map((t,i)=><Path key={i} data={t.data} fill={t.fill} stroke={t.stroke} strokeWidth={t.width} opacity={t.opacity}/>)}</Group>
-        {doc.grid.visible&&<Group listening={false}>{gridLines.map(l=><Line key={l.id} points={l.points} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
-        <Group listening={false} scaleX={cell} scaleY={cell}>{districtShapes.map(g=><Group key={g.district.id}><Path data={g.fill} fill={/^#[0-9a-f]{6}$/i.test(g.district.color)?g.district.color:'#8eaaa1'} opacity={districtView.opacity}/><Path data={g.boundary} stroke={g.district.id===district.selectedId?'#fff0b5':g.district.color} strokeWidth={(g.district.id===district.selectedId?2.5:1.3)/view.scale/cell} dash={g.district.locked?[.3,.2]:undefined}/>{districtView.names&&<Text x={g.label.x-4} y={g.label.y-.5} width={8} align="center" fontSize={.7} text={`${g.district.locked?'◆ ':''}${g.district.name}`} fill="#fff2c9" stroke="#26372b" strokeWidth={.05} fillAfterStrokeEnabled/>}</Group>)}</Group>
-        <Group>{roads.map(r => <Group key={r.id}>{infrastructureStrokes(r.road,r).map((stroke,n)=><Path key={n} roadId={r.id} data={stroke.data} scaleX={cell} scaleY={cell} stroke={conflictIds.has(`infrastructure:${r.id}`)&&n===0?'#ed7c66':infra.roadId===r.id&&n===0?'#ffe2a0':stroke.color} strokeWidth={stroke.width} dash={stroke.dash} hitStrokeWidth={Math.max(stroke.width,24/view.scale/cell)} listening={infrastructureActive&&infra.mode!=='draw'} lineCap="round" lineJoin="round"/>)}</Group>)}</Group>
+      <Layer name="world-presentation"><Rect width={width} height={height} fill={styleBackground(style)} stroke="#728062" strokeWidth={2}/>
+        <TerrainVisual paths={terrainPaths} cell={cell} width={doc.grid.width} height={doc.grid.height} cachePixels={terrainCachePixels(cell*view.scale)}/>
+        {doc.grid.visible&&<Group name="grid" listening={false}>{gridLines.map(l=><Line key={l.id} points={l.points} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
+        <Group name="districts" listening={false} scaleX={cell} scaleY={cell}>{districtShapes.map(g=><Group key={g.district.id}><Path data={g.fill} fill={/^#[0-9a-f]{6}$/i.test(g.district.color)?g.district.color:'#8eaaa1'} opacity={districtView.opacity}/><Path data={g.boundary} stroke={g.district.id===district.selectedId?'#fff0b5':g.district.color} strokeWidth={(g.district.id===district.selectedId?2.5:1.3)/view.scale/cell} dash={g.district.locked?[.3,.2]:undefined}/>{districtView.names&&<Text x={g.label.x-4} y={g.label.y-.5} width={8} align="center" fontSize={.7} text={`${g.district.locked?'◆ ':''}${g.district.name}`} fill="#fff2c9" stroke="#26372b" strokeWidth={.05} fillAfterStrokeEnabled/>}</Group>)}</Group>
+        {(['roads','infrastructure'] as const).map(layer=><Group name={layer} key={layer}>{roads.filter(r=>(isDefense(r.road)||isBridge(r.road)?'infrastructure':'roads')===layer).map(r => <InfrastructureVisual key={r.id} road={r.road} geometry={r} style={style} reduced={reduced} cell={cell} hitWidth={24/view.scale/cell} interactive={infrastructureActive&&infra.mode!=='draw'} conflict={conflictIds.has(`infrastructure:${r.id}`)} active={infra.roadId===r.id}/>)}</Group>)}
         {doc.buildings.filter(b => doc.layers.find(l => l.id === b.layerId)?.visible).map(original => {
           const b = preview?.id === original.id ? { ...original, ...preview } : original;
-          const f = footprint(b), w = b.width * cell, h = b.height * cell;
-          const warn = buildingWarnings(doc, b).length > 0, active = selectedId === b.id;
+          const f = footprint(b);
+          const warn = b===original?buildingWarningIds.has(b.id):buildingWarnings(doc,b).length>0, active = selectedId === b.id;
           return <Group key={b.id} name="building" buildingId={b.id} x={b.x * cell} y={b.y * cell}>
-            <Rect width={f.width * cell} height={f.height * cell} fill={b.locked ? '#625f4d' : '#997343'} stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn ? '#ef927b' : active ? '#ffe2a0' : highlighted.has(b.id)?'#9ee5d5':'#292d24'} strokeWidth={active||highlighted.has(b.id) ? 4 : 2}/>
-            <Group listening={false} x={f.width * cell / 2} y={f.height * cell / 2} rotation={b.rotation}><Path data={symbolPaths[buildingDefinition(b.kind).symbol]} x={-w / 2 + 4} y={-h / 2 + 4} scaleX={(w - 8) / 64} scaleY={(h - 8) / 64} stroke="#efd19a" strokeWidth={2} fill="#725535"/></Group>
-            <Rect listening={false} x={(entrance(b).x-b.x)*cell} y={(entrance(b).y-b.y)*cell-4} width={cell*.6} height={5} fill="#f7dda5"/>
-            {b.locked && <Rect listening={false} x={3} y={3} width={8} height={8} fill="#c8d4de"/>}
+            <BuildingVisual building={b} style={style} reduced={reduced} cell={cell}/>
+            <Rect width={f.width*cell} height={f.height*cell} fill="rgba(0,0,0,0.001)" stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn?'#ef927b':active?'#ffe2a0':highlighted.has(b.id)?'#9ee5d5':undefined} strokeWidth={active||highlighted.has(b.id)?4:2}/>
+
           </Group>;
         })}
+        <Group name="labels" listening={false}><Group name="decorations"/>{visual.labels&&doc.buildings.filter(b=>doc.layers.some(l=>l.id===b.layerId&&l.visible)).map(b=>{const f=footprint(b);return <Text key={b.id} x={(b.x+f.width/2-4)*cell} y={(b.y+f.height+.2)*cell} width={8*cell} align="center" fontSize={cell*.65} text={b.name} fill="#f6ead0" stroke="#152019" strokeWidth={cell*.08} fillAfterStrokeEnabled/>;})}</Group>
         {!developmentActive&&(infrastructureActive||infra.preview)&&<Group>
           {[infra.preview,roadPreview,infra.draft.length?{id:'draft',layerId:doc.layers[0].id,points:infra.draft,surface:infra.surface,width:infra.width,style:infra.smooth?'organic':'planned',editVersion:1} as Road:null].filter((r):r is Road=>!!r).map(r=>{const g=roadGeometry(doc,r);return <Path key={r.id} listening={false} data={g.data} scaleX={cell} scaleY={cell} stroke="#ffe2a0" strokeWidth={g.width} opacity={.8} dash={[.3,.2]}/>;})}
           {infrastructureActive&&infra.mode==='select'&&selectedRoad?.points.map((p,n,points)=>{
@@ -170,14 +176,14 @@ export function SettlementCanvas() {
           })}
         </Group>}
       </Layer>
-      <Layer listening={tool==='districts'}>
+      <Layer name="district-interactions" listening={tool==='districts'}>
         <Group scaleX={cell} scaleY={cell}>
           {districtPendingGeometry&&<Group listening={false}><Path data={districtPendingGeometry.fill} fill={district.pending!.color} opacity={.28}/><Path data={districtPendingGeometry.boundary} stroke="#fff0b5" strokeWidth={2/view.scale/cell}/>{[...districtConflicts].map(k=>{const [x,y]=k.split(',').map(Number);return <Rect key={k} x={x} y={y} width={1} height={1} fill="#f26d5b" opacity={.6}/>;})}</Group>}
           {!!districtPatch.length&&<Path listening={false} data={districtPatch.map(p=>`M${p.x} ${p.y}h1v1h-1Z`).join('')} fill={district.mode==='erase'?'#f28c79':'#ecd695'} opacity={.5}/>}
           {!!districtBoundary.length&&(tool==='districts'||district.camera)&&<Group><Line listening={false} points={districtBoundary.flatMap(p=>[p.x,p.y])} closed={districtBoundary.length>=3} stroke="#ffe2a0" fill="#c3b16a" opacity={.6} strokeWidth={2/view.scale/cell}/>{districtBoundary.map((p,i)=><Circle key={i} districtPointIndex={i} x={p.x} y={p.y} radius={7/view.scale/cell} hitStrokeWidth={30/view.scale/cell} fill={district.corner===i?'#a7ead5':'#ffe2a0'} stroke="#253a2d" strokeWidth={2/view.scale/cell}/>)}</Group>}
         </Group>
       </Layer>
-      <Layer listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview}/><ExpansionOverlay doc={doc} proposal={expansion.preview}/></Layer>
+      <Layer name="proposal-interactions" listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview}/><ExpansionOverlay doc={doc} proposal={expansion.preview} style={style} reduced={reduced} cachePixels={terrainCachePixels(cell*view.scale)}/></Layer>
       <Layer listening={false}>
         <Group listening={false} scaleX={cell} scaleY={cell}>{patchPaths.map(p=><Path key={p.color} data={p.data} fill={p.color} opacity={.58}/>)}
           {tool==='terrain-editor'&&brushPoint&&(terrainEditor.settings.shape==='circle'?<Circle x={brushPoint.x} y={brushPoint.y} radius={terrainEditor.settings.size/2} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>:<Rect x={brushPoint.x-terrainEditor.settings.size/2} y={brushPoint.y-terrainEditor.settings.size/2} width={terrainEditor.settings.size} height={terrainEditor.settings.size} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>)}

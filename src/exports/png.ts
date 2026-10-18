@@ -1,13 +1,15 @@
+import {isBridge,isDefense} from '../model/infrastructure';
 import { defaultDistrictView } from '../model/districts';
 import { districtGeometry, visibleDistricts } from '../rendering/districtGeometry';
-import { terrainGeometry } from '../rendering/terrainGeometry';
+import { terrainScene } from '../rendering/scene';
+import { buildingPresentation, reducedDetail, styleBackground, type VisualStyle } from '../rendering/styles';
 import { infrastructureStrokes } from '../rendering/infrastructureGeometry';
 import type { SettlementDocument } from '../model/document';
 import { footprint } from '../model/buildings';
 import { buildingDefinition } from '../model/catalogue';
 import { symbolPaths } from '../rendering/symbols';
 import { roadContext, roadGeometry } from '../rendering/roadGeometry';
-export interface ImageOptions { resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
+export interface ImageOptions { style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
 export function imageDimensions(doc: SettlementDocument, resolution: number) {
   if (!Number.isInteger(resolution) || resolution < 256 || resolution > 4096) throw new Error('Choose a PNG resolution from 256 to 4096 pixels.');
   const scale=resolution/Math.max(doc.grid.width,doc.grid.height),width=Math.round(doc.grid.width*scale),height=Math.round(doc.grid.height*scale);
@@ -17,21 +19,23 @@ export function imageDimensions(doc: SettlementDocument, resolution: number) {
 const escapeText=(s:string)=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]!));
 /** Complete world-space scene shared by all viewport-independent PNG sizes. No remote assets. */
 export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
-  const size=imageDimensions(doc,options.resolution);
-  const terrain=terrainGeometry(doc,{contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail}).map(t=>`<path data-terrain="true" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
+  const size=imageDimensions(doc,options.resolution),style=options.style??'planning';
+  if(!['planning','illustrated'].includes(style))throw new Error('Choose Planning or Illustrated PNG style.');
+  const reduced=options.reduced??reducedDetail(style,options.resolution/Math.max(doc.grid.width,doc.grid.height));
+  const terrain=terrainScene(doc,{style,reduced,contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail}).map(t=>`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
   const visible=(id:string)=>doc.layers.find(l=>l.id===id)?.visible;
-  const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}">${infrastructureStrokes(r,g).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
+  const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).sort((a,b)=>Number(isBridge(a)||isDefense(a))-Number(isBridge(b)||isDefense(b))).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}" data-layer="${isBridge(r)||isDefense(r)?'infrastructure':'roads'}">${infrastructureStrokes(r,g,style,reduced).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
   const buildings=doc.buildings.filter(b=>visible(b.layerId)).map(b=>{
-    const f=footprint(b),w=b.width,h=b.height;
-    return `<g data-building="${escapeText(b.id)}"><rect x="${b.x}" y="${b.y}" width="${f.width}" height="${f.height}" fill="${b.locked?'#625f4d':'#997343'}" stroke="#292d24" stroke-width=".07"/><g transform="translate(${b.x+f.width/2} ${b.y+f.height/2}) rotate(${b.rotation}) translate(${-w/2+.125} ${-h/2+.125}) scale(${(w-.25)/64} ${(h-.25)/64})"><path d="${symbolPaths[buildingDefinition(b.kind).symbol]}" fill="#725535" stroke="#efd19a" stroke-width="2"/></g><rect x="${b.x+Math.floor(f.width/2)}" y="${b.y+f.height-.125}" width=".6" height=".16" fill="#f7dda5"/>${b.locked?`<rect x="${b.x+.1}" y="${b.y+.1}" width=".25" height=".25" fill="#c8d4de"/>`:''}</g>`;
+    const f=footprint(b),w=b.width,h=b.height,a=buildingPresentation(b,style,reduced);
+    return `<g data-building="${escapeText(b.id)}" data-category="${a.category}">${a.shadow?`<rect x="${b.x+.12}" y="${b.y+.16}" width="${f.width}" height="${f.height}" fill="${a.shadowColor}" opacity=".35"/>`:``}<rect x="${b.x}" y="${b.y}" width="${f.width}" height="${f.height}" fill="${a.base}" stroke="${a.outline}" stroke-width=".055"/><rect x="${b.x+.06}" y="${b.y+.06}" width="${Math.max(.1,f.width-.12)}" height=".14" fill="${a.accent}"/><g transform="translate(${b.x+f.width/2} ${b.y+f.height/2}) rotate(${b.rotation}) translate(${-w/2+.125} ${-h/2+.125}) scale(${(w-.25)/64} ${(h-.25)/64})"><path d="${symbolPaths[buildingDefinition(b.kind).symbol]}" fill="${a.roof}" stroke="${a.ink}" stroke-width="${style==='planning'?2.8:2}"/></g><rect x="${b.x+Math.floor(f.width/2)}" y="${b.y+f.height-.125}" width=".6" height=".16" fill="${a.entrance}"/>${b.locked?`<rect x="${b.x+.1}" y="${b.y+.1}" width=".3" height=".3" fill="${a.lock}" stroke="#203d3a" stroke-width=".04"/>`:''}</g>`;
   }).join('');
   const dv=doc.districtView??defaultDistrictView;
   const districtShapes=visibleDistricts(doc,options.districts===true||options.districtNames===true).map(d=>({district:d,...districtGeometry(doc,d)}));
   const districts=(options.districts??dv.visible)?districtShapes.map(g=>{const color=/^#[0-9a-f]{6}$/i.test(g.district.color)?g.district.color:'#8eaaa1';return `<g data-district="${escapeText(g.district.id)}"><path d="${g.fill}" fill="${color}" opacity="${dv.opacity}"/><path d="${g.boundary}" fill="none" stroke="${color}" stroke-width=".1" ${g.district.locked?'stroke-dasharray=".3 .2"':''}/></g>`;}).join(''):'';
   const districtNames=(options.districtNames??(dv.names&&dv.visible))?districtShapes.map(g=>`<text data-district-label="true" x="${g.label.x}" y="${g.label.y}" text-anchor="middle" font-family="sans-serif" font-size=".7" fill="#fff2c9" stroke="#26372b" stroke-width=".1" paint-order="stroke">${escapeText(g.district.name)}</text>`).join(''):'';
   const labels=options.labels?doc.buildings.filter(b=>visible(b.layerId)).map(b=>{const f=footprint(b);return `<text data-label="true" x="${b.x+f.width/2}" y="${b.y+f.height+.85}" text-anchor="middle" font-family="sans-serif" font-size=".65" fill="#f6ead0" stroke="#152019" stroke-width=".12" paint-order="stroke">${escapeText(b.name)}</text>`;}).join(''):'';
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${doc.grid.width} ${doc.grid.height}"><title>${escapeText(doc.name)}</title><rect width="${doc.grid.width}" height="${doc.grid.height}" fill="#344536"/>${terrain}${grid}${districts}${districtNames}${roads}${buildings}${labels}</svg>`;
+  return `<svg data-visual-style="${style}" xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${doc.grid.width} ${doc.grid.height}"><title>${escapeText(doc.name)}</title><rect width="${doc.grid.width}" height="${doc.grid.height}" fill="${styleBackground(style)}"/>${terrain}${grid}${districts}${districtNames}${roads}${buildings}<g data-layer="decorations"/>${labels}</svg>`;
 }
 export async function renderPng(doc: SettlementDocument, options: ImageOptions): Promise<Blob> {
   const {width,height}=imageDimensions(doc,options.resolution);
