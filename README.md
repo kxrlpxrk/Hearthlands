@@ -137,3 +137,7 @@ Open **Districts** for deterministic detection previews, polygon/cell editing, m
 ### Selective district development (Phase 5A)
 
 Select a district and choose **Develop district** for fill-only growth, explicitly selected replacements or proposed access connections. Every proposal is previewed separately; acceptance creates a restore point and one undo command. Existing objects are protected regardless of IDs/provenance. See [development rules, limitations and physical-iPhone acceptance](docs/phase5a-development.md).
+
+### Mobile layout and loaded release (Phase 5A.1)
+
+Editing actions move inside the open mobile sheet; passive district selection has no floating toolbar. The selected district heading and **Develop district** stay together. Check the footer build marker when troubleshooting old Safari tabs. See [screenshots, release checks and iPhone verification](docs/phase5a1-mobile.md). Deployment also runs `npm run verify:release` to check the actual production bundle and commit marker.

@@ -1,0 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { basename, join } from 'node:path';
+const read=file=>readFileSync(join('dist',file),'utf8');
+const release=JSON.parse(read('release.json')),html=read('index.html');
+const script=html.match(/<script[^>]+src="([^"]+\.js)"/);
+if(!script)throw new Error('Production entry script is missing.');
+const bundle=read(join('assets',basename(script[1])));
+if(release.release!=='5A.1'||!release.commit||!html.includes(`5A.1 ${release.commit}`))throw new Error('HTML and release metadata disagree.');
+if(process.env.GITHUB_SHA&&release.commit!==process.env.GITHUB_SHA.slice(0,7))throw new Error('Release marker does not match this deployment commit.');
+for(const text of ['Develop district','Development mode','5A.1'])if(!bundle.includes(text))throw new Error(`Production bundle is missing ${text}.`);
+console.log(`Verified Hearthlands ${release.release} (${release.commit}): matching HTML, release metadata and Phase 5A controls in ${basename(script[1])}.`);

@@ -13,7 +13,7 @@ export function InfrastructureActions(){
   const run=(action:()=>void)=>{try{action();setError('');}catch(e){setError(String(e instanceof Error?e.message:e));}};
   return <div className="infrastructure-actions">
     <strong>{s.tool==='pan'?'Camera':`Infrastructure · ${i.mode.replace('-',' ')}`}</strong>
-    {i.draft.length>0&&<><span>{i.draft.length} points</span><button onClick={()=>run(()=>{s.edit(d=>putInfrastructure(d,draftRoad()));s.setInfrastructure({draft:[]});})}>Finish path</button><button onClick={()=>s.setInfrastructure({draft:i.draft.slice(0,-1)})}>Back a point</button><button onClick={()=>s.setInfrastructure({draft:[]})}>Cancel path</button></>}
+    {i.draft.length>0&&<><span>{i.draft.length} points</span><button onClick={()=>run(()=>{s.edit(d=>putInfrastructure(d,draftRoad()));s.setInfrastructure({draft:[]});})}>Finish path</button><button onClick={()=>s.setInfrastructure({draft:i.draft.slice(0,-1)})}>Back a point</button><button className="action-cancel" onClick={()=>s.setInfrastructure({draft:[]})}>Cancel path</button></>}
     {selected&&i.point!==null&&<><span>Point {i.point+1}</span><button disabled={selected.locked||selected.points.length<=2||isBridge(selected)} onClick={()=>run(()=>{s.edit(d=>putInfrastructure(d,{...selected,editVersion:1,points:selected.points.filter((_,n)=>n!==i.point)}));s.setInfrastructure({point:null});})}>Delete point</button></>}
     <button onClick={()=>{const camera=s.tool!=='pan';s.setTool(camera?'pan':'infrastructure');s.setInfrastructure({camera});}}>{s.tool==='pan'?'Resume infrastructure':'Pan camera'}</button>
     {error&&<p role="alert">{error}</p>}

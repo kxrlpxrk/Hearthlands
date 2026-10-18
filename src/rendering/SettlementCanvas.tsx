@@ -1,3 +1,4 @@
+import { ActionDock, ActionSlot } from '../ui/ActionDock';
 import { DevelopmentActions } from '../ui/DevelopmentPanel';
 import { DevelopmentOverlay } from './DevelopmentOverlay';
 import { DistrictActions } from '../ui/DistrictPanel';
@@ -180,11 +181,12 @@ export function SettlementCanvas() {
         </Group>
       </Layer>
     </Stage>
-    <DevelopmentActions/>
+    <ActionSlot place="map"/><ActionDock><DevelopmentActions/>
     {!developmentActive&&(tool==='districts'||district.pending||district.detection||tool==='pan'&&district.camera)&&<DistrictActions/>}
-    {(warnings.length > 0 || notice) && <div role="alert" className="canvas-warning">{notice || warnings.join(' · ')}</div>}
+
     {!developmentActive&&(infrastructureActive||(infra.camera||infra.roadId||infra.draft.length>0)&&tool==='pan')&&<InfrastructureActions/>}
-    {!developmentActive&&(tool==='terrain-editor'||terrainEditor.pending||tool==='pan'&&terrainEditor.camera)&&<TerrainActions painting={terrainPatch.length>0}/>}
+    {!developmentActive&&(tool==='terrain-editor'||terrainEditor.pending||tool==='pan'&&terrainEditor.camera)&&<TerrainActions painting={terrainPatch.length>0}/>}</ActionDock>
+    {(warnings.length > 0 || notice) && <div role="alert" className="canvas-warning">{notice || warnings.join(' · ')}</div>}
     <div className="canvas-hint">{tool==='districts'?'District editing · one finger edits · two fingers explore':null}{tool==='terrain-editor'?`One finger paints · Two fingers explore · ${elevationReadout.toFixed(1)} m`:null}{tool==='infrastructure'?'Tap or trace · Finish path · Two fingers pan/zoom · Roads panel to edit':null}{tool==='districts'||tool==='infrastructure'||tool==='terrain-editor'?null:tool === 'pan' ? 'Drag to explore · Scroll or pinch to zoom' : tool === 'select' ? 'Tap to select · Drag to move · Properties to edit' : 'Tap to place · Select to edit · Pan to explore'}</div>
     <div className="zoom-controls"><button aria-label="Zoom out" onClick={() => zoom(1 / 1.25)}>−</button><span>{Math.round(view.scale * 100)}%</span><button aria-label="Zoom in" onClick={() => zoom(1.25)}>+</button><button onClick={fit}>Fit</button></div>
   </div>;
