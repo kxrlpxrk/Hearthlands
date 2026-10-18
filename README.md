@@ -145,3 +145,5 @@ Editing actions move inside the open mobile sheet; passive district selection ha
 Phase 5B adds protected, preview-first settlement growth and optional east/south map enlargement. See [expansion controls, limits, screenshots and physical-iPhone verification](docs/phase5b-expansion.md).
 
 Phase 6A adds Planning / Illustrated styles, shared visual layers, zoom-aware terrain rendering and style-selectable PNG exports without editing settlement documents. See [visual architecture, screenshots, performance and iPhone checks](docs/phase6a-visual-engine.md).
+
+Phase 6B adds a versioned building asset registry, themed automatic variations, manual appearance thumbnails and matching Illustrated exports. See [starter artwork, manifest architecture, validation and physical-iPhone steps](docs/phase6b-building-assets.md).

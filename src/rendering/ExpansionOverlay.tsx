@@ -1,3 +1,4 @@
+import {BuildingVisual} from './BuildingVisual';
 import {TerrainVisual} from './TerrainVisual';
 import { useMemo } from 'react';
 import { Group, Path, Rect } from 'react-konva';
@@ -13,5 +14,5 @@ export function ExpansionOverlay({doc,proposal:p,style='planning',reduced=false,
  if(!p||!geometry)return null;
  return <Group listening={false} scaleX={doc.grid.cellSize} scaleY={doc.grid.cellSize}>
  {!!geometry.terrain.length&&<Group clipFunc={context=>{context.rect(doc.grid.width,0,p.document.grid.width-doc.grid.width,p.document.grid.height);context.rect(0,doc.grid.height,doc.grid.width,p.document.grid.height-doc.grid.height);}}><TerrainVisual paths={geometry.terrain} cell={1} width={p.document.grid.width} height={p.document.grid.height} cachePixels={cachePixels}/></Group>}
- <Rect width={p.document.grid.width} height={p.document.grid.height} stroke="#d5a6f6" strokeWidth={.25} dash={[1,.6]}/>{geometry.districts.map((g,i)=><Group key={i}><Path data={g.fill} fill="#59d0d8" opacity={.15}/><Path data={g.boundary} stroke="#7ce6ed" strokeWidth={.15}/></Group>)}{geometry.roads.map((g,i)=><Path key={i} data={g.data} stroke="#ffdf70" strokeWidth={g.width} lineCap="round"/>)}{p.buildings.map(b=>{const f=footprint(b);return <Rect key={b.id} x={b.x} y={b.y} width={f.width} height={f.height} fill="#459c75" stroke="#b7ffd6" strokeWidth={.13}/>;})}</Group>;
+ <Rect width={p.document.grid.width} height={p.document.grid.height} stroke="#d5a6f6" strokeWidth={.25} dash={[1,.6]}/>{geometry.districts.map((g,i)=><Group key={i}><Path data={g.fill} fill="#59d0d8" opacity={.15}/><Path data={g.boundary} stroke="#7ce6ed" strokeWidth={.15}/></Group>)}{geometry.roads.map((g,i)=><Path key={i} data={g.data} stroke="#ffdf70" strokeWidth={g.width} lineCap="round"/>)}{p.buildings.map(b=>{const f=footprint(b);return <Group key={b.id} x={b.x} y={b.y}><BuildingVisual building={b} seed={doc.seed} architecture={doc.architecture} style={style} reduced={reduced} cell={1}/><Rect width={f.width} height={f.height} fill="rgba(69,156,117,.25)" stroke="#b7ffd6" strokeWidth={.13}/></Group>;})}</Group>;
 }

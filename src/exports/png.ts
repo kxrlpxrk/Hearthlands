@@ -1,3 +1,5 @@
+import {resolveBuildingAsset} from '../model/appearance';
+import {assetTransform,artworkSvg} from '../rendering/buildingArtwork';
 import {isBridge,isDefense} from '../model/infrastructure';
 import { defaultDistrictView } from '../model/districts';
 import { districtGeometry, visibleDistricts } from '../rendering/districtGeometry';
@@ -28,6 +30,10 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
   const buildings=doc.buildings.filter(b=>visible(b.layerId)).map(b=>{
     const f=footprint(b),w=b.width,h=b.height,a=buildingPresentation(b,style,reduced);
+    if(style==='illustrated'){
+      const asset=resolveBuildingAsset(doc,b),t=assetTransform(b,asset);
+      return `<g data-building="${escapeText(b.id)}" data-category="${a.category}" data-asset="${asset.id}">${a.shadow?`<g transform="translate(${b.x+f.width/2+.12} ${b.y+f.height/2+.16}) rotate(${b.rotation}) translate(${-w/2} ${-h/2}) translate(${t.x} ${t.y}) scale(${t.scaleX} ${t.scaleY})" opacity=".25">${artworkSvg(asset,true,a.shadowColor)}</g>`:''}<g transform="translate(${b.x+f.width/2} ${b.y+f.height/2}) rotate(${b.rotation}) translate(${-w/2} ${-h/2}) translate(${t.x} ${t.y}) scale(${t.scaleX} ${t.scaleY})">${artworkSvg(asset,reduced)}</g><rect x="${b.x+Math.floor(f.width/2)}" y="${b.y+f.height-.125}" width=".6" height=".16" fill="${a.entrance}"/>${b.locked?`<rect x="${b.x+.1}" y="${b.y+.1}" width=".3" height=".3" fill="${a.lock}" stroke="#203d3a" stroke-width=".04"/>`:''}</g>`;
+    }
     return `<g data-building="${escapeText(b.id)}" data-category="${a.category}">${a.shadow?`<rect x="${b.x+.12}" y="${b.y+.16}" width="${f.width}" height="${f.height}" fill="${a.shadowColor}" opacity=".35"/>`:``}<rect x="${b.x}" y="${b.y}" width="${f.width}" height="${f.height}" fill="${a.base}" stroke="${a.outline}" stroke-width=".055"/><rect x="${b.x+.06}" y="${b.y+.06}" width="${Math.max(.1,f.width-.12)}" height=".14" fill="${a.accent}"/><g transform="translate(${b.x+f.width/2} ${b.y+f.height/2}) rotate(${b.rotation}) translate(${-w/2+.125} ${-h/2+.125}) scale(${(w-.25)/64} ${(h-.25)/64})"><path d="${symbolPaths[buildingDefinition(b.kind).symbol]}" fill="${a.roof}" stroke="${a.ink}" stroke-width="${style==='planning'?2.8:2}"/></g><rect x="${b.x+Math.floor(f.width/2)}" y="${b.y+f.height-.125}" width=".6" height=".16" fill="${a.entrance}"/>${b.locked?`<rect x="${b.x+.1}" y="${b.y+.1}" width=".3" height=".3" fill="${a.lock}" stroke="#203d3a" stroke-width=".04"/>`:''}</g>`;
   }).join('');
   const dv=doc.districtView??defaultDistrictView;

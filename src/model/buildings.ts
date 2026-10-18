@@ -1,3 +1,4 @@
+import {releaseAppearancePin} from './appearance';
 import { footprintTerrainWarnings } from './terrain';
 import type { Building, SettlementDocument } from './document';
 export function footprint(b: Building) { return b.rotation % 180 === 0 ? { width: b.width, height: b.height } : { width: b.height, height: b.width }; }
@@ -17,7 +18,8 @@ export function updateBuilding(doc: SettlementDocument, id: string, patch: Parti
   const next = { ...b, ...patch };
   if (![next.x, next.y, next.width, next.height, next.rotation].every(Number.isFinite) || next.width < 1 || next.height < 1 || next.width > 192 || next.height > 192) return doc;
   next.rotation = ((Math.round(next.rotation / 90) * 90) % 360 + 360) % 360;
-  return { ...doc, buildings: doc.buildings.map(item => item.id === id ? next : item) };
+  const architecture=b.locked!==next.locked?releaseAppearancePin(doc,id):doc.architecture;
+  return { ...doc,...(architecture!==doc.architecture?{architecture}:{}), buildings: doc.buildings.map(item => item.id === id ? next : item) };
 }
 export function deleteBuilding(doc: SettlementDocument, id: string): SettlementDocument {
   if (doc.buildings.find(b => b.id === id)?.locked) return doc;

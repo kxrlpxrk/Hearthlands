@@ -7,6 +7,7 @@ export function generateTerrain(s: GenerationSettings): SettlementDocument {
   const phase = seededRandom(s.seed)() * Math.PI * 2;
   const doc = createDocument();
   doc.name = s.preset === 'viking' ? 'Ravenfjord' : 'Willowmere'; doc.seed = s.seed;
+  doc.architecture={version:1,theme:s.environment==='coastal'?'coastal':s.preset==='medieval'?'rural':'viking'};
   doc.grid = { ...doc.grid, width: s.width, height: s.height };
   for (let y = 0; y < s.height; y++) for (let x = 0; x < s.width; x++) {
     const bend = Math.sin(y / s.height * 6 + phase) * s.width * .045 + Math.sin(y / 13 + phase) * 1.8;
