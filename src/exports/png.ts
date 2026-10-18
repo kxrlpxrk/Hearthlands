@@ -1,3 +1,4 @@
+import {prepareBundledImages} from '../rendering/bundledImages';
 import {resolveBuildingAsset} from '../model/appearance';
 import {assetTransform,artworkSvg} from '../rendering/buildingArtwork';
 import {isBridge,isDefense} from '../model/infrastructure';
@@ -45,6 +46,7 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
 }
 export async function renderPng(doc: SettlementDocument, options: ImageOptions): Promise<Blob> {
   const {width,height}=imageDimensions(doc,options.resolution);
+  if(options.style==='illustrated')await prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b)));
   const url=URL.createObjectURL(new Blob([mapSvg(doc,options)],{type:'image/svg+xml;charset=utf-8'}));
   const canvas=document.createElement('canvas');
   try {
