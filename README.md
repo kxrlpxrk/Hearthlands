@@ -129,3 +129,7 @@ The focused infrastructure suite covers point edits, connections, bridge banks/w
 Open **Terrain** from the toolbar or phone navigation for Sculpt, Water, Ground and Nature tools. Elevation, ground, vegetation and water are independent document layers. Strokes support circular/square brushes, adjustable size/strength, sampled elevation, undo/redo, cancel and two-finger camera gestures. Unsafe changes pause for a named structure preview; apply only unaffected cells or cancel. Existing structures are never relocated or deleted by terrain tools.
 
 Document v3 lazily migrates older projects and snapshots without rewriting legacy terrain meanings. Generation, navigation, building warnings, bridge/road validation and exports use shared terrain queries. Canvas and PNG share deterministic terrain geometry, contours, shading, cliffs and optional detail. See [landscape rules, exact iPhone steps, tests and benchmarks](docs/phase4b-terrain.md).
+
+### District designer (Phase 4C)
+
+Open **Districts** for deterministic detection previews, polygon/cell editing, membership statistics and overlays. Confirm/cancel changes explicitly; locked and hidden areas retain their cells. Districts remain compatible with v1/v2/v3 project files, autosave, restore points and JSON. PNG exports have independent district overlay/name options. See [district controls, data rules and iPhone verification](docs/phase4c-districts.md).

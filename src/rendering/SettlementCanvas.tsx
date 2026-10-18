@@ -1,3 +1,6 @@
+import { DistrictActions } from '../ui/DistrictPanel';
+import { defaultDistrictView, insertBoundaryPoint, districtCells, districtMembership, DistrictStroke, districtTypes, key as districtKey, overlapCells, type District } from '../model/districts';
+import { districtGeometry, visibleDistricts } from './districtGeometry';
 import { TerrainActions } from '../ui/TerrainPanel';
 import { terrainGeometry, previewTerrainColor } from './terrainGeometry';
 import { TerrainStroke, commitTerrain, terrainProtection } from '../model/terrainStroke';
@@ -9,7 +12,7 @@ import type { Cell, Road } from '../model/document';
 import { roadContext, roadGeometry } from './roadGeometry';
 import { entrance } from '../generator/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Rect, Line, Group, Path, Circle } from 'react-konva';
+import { Stage, Layer, Rect, Line, Group, Path, Circle, Text } from 'react-konva';
 import type Konva from 'konva';
 import { useStudio } from '../ui/store';
 import { eraseCell, paintTerrain, placeBuilding } from '../model/operations';
@@ -19,7 +22,7 @@ import { buildingWarnings, footprint, snapPosition, updateBuilding } from '../mo
 import { symbolPaths } from './symbols';
 const colors = { grass: '#536447', water: '#355d69', forest: '#294c3e', stone: '#737775' };
 type View = { x: number; y: number; scale: number };
-type Gesture = { start: { x: number; y: number }; view: View; id?: string; x?: number; y?: number; moved: boolean; roadId?:string; pointIndex?:number; trace?:Cell[] };
+type Gesture = { start: { x: number; y: number }; view: View; id?: string; x?: number; y?: number; moved: boolean; roadId?:string; pointIndex?:number; trace?:Cell[]; districtPointIndex?:number };
 export function SettlementCanvas() {
   const host = useRef<HTMLDivElement>(null), stage = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
@@ -31,16 +34,24 @@ export function SettlementCanvas() {
   const suppress = useRef(false);
   const terrainStroke=useRef<TerrainStroke|null>(null),frame=useRef(0);
   const [terrainPatch,setTerrainPatch]=useState<LandscapeCell[]>([]),[brushPoint,setBrushPoint]=useState<Cell|null>(null);
+  const districtStroke=useRef<DistrictStroke|null>(null);
+  const [districtPatch,setDistrictPatch]=useState<Cell[]>([]),[districtCorner,setDistrictCorner]=useState<{index:number;point:Cell}|null>(null);
   const [elevationReadout,setElevationReadout]=useState(0);
-  const { present: doc, tool, edit, selectedId, select, infrastructure:infra, setInfrastructure, terrainEditor:terrainEditor, setTerrainEditor } = useStudio();
+  const { present: doc, tool, edit, selectedId, select, infrastructure:infra, setInfrastructure, terrainEditor:terrainEditor, setTerrainEditor, districtEditor:district, setDistrictEditor } = useStudio();
   useEffect(() => { const observer = new ResizeObserver(([entry]) => setSize({ width: entry.contentRect.width, height: entry.contentRect.height })); observer.observe(host.current!); return () => observer.disconnect(); }, []);
-  useEffect(() => { setPreview(null); setRoadPreview(null); gesture.current = null; terrainStroke.current=null;setTerrainPatch([]);cancelAnimationFrame(frame.current);frame.current=0; }, [tool, doc]);
-  useEffect(()=>{const cancel=()=>{terrainStroke.current=null;gesture.current=null;setTerrainPatch([]);cancelAnimationFrame(frame.current);frame.current=0;};const multiTouch=(e:TouchEvent)=>{if(e.touches.length>1){suppress.current=true;cancel();}};document.addEventListener('touchstart',multiTouch,{passive:true});window.addEventListener('hearthlands-cancel-stroke',cancel);return()=>{cancel();window.removeEventListener('hearthlands-cancel-stroke',cancel);document.removeEventListener('touchstart',multiTouch);};},[]);
+  useEffect(() => { setDistrictPatch([]);setDistrictCorner(null);districtStroke.current=null;setPreview(null); setRoadPreview(null); gesture.current = null; terrainStroke.current=null;setTerrainPatch([]);cancelAnimationFrame(frame.current);frame.current=0; }, [tool, doc]);
+  useEffect(()=>{const cancel=()=>{districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);terrainStroke.current=null;gesture.current=null;setTerrainPatch([]);cancelAnimationFrame(frame.current);frame.current=0;};const multiTouch=(e:TouchEvent)=>{if(e.touches.length>1){suppress.current=true;cancel();}};document.addEventListener('touchstart',multiTouch,{passive:true});window.addEventListener('hearthlands-cancel-stroke',cancel);return()=>{cancel();window.removeEventListener('hearthlands-cancel-stroke',cancel);document.removeEventListener('touchstart',multiTouch);};},[]);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const gridLines=useMemo(()=>[...Array.from({length:doc.grid.width+1},(_,i)=>({id:`x${i}`,points:[i*cell,0,i*cell,height]})),...Array.from({length:doc.grid.height+1},(_,i)=>({id:`y${i}`,points:[0,i*cell,width,i*cell]}))],[doc.grid.width,doc.grid.height,cell,width,height]);
   useMemo(()=>tool==='terrain-editor'?terrainProtection(doc):null,[tool,doc]);
   const terrainPaths=useMemo(()=>terrainGeometry(doc),[doc.terrain,doc.landscape,doc.grid.width,doc.grid.height,doc.seed,doc.planning]);
   const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ road:r, id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.landscape, doc.buildings]);
+  const districtView=doc.districtView??defaultDistrictView;
+  const districtShapes=useMemo(()=>{const districts=district.detection??visibleDistricts(doc);return districts.map(d=>({district:d,...districtGeometry(doc,d)}));},[doc.districts,doc.districtView,doc.layers,doc.grid.width,doc.grid.height,district.detection]);
+  const highlighted=useMemo(()=>new Set(district.highlight&&district.selectedId?districtMembership(doc).get(district.selectedId)?.map(b=>b.id):[]),[doc.buildings,doc.districts,district.highlight,district.selectedId]);
+  const districtBoundary=district.draft.map((p,i)=>districtCorner?.index===i?districtCorner.point:p);
+  const districtPendingGeometry=useMemo(()=>district.pending?districtGeometry(doc,district.pending):null,[district.pending,doc.grid.width,doc.grid.height]);
+  const districtConflicts=useMemo(()=>district.pending?overlapCells(doc,district.pending):new Set<string>(),[district.pending,doc.districts]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
   function zoom(factor: number, anchor = { x: size.width / 2, y: size.height / 2 }) {
@@ -79,6 +90,7 @@ export function SettlementCanvas() {
   function finish() {
     const g = gesture.current; gesture.current = null;
     if (!g || suppress.current) { setPreview(null);setRoadPreview(null); return; }
+    if(tool==='districts'){const p=stage.current!.getPointerPosition();if(!p)return;const q=terrainPoint(p);if(district.pending||district.detection)return;if(districtStroke.current){const stroke=districtStroke.current;districtStroke.current=null;setDistrictPatch([]);safeEdit(()=>{const old=doc.districts.find(d=>d.id===district.selectedId);if(old?.locked)throw new Error('Unlock this district before painting.');const d:District=old??{id:crypto.randomUUID(),name:`New ${districtTypes[district.type].name.split(' / ')[0]} district`,type:district.type,color:districtTypes[district.type].color,layerId:doc.layers[0].id,cells:[]};setDistrictEditor({pending:stroke.result(doc,d,district.mode==='erase')});});return;}if(g.districtPointIndex!==undefined){setDistrictEditor({...(districtCorner?{draft:districtBoundary}:{}),corner:g.districtPointIndex});setDistrictCorner(null);return;}if(district.mode==='polygon'||district.mode==='reshape'){if(!g.moved){const point={x:Math.max(0,Math.min(doc.grid.width,q.x)),y:Math.max(0,Math.min(doc.grid.height,q.y))};setDistrictEditor({corner:null,draft:district.mode==='reshape'&&doc.districts.find(d=>d.id===district.selectedId)?.boundary?insertBoundaryPoint(district.draft,point):[...district.draft,point]});}return;}if(district.mode==='select'){const hit=districtView.visible?doc.districts.find(d=>d.visible!==false&&doc.layers.some(l=>l.id===d.layerId&&l.visible)&&districtCells(d,doc).some(c=>districtKey(c)===districtKey(q))):undefined;setDistrictEditor({selectedId:hit?.id??null});}return;}
     if(tool==='terrain-editor'){const stroke=terrainStroke.current;cancelTerrain();if(stroke){const pending=stroke.preview();setTerrainEditor({readout:pending.conflicts.length?elevationReadout:stroke.patches.get(terrainKey(brushPoint??{x:-1,y:-1}))?.elevation??elevationReadout});if(pending.conflicts.length)setTerrainEditor({pending});else safeEdit(()=>edit(d=>commitTerrain(d,pending)));}return;}
     if(tool==='infrastructure'){const p=stage.current!.getPointerPosition();if(p)finishInfrastructure(g,p);return;}
     if (g.moved) { if (preview) edit(d => updateBuilding(d, preview.id, { x: preview.x, y: preview.y })); setPreview(null); return; }
@@ -96,18 +108,20 @@ export function SettlementCanvas() {
       onPointerDown={e => {
         if (!e.evt.isPrimary || e.evt.button > 0) return;
         suppress.current = false; setNotice('');
+        if(tool==='districts'){if(district.pending||district.detection)return;if((district.mode==='paint'||district.mode==='erase')&&!doc.districts.find(d=>d.id===district.selectedId)?.locked){districtStroke.current=new DistrictStroke(district.size);districtStroke.current.add(terrainPoint(stage.current!.getPointerPosition()!));setDistrictPatch([...districtStroke.current.cells.values()]);}}
         if(tool==='terrain-editor'){if(terrainEditor.pending)return;const p=terrainPoint(stage.current!.getPointerPosition()!);setBrushPoint(p);const sampled=terrainQuery(doc).at(p).elevation;setElevationReadout(sampled);setTerrainEditor({readout:sampled});terrainStroke.current=new TerrainStroke(doc,{...terrainEditor.settings});terrainStroke.current.add(p);setTerrainPatch([...terrainStroke.current.patches.values()]);}
         (e.evt.target as Element).setPointerCapture?.(e.evt.pointerId);
         const id = e.target.findAncestor('.building', true)?.getAttr('buildingId') as string | undefined;
         const b = doc.buildings.find(b => b.id === id);
         const roadId=(e.target as Konva.Node).getAttr('roadId') as string|undefined,pointIndex=(e.target as Konva.Node).getAttr('pointIndex') as number|undefined;
-        gesture.current = { start: stage.current!.getPointerPosition()!, view, id, x: b?.x, y: b?.y, moved: false,roadId,pointIndex,trace:tool==='infrastructure'&&infra.mode==='draw'?[worldPoint(stage.current!.getPointerPosition()!)]:undefined };
+        gesture.current = { start: stage.current!.getPointerPosition()!, view, id, x: b?.x, y: b?.y, moved: false,roadId,pointIndex,districtPointIndex:(e.target as Konva.Node).getAttr('districtPointIndex') as number|undefined,trace:tool==='infrastructure'&&infra.mode==='draw'?[worldPoint(stage.current!.getPointerPosition()!)]:undefined };
       }}
       onPointerMove={() => { const g = gesture.current, p = stage.current!.getPointerPosition();
         if(p&&tool==='terrain-editor'&&!suppress.current){const q=terrainPoint(p);setBrushPoint(q);setElevationReadout(terrainQuery(doc).at(q).elevation);if(terrainStroke.current){terrainStroke.current.add(q);if(!frame.current)frame.current=requestAnimationFrame(()=>{frame.current=0;if(terrainStroke.current)setTerrainPatch([...terrainStroke.current.patches.values()]);});}return;}
         if (!g || !p || suppress.current) return;
         const dx = p.x - g.start.x, dy = p.y - g.start.y;
         if (Math.hypot(dx, dy) < 6 && !g.moved) return; g.moved = true;
+        if(tool==='districts'){const q=terrainPoint(p);if(districtStroke.current){districtStroke.current.add(q);if(!frame.current)frame.current=requestAnimationFrame(()=>{frame.current=0;if(districtStroke.current)setDistrictPatch([...districtStroke.current.cells.values()]);});}else if(g.districtPointIndex!==undefined)setDistrictCorner({index:g.districtPointIndex,point:{x:Math.max(0,Math.min(doc.grid.width,q.x)),y:Math.max(0,Math.min(doc.grid.height,q.y))}});return;}
         if(tool==='infrastructure'){
           if(infra.mode==='draw'){const q=worldPoint(p);if(g.trace&&distance(q,g.trace[g.trace.length-1])>.65){g.trace.push(q);setRoadPreview({id:'trace',layerId:doc.layers[0].id,points:[...infra.draft,...g.trace],surface:infra.surface,width:infra.width,style:infra.smooth?'organic':'planned',editVersion:1});}}
           else if(g.pointIndex!==undefined){const r=doc.roads.find(r=>r.id===g.roadId);if(r&&!r.locked){const q=worldPoint(p,r.id);setRoadPreview({...r,editVersion:1,points:r.points.map((point,n)=>n===g.pointIndex?q:point)});}}
@@ -116,20 +130,21 @@ export function SettlementCanvas() {
         if (tool === 'pan') setView({ ...g.view, x: g.view.x + dx, y: g.view.y + dy });
         if (tool === 'select' && g.id) select(g.id);
         if (tool === 'select' && g.id && !doc.buildings.find(b => b.id === g.id)?.locked) setPreview({ id: g.id, x: snapPosition(g.x! + dx / g.view.scale / cell, doc.grid.snap), y: snapPosition(g.y! + dy / g.view.scale / cell, doc.grid.snap) });
-      }} onPointerUp={finish} onPointerCancel={() => { gesture.current = null; cancelTerrain(); setPreview(null); setRoadPreview(null); }}
-      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; cancelTerrain(); setPreview(null); setRoadPreview(null); pinch.current = null; } }}
+      }} onPointerUp={finish} onPointerCancel={() => { gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); }}
+      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); pinch.current = null; } }}
       onTouchMove={e => { const t = e.evt.touches; if (t.length !== 2) return; e.evt.preventDefault(); const rect = host.current!.getBoundingClientRect(); const point = { x: (t[0].clientX + t[1].clientX) / 2 - rect.left, y: (t[0].clientY + t[1].clientY) / 2 - rect.top }; const distance = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); if (pinch.current) { const old = pinch.current; setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * distance / old.distance)); return { scale, x: point.x - (old.x - v.x) * scale / v.scale, y: point.y - (old.y - v.y) * scale / v.scale }; }); } pinch.current = { ...point, distance }; }}
       onTouchEnd={() => { pinch.current = null; }}>
       <Layer><Rect width={width} height={height} fill="#344536" stroke="#728062" strokeWidth={2}/>
         <Group listening={false} scaleX={cell} scaleY={cell}>{terrainPaths.map((t,i)=><Path key={i} data={t.data} fill={t.fill} stroke={t.stroke} strokeWidth={t.width} opacity={t.opacity}/>)}</Group>
         {doc.grid.visible&&<Group listening={false}>{gridLines.map(l=><Line key={l.id} points={l.points} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
+        <Group listening={false} scaleX={cell} scaleY={cell}>{districtShapes.map(g=><Group key={g.district.id}><Path data={g.fill} fill={/^#[0-9a-f]{6}$/i.test(g.district.color)?g.district.color:'#8eaaa1'} opacity={districtView.opacity}/><Path data={g.boundary} stroke={g.district.id===district.selectedId?'#fff0b5':g.district.color} strokeWidth={(g.district.id===district.selectedId?2.5:1.3)/view.scale/cell} dash={g.district.locked?[.3,.2]:undefined}/>{districtView.names&&<Text x={g.label.x-4} y={g.label.y-.5} width={8} align="center" fontSize={.7} text={`${g.district.locked?'◆ ':''}${g.district.name}`} fill="#fff2c9" stroke="#26372b" strokeWidth={.05} fillAfterStrokeEnabled/>}</Group>)}</Group>
         <Group>{roads.map(r => <Group key={r.id}>{infrastructureStrokes(r.road,r).map((stroke,n)=><Path key={n} roadId={r.id} data={stroke.data} scaleX={cell} scaleY={cell} stroke={conflictIds.has(`infrastructure:${r.id}`)&&n===0?'#ed7c66':infra.roadId===r.id&&n===0?'#ffe2a0':stroke.color} strokeWidth={stroke.width} dash={stroke.dash} hitStrokeWidth={Math.max(stroke.width,24/view.scale/cell)} listening={infrastructureActive&&infra.mode!=='draw'} lineCap="round" lineJoin="round"/>)}</Group>)}</Group>
         {doc.buildings.filter(b => doc.layers.find(l => l.id === b.layerId)?.visible).map(original => {
           const b = preview?.id === original.id ? { ...original, ...preview } : original;
           const f = footprint(b), w = b.width * cell, h = b.height * cell;
           const warn = buildingWarnings(doc, b).length > 0, active = selectedId === b.id;
           return <Group key={b.id} name="building" buildingId={b.id} x={b.x * cell} y={b.y * cell}>
-            <Rect width={f.width * cell} height={f.height * cell} fill={b.locked ? '#625f4d' : '#997343'} stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn ? '#ef927b' : active ? '#ffe2a0' : '#292d24'} strokeWidth={active ? 4 : 2}/>
+            <Rect width={f.width * cell} height={f.height * cell} fill={b.locked ? '#625f4d' : '#997343'} stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn ? '#ef927b' : active ? '#ffe2a0' : highlighted.has(b.id)?'#9ee5d5':'#292d24'} strokeWidth={active||highlighted.has(b.id) ? 4 : 2}/>
             <Group listening={false} x={f.width * cell / 2} y={f.height * cell / 2} rotation={b.rotation}><Path data={symbolPaths[buildingDefinition(b.kind).symbol]} x={-w / 2 + 4} y={-h / 2 + 4} scaleX={(w - 8) / 64} scaleY={(h - 8) / 64} stroke="#efd19a" strokeWidth={2} fill="#725535"/></Group>
             <Rect listening={false} x={(entrance(b).x-b.x)*cell} y={(entrance(b).y-b.y)*cell-4} width={cell*.6} height={5} fill="#f7dda5"/>
             {b.locked && <Rect listening={false} x={3} y={3} width={8} height={8} fill="#c8d4de"/>}
@@ -145,16 +160,24 @@ export function SettlementCanvas() {
           })}
         </Group>}
       </Layer>
+      <Layer listening={tool==='districts'}>
+        <Group scaleX={cell} scaleY={cell}>
+          {districtPendingGeometry&&<Group listening={false}><Path data={districtPendingGeometry.fill} fill={district.pending!.color} opacity={.28}/><Path data={districtPendingGeometry.boundary} stroke="#fff0b5" strokeWidth={2/view.scale/cell}/>{[...districtConflicts].map(k=>{const [x,y]=k.split(',').map(Number);return <Rect key={k} x={x} y={y} width={1} height={1} fill="#f26d5b" opacity={.6}/>;})}</Group>}
+          {!!districtPatch.length&&<Path listening={false} data={districtPatch.map(p=>`M${p.x} ${p.y}h1v1h-1Z`).join('')} fill={district.mode==='erase'?'#f28c79':'#ecd695'} opacity={.5}/>}
+          {!!districtBoundary.length&&(tool==='districts'||district.camera)&&<Group><Line listening={false} points={districtBoundary.flatMap(p=>[p.x,p.y])} closed={districtBoundary.length>=3} stroke="#ffe2a0" fill="#c3b16a" opacity={.6} strokeWidth={2/view.scale/cell}/>{districtBoundary.map((p,i)=><Circle key={i} districtPointIndex={i} x={p.x} y={p.y} radius={7/view.scale/cell} hitStrokeWidth={30/view.scale/cell} fill={district.corner===i?'#a7ead5':'#ffe2a0'} stroke="#253a2d" strokeWidth={2/view.scale/cell}/>)}</Group>}
+        </Group>
+      </Layer>
       <Layer listening={false}>
         <Group listening={false} scaleX={cell} scaleY={cell}>{patchPaths.map(p=><Path key={p.color} data={p.data} fill={p.color} opacity={.58}/>)}
           {tool==='terrain-editor'&&brushPoint&&(terrainEditor.settings.shape==='circle'?<Circle x={brushPoint.x} y={brushPoint.y} radius={terrainEditor.settings.size/2} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>:<Rect x={brushPoint.x-terrainEditor.settings.size/2} y={brushPoint.y-terrainEditor.settings.size/2} width={terrainEditor.settings.size} height={terrainEditor.settings.size} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>)}
         </Group>
       </Layer>
     </Stage>
+    {(tool==='districts'||district.pending||district.detection||tool==='pan'&&district.camera)&&<DistrictActions/>}
     {(warnings.length > 0 || notice) && <div role="alert" className="canvas-warning">{notice || warnings.join(' · ')}</div>}
     {(infrastructureActive||(infra.camera||infra.roadId||infra.draft.length>0)&&tool==='pan')&&<InfrastructureActions/>}
     {(tool==='terrain-editor'||terrainEditor.pending||tool==='pan'&&terrainEditor.camera)&&<TerrainActions painting={terrainPatch.length>0}/>}
-    <div className="canvas-hint">{tool==='terrain-editor'?`One finger paints · Two fingers explore · ${elevationReadout.toFixed(1)} m`:null}{tool==='infrastructure'?'Tap or trace · Finish path · Two fingers pan/zoom · Roads panel to edit':null}{tool==='infrastructure'||tool==='terrain-editor'?null:tool === 'pan' ? 'Drag to explore · Scroll or pinch to zoom' : tool === 'select' ? 'Tap to select · Drag to move · Properties to edit' : 'Tap to place · Select to edit · Pan to explore'}</div>
+    <div className="canvas-hint">{tool==='districts'?'District editing · one finger edits · two fingers explore':null}{tool==='terrain-editor'?`One finger paints · Two fingers explore · ${elevationReadout.toFixed(1)} m`:null}{tool==='infrastructure'?'Tap or trace · Finish path · Two fingers pan/zoom · Roads panel to edit':null}{tool==='districts'||tool==='infrastructure'||tool==='terrain-editor'?null:tool === 'pan' ? 'Drag to explore · Scroll or pinch to zoom' : tool === 'select' ? 'Tap to select · Drag to move · Properties to edit' : 'Tap to place · Select to edit · Pan to explore'}</div>
     <div className="zoom-controls"><button aria-label="Zoom out" onClick={() => zoom(1 / 1.25)}>−</button><span>{Math.round(view.scale * 100)}%</span><button aria-label="Zoom in" onClick={() => zoom(1.25)}>+</button><button onClick={fit}>Fit</button></div>
   </div>;
 }

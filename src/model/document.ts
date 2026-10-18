@@ -1,3 +1,4 @@
+import type { District, DistrictView } from './districts';
 import { emptyLandscape, type Landscape } from './terrain';
 export type TerrainKind = 'grass' | 'water' | 'forest' | 'stone';
 import { buildingDefinition, type BuildingKind } from './catalogue';
@@ -28,7 +29,8 @@ export interface SettlementDocument {
   buildings: Building[];
   roads: Road[];
   planning?: SettlementPlan;
-  districts: { id: string; name: string; cells: Cell[]; color: string; layerId: string }[];
+  districts: District[];
+  districtView?: DistrictView;
   layers: { id: string; name: string; visible: boolean }[];
 }
 export function createDocument(): SettlementDocument {
