@@ -1,3 +1,4 @@
+import { defaultExpansion, type ExpansionProposal, type ExpansionSettings } from '../generator/expansion';
 import { defaultDevelopment, type DevelopmentProposal, type DevelopmentSettings } from '../generator/development';
 import type { District, DistrictType } from '../model/districts';
 import { defaultBrush, type BrushSettings, type TerrainPreview } from '../model/terrainStroke';
@@ -11,7 +12,11 @@ export interface InfrastructureState { camera:boolean; mode:'draw'|'select'|'add
 export interface TerrainEditorState { settings:BrushSettings; tab:'Sculpt'|'Water'|'Ground'|'Nature'; camera:boolean; readout:number; pending:TerrainPreview|null }
 export interface DistrictEditorState { corner?:number|null; base?:SettlementDocument; camera:boolean; mode:'select'|'polygon'|'paint'|'erase'|'reshape'; selectedId:string|null; type:DistrictType; size:number; draft:Cell[]; pending:District|null; detection:District[]|null; highlight:boolean }
 export interface DevelopmentState {open:boolean;districtId:string|null;settings:DevelopmentSettings;preview:DevelopmentProposal|null;base:SettlementDocument|null;busy:boolean;applying:boolean;error:string}
+export interface ExpansionState {open:boolean;settings:ExpansionSettings;preview:ExpansionProposal|null;base:SettlementDocument|null;busy:boolean;applying:boolean;error:string;progress:string}
 interface StudioState extends History {
+ expansion:ExpansionState;
+ setExpansion:(patch:Partial<ExpansionState>)=>void;
+ acceptExpansion:(base:SettlementDocument,next:SettlementDocument)=>void;
   development:DevelopmentState;
   setDevelopment:(patch:Partial<DevelopmentState>)=>void;
   acceptDevelopment:(base:SettlementDocument,next:SettlementDocument)=>void;
@@ -31,6 +36,9 @@ interface StudioState extends History {
   restore: (doc: SettlementDocument) => void;
 }
 export const useStudio = create<StudioState>(set => ({
+  expansion:{open:false,settings:{...defaultExpansion},preview:null,base:null,busy:false,applying:false,error:'',progress:''},
+ setExpansion:patch=>set(s=>({expansion:{...s.expansion,...patch}})),
+ acceptExpansion:(base,next)=>set(s=>{if(s.present!==base)throw new Error('Project changed during expansion backup.');return {...commit(s,next),expansion:{...s.expansion,preview:null,base:null,applying:false,open:false}};}),
   development:{open:false,districtId:null,settings:{...defaultDevelopment},preview:null,base:null,busy:false,applying:false,error:''},
   setDevelopment:patch=>set(s=>({development:{...s.development,...patch}})),
   acceptDevelopment:(base,next)=>set(s=>{if(s.present!==base)throw new Error('Project changed while creating the restore point.');return {...commit(s,next),development:{...s.development,preview:null,base:null,applying:false,open:false}};}),
@@ -42,7 +50,7 @@ export const useStudio = create<StudioState>(set => ({
   setInfrastructure:patch=>set(s=>({infrastructure:{...s.infrastructure,...patch}})),
   selectedId: null, select: selectedId => set(s=>({ selectedId,infrastructure:{...s.infrastructure,preview:null} })),
   present: createDocument(), past: [], future: [], tool: 'pan',
-  setTool: tool => set(s=>({ tool, selectedId: null,districtEditor:{...s.districtEditor,camera:false},terrainEditor:{...s.terrainEditor,camera:false,pending:tool==='terrain-editor'||tool==='pan'?s.terrainEditor.pending:null},infrastructure:{...s.infrastructure,camera:false,roadId:tool==='pan'||tool==='infrastructure'?s.infrastructure.roadId:null,draft:tool==='pan'||tool==='infrastructure'?s.infrastructure.draft:[],preview:null,point:null} })), edit: operation => set(s => {if(s.development.applying)return s;const next=operation(s.present);return {...commit(s,next),infrastructure:{...s.infrastructure,preview:next.buildings!==s.present.buildings?null:s.infrastructure.preview}};}),
-  undo: () => set(s => s.development.applying?s:({...undo(s),development:{...s.development,preview:null,base:null,busy:false,open:false},districtEditor:{...s.districtEditor,pending:null,detection:null,draft:[]},terrainEditor:{...s.terrainEditor,pending:null},infrastructure:{...s.infrastructure,preview:null,point:null}})), redo: () => set(s => s.development.applying?s:({...redo(s),development:{...s.development,preview:null,base:null,busy:false,open:false},districtEditor:{...s.districtEditor,pending:null,detection:null,draft:[]},terrainEditor:{...s.terrainEditor,pending:null},infrastructure:{...s.infrastructure,preview:null,point:null}})),
-  restore: present => set(s=>({ present: migrateDocument(present),development:{...s.development,preview:null,base:null,busy:false,applying:false,open:false,districtId:null,error:''},districtEditor:{...s.districtEditor,selectedId:null,pending:null,detection:null,draft:[],camera:false,highlight:false}, selectedId: null, past: [], future: [],terrainEditor:{...s.terrainEditor,camera:false,pending:null},infrastructure:{...s.infrastructure,roadId:null,point:null,draft:[],preview:null} })),
+  setTool: tool => set(s=>({ tool, selectedId: null,districtEditor:{...s.districtEditor,camera:false},terrainEditor:{...s.terrainEditor,camera:false,pending:tool==='terrain-editor'||tool==='pan'?s.terrainEditor.pending:null},infrastructure:{...s.infrastructure,camera:false,roadId:tool==='pan'||tool==='infrastructure'?s.infrastructure.roadId:null,draft:tool==='pan'||tool==='infrastructure'?s.infrastructure.draft:[],preview:null,point:null} })), edit: operation => set(s => {if(s.development.applying||s.expansion.applying)return s;const next=operation(s.present);return {...commit(s,next),infrastructure:{...s.infrastructure,preview:next.buildings!==s.present.buildings?null:s.infrastructure.preview}};}),
+  undo: () => set(s => s.development.applying||s.expansion.applying?s:({...undo(s),expansion:{...s.expansion,preview:null,base:null,busy:false,open:false},development:{...s.development,preview:null,base:null,busy:false,open:false},districtEditor:{...s.districtEditor,pending:null,detection:null,draft:[]},terrainEditor:{...s.terrainEditor,pending:null},infrastructure:{...s.infrastructure,preview:null,point:null}})), redo: () => set(s => s.development.applying||s.expansion.applying?s:({...redo(s),expansion:{...s.expansion,preview:null,base:null,busy:false,open:false},development:{...s.development,preview:null,base:null,busy:false,open:false},districtEditor:{...s.districtEditor,pending:null,detection:null,draft:[]},terrainEditor:{...s.terrainEditor,pending:null},infrastructure:{...s.infrastructure,preview:null,point:null}})),
+  restore: present => set(s=>({ present: migrateDocument(present),expansion:{...s.expansion,preview:null,base:null,busy:false,applying:false,open:false,error:''},development:{...s.development,preview:null,base:null,busy:false,applying:false,open:false,districtId:null,error:''},districtEditor:{...s.districtEditor,selectedId:null,pending:null,detection:null,draft:[],camera:false,highlight:false}, selectedId: null, past: [], future: [],terrainEditor:{...s.terrainEditor,camera:false,pending:null},infrastructure:{...s.infrastructure,roadId:null,point:null,draft:[],preview:null} })),
 }));

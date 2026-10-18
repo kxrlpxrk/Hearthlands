@@ -4,6 +4,7 @@ let worker:Worker|null=null;
 export function cancelDevelopment(){const s=useStudio.getState();if(s.development.applying)return;worker?.terminate();worker=null;s.setDevelopment({preview:null,base:null,busy:false,error:''});}
 export function previewDevelopment(){
  const s=useStudio.getState(),dev=s.development,base=s.present;
+ if(s.expansion.preview||s.expansion.busy||s.expansion.applying)throw new Error('Accept or cancel expansion first.');
  if(dev.districtId!==s.districtEditor.selectedId)throw new Error('Select this district again before developing it.');
  if(s.terrainEditor.pending||s.districtEditor.pending||s.districtEditor.detection||s.districtEditor.draft.length||s.infrastructure.draft.length)throw new Error('Finish or cancel other map drafts before development.');
  cancelDevelopment();s.setTool('pan');s.setDevelopment({busy:true,base,error:''});

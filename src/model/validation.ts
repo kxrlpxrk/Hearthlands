@@ -11,7 +11,7 @@ function boolean(value: unknown, path: string) { if (typeof value !== 'boolean')
 function oneOf(value: unknown, values: readonly string[], path: string) { if (typeof value !== 'string' || !values.includes(value)) fail(path); }
 function cell(value: unknown, path: string, integer = false) { const c = record(value,path); number(c.x,`${path}.x`); number(c.y,`${path}.y`); if (integer && (!Number.isInteger(c.x) || !Number.isInteger(c.y))) fail(path); }
 function cells(value: unknown, path: string) { for (const c of list(value,path,500_000)) cell(c,path); }
-function provenance(value:unknown){if(value===undefined)return;const p=record(value,'provenance');if(p.version!==1||p.source!=='district-development')fail('unsupported provenance');text(p.districtId,'provenance district');text(p.proposalId,'proposal id');number(p.seed,'provenance seed',-Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER);if(!Number.isSafeInteger(p.seed))fail('provenance seed');if(p.replaces!==undefined)text(p.replaces,'replaced building id');}
+function provenance(value:unknown){if(value===undefined)return;const p=record(value,'provenance');if(p.version!==1||!['district-development','settlement-expansion'].includes(p.source as string))fail('unsupported provenance');text(p.districtId,'provenance district');text(p.proposalId,'proposal id');number(p.seed,'provenance seed',-Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER);if(!Number.isSafeInteger(p.seed))fail('provenance seed');if(p.replaces!==undefined)text(p.replaces,'replaced building id');}
 export function validateDocument(value: unknown): SettlementDocument {
   let nodes = 0;
   function safe(v: unknown, depth = 0) {

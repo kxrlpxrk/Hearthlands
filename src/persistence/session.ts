@@ -1,3 +1,4 @@
+import { applyExpansion, type ExpansionProposal } from '../generator/expansion';
 import { applyDevelopment, type DevelopmentProposal } from '../generator/development';
 import { createDocument, type SettlementDocument } from '../model/document';
 import { useStudio } from '../ui/store';
@@ -44,6 +45,7 @@ class ProjectSession {
   }
   private async transition<T>(action: () => Promise<T>): Promise<T> {
     if(useStudio.getState().development.preview||useStudio.getState().development.busy||useStudio.getState().development.applying)throw new Error('Accept or cancel the development preview before changing projects or restore points.');
+    const expansion=useStudio.getState().expansion;if(expansion.preview||expansion.busy||expansion.applying)throw new Error('Accept or cancel the expansion preview before changing projects or restore points.');
     const districts=useStudio.getState().districtEditor;
     if(districts.pending||districts.detection||districts.draft.length)throw new Error('Confirm or cancel the district preview before changing projects or restore points. District previews are not saved.');
     if(useStudio.getState().terrainEditor.pending)throw new Error('Apply or cancel the terrain preview before switching projects, renaming, generating or restoring. The preview is not saved.');
@@ -74,7 +76,7 @@ class ProjectSession {
   }); }
   async develop(proposal:DevelopmentProposal,confirmed=false){
     const state=useStudio.getState(),base=state.present;
-    if(this.transitioning||state.development.applying)throw new Error('A project operation is already in progress.');
+    if(this.transitioning||state.expansion.preview||state.expansion.busy||state.expansion.applying||state.development.applying)throw new Error('A project operation is already in progress.');
     if(state.terrainEditor.pending||state.districtEditor.pending||state.districtEditor.detection||state.districtEditor.draft.length)throw new Error('Finish or cancel other map previews first.');
     const next=applyDevelopment(base,proposal,confirmed);
     this.transitioning=true;state.setDevelopment({applying:true,error:''});
@@ -87,6 +89,21 @@ class ProjectSession {
       useStudio.getState().acceptDevelopment(base,next);
       await this.flush();
     }finally{this.transitioning=false;useStudio.getState().setDevelopment({applying:false});}
+  }
+  async expand(proposal:ExpansionProposal,confirmed=false){
+    const state=useStudio.getState(),base=state.present;
+    if(this.transitioning||state.expansion.applying)throw new Error('A project operation is already in progress.');
+    if(state.development.preview||state.development.busy||state.development.applying||state.terrainEditor.pending||state.districtEditor.pending||state.districtEditor.detection||state.districtEditor.draft.length||state.infrastructure.draft.length)throw new Error('Finish or cancel other map previews first.');
+    const next=applyExpansion(base,proposal,confirmed);
+    this.transitioning=true;state.setExpansion({applying:true,error:''});
+    try{
+      await this.flush();
+      if(useStudio.getState().present!==base)throw new Error('Project changed before expansion backup. Generate another preview.');
+      await repository.snapshot(base.id,'Automatic backup before settlement expansion');
+      if(useStudio.getState().present!==base)throw new Error('Project changed during backup. No expansion applied.');
+      useStudio.getState().acceptExpansion(base,next);
+      await this.flush();
+    }finally{this.transitioning=false;useStudio.getState().setExpansion({applying:false});}
   }
   replace(doc: SettlementDocument) { return this.transition(async () => {
     const id = useStudio.getState().present.id;

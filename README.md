@@ -141,3 +141,5 @@ Select a district and choose **Develop district** for fill-only growth, explicit
 ### Mobile layout and loaded release (Phase 5A.1)
 
 Editing actions move inside the open mobile sheet; passive district selection has no floating toolbar. The selected district heading and **Develop district** stay together. Check the footer build marker when troubleshooting old Safari tabs. See [screenshots, release checks and iPhone verification](docs/phase5a1-mobile.md). Deployment also runs `npm run verify:release` to check the actual production bundle and commit marker.
+
+Phase 5B adds protected, preview-first settlement growth and optional east/south map enlargement. See [expansion controls, limits, screenshots and physical-iPhone verification](docs/phase5b-expansion.md).
