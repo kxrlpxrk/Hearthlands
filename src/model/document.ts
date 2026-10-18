@@ -3,10 +3,10 @@ import { emptyLandscape, type Landscape } from './terrain';
 export type TerrainKind = 'grass' | 'water' | 'forest' | 'stone';
 import { buildingDefinition, type BuildingKind } from './catalogue';
 export type { BuildingKind } from './catalogue';
-export interface Building extends Cell { id: string; kind: BuildingKind; layerId: string; name: string; width: number; height: number; rotation: number; locked: boolean }
+export interface Building extends Cell { provenance?: import('./provenance').Provenance; id: string; kind: BuildingKind; layerId: string; name: string; width: number; height: number; rotation: number; locked: boolean }
 export interface Cell { x: number; y: number }
 export type RoadStyle = 'organic' | 'planned' | 'contextual';
-export interface Road { editVersion?: 1; surface?: import('./infrastructure').Surface; width?: number; locked?: boolean; name?: string; id: string; points: Cell[]; layerId: string; kind?: 'primary' | 'secondary' | 'access'; style?: RoadStyle }
+export interface Road { provenance?: import('./provenance').Provenance; editVersion?: 1; surface?: import('./infrastructure').Surface; width?: number; locked?: boolean; name?: string; id: string; points: Cell[]; layerId: string; kind?: 'primary' | 'secondary' | 'access'; style?: RoadStyle }
 export interface SettlementPlan {
   version: 1;
   layout: RoadStyle;

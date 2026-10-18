@@ -133,3 +133,7 @@ Document v3 lazily migrates older projects and snapshots without rewriting legac
 ### District designer (Phase 4C)
 
 Open **Districts** for deterministic detection previews, polygon/cell editing, membership statistics and overlays. Confirm/cancel changes explicitly; locked and hidden areas retain their cells. Districts remain compatible with v1/v2/v3 project files, autosave, restore points and JSON. PNG exports have independent district overlay/name options. See [district controls, data rules and iPhone verification](docs/phase4c-districts.md).
+
+### Selective district development (Phase 5A)
+
+Select a district and choose **Develop district** for fill-only growth, explicitly selected replacements or proposed access connections. Every proposal is previewed separately; acceptance creates a restore point and one undo command. Existing objects are protected regardless of IDs/provenance. See [development rules, limitations and physical-iPhone acceptance](docs/phase5a-development.md).

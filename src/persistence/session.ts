@@ -1,3 +1,4 @@
+import { applyDevelopment, type DevelopmentProposal } from '../generator/development';
 import { createDocument, type SettlementDocument } from '../model/document';
 import { useStudio } from '../ui/store';
 import { Autosave, type SaveState } from './autosave';
@@ -42,6 +43,7 @@ class ProjectSession {
     await this.saver.flush();
   }
   private async transition<T>(action: () => Promise<T>): Promise<T> {
+    if(useStudio.getState().development.preview||useStudio.getState().development.busy||useStudio.getState().development.applying)throw new Error('Accept or cancel the development preview before changing projects or restore points.');
     const districts=useStudio.getState().districtEditor;
     if(districts.pending||districts.detection||districts.draft.length)throw new Error('Confirm or cancel the district preview before changing projects or restore points. District previews are not saved.');
     if(useStudio.getState().terrainEditor.pending)throw new Error('Apply or cancel the terrain preview before switching projects, renaming, generating or restoring. The preview is not saved.');
@@ -70,6 +72,22 @@ class ProjectSession {
     const restored = await repository.restore(id, snapshotId, this.saver!.revision);
     this.install(restored.document, restored.revision);
   }); }
+  async develop(proposal:DevelopmentProposal,confirmed=false){
+    const state=useStudio.getState(),base=state.present;
+    if(this.transitioning||state.development.applying)throw new Error('A project operation is already in progress.');
+    if(state.terrainEditor.pending||state.districtEditor.pending||state.districtEditor.detection||state.districtEditor.draft.length)throw new Error('Finish or cancel other map previews first.');
+    const next=applyDevelopment(base,proposal,confirmed);
+    this.transitioning=true;state.setDevelopment({applying:true,error:''});
+    try{
+      await this.flush();
+      if(useStudio.getState().present!==base)throw new Error('Project changed before backup. Generate another preview.');
+      const district=base.districts.find(d=>d.id===proposal.districtId)!;
+      await repository.snapshot(base.id,`Automatic backup before district development · ${district.name}`);
+      if(useStudio.getState().present!==base)throw new Error('Project changed during backup. No development applied.');
+      useStudio.getState().acceptDevelopment(base,next);
+      await this.flush();
+    }finally{this.transitioning=false;useStudio.getState().setDevelopment({applying:false});}
+  }
   replace(doc: SettlementDocument) { return this.transition(async () => {
     const id = useStudio.getState().present.id;
     await repository.snapshot(id, 'Automatic backup before generated replacement');

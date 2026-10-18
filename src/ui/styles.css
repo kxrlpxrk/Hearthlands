@@ -37,3 +37,15 @@
 .district-panel section {border-top:1px solid #43513d;padding-top:12px}
 .district-actions {max-width:calc(100% - 24px)}
 @media(max-width:650px){.mobile-nav{overflow-x:auto;justify-content:flex-start}.mobile-nav button{flex:0 0 auto;min-width:62px}.tabs{overflow-x:auto}.tabs button{padding:8px 5px;font-size:11px}.district-list{max-height:200px}}
+
+.development-panel {border:1px solid #687557;padding:12px;border-radius:6px;margin:12px 0;background:#202d23}
+.development-panel fieldset {border:0;padding:0;margin:0;min-width:0}
+.replacement-list {max-height:240px;overflow:auto}
+.replacement-list small {display:block;overflow-wrap:anywhere;color:#93a28c;font-size:9px}
+.development-actions p {margin:3px 0;flex-basis:100%}
+.development-actions details {flex-basis:100%}
+.development-actions .checkbox-label {flex-basis:100%;margin:0}
+.development-actions label input {width:auto;flex-shrink:0}
+.development-panel .checkbox-label {align-items:center;min-height:44px}
+.development-panel select,.development-panel input[type=number] {width:100%;min-height:44px}
+@media(max-width:650px){.development-panel select,.development-panel input{font-size:16px}.development-actions{max-height:42%;font-size:11px}}
