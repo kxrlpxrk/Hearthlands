@@ -1,9 +1,13 @@
+import painted from './png/hearthlands-viking-longhouse-02.png?inline';
+import mossy from './png/hearthlands-viking-longhouse-03.png?inline';
 import ravenfjord from './png/hearthlands-viking-longhouse-01.png?inline';
 import timber from './png/demo-viking-timber-longhouse.png?inline';
 import turf from './png/demo-viking-turf-longhouse.png?inline';
 /** Closed build-time allowlist. Vite inlines trusted PNG bytes; no runtime URL, fetch,
  * base-path assumption, CORS dependency or image blob is stored in project data. */
 const installedImages:Readonly<Record<string,string>>={
+ 'buildings/hearthlands-viking-longhouse-02.png':painted,
+ 'buildings/hearthlands-viking-longhouse-03.png':mossy,
  'buildings/hearthlands-viking-longhouse-01.png':ravenfjord,
  'buildings/demo-viking-timber-longhouse.png':timber,
  'buildings/demo-viking-turf-longhouse.png':turf,

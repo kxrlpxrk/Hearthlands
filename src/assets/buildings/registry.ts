@@ -24,7 +24,11 @@ export const customImageAssets:readonly BuildingAsset[]=[{
  id:'hearthlands.viking.longhouse.01',kind:'longhouse',name:'Ravenfjord Timber Longhouse',theme:'viking',variation:'Custom timber roof · manual only',
  artwork:{format:'bundled-image',source:'buildings/hearthlands-viking-longhouse-01.png',mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
-}];
+},...([['02','Ravenfjord Painted Timber Hall','Painted timber roof'],['03','Ravenfjord Mossy Timber Hall','Mossy timber roof']] as const).map(([number,name,variation]):BuildingAsset=>({
+ id:`hearthlands.viking.longhouse.${number}`,kind:'longhouse',name,theme:'viking',variation:`${variation} · manual only`,
+ artwork:{format:'bundled-image',source:`buildings/hearthlands-viking-longhouse-${number}.png`,mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
+ thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
+}))];
 export const buildingAssets:readonly BuildingAsset[]=[...starterPack.assets,...demoImageAssets,...customImageAssets];
 export const assetById=new Map(buildingAssets.map(a=>[a.id,a]));
 const byKind=new Map(catalogue.map(b=>[b.kind,buildingAssets.filter(a=>a.kind===b.kind)]));
