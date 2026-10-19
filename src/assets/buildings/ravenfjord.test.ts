@@ -16,7 +16,7 @@ const supplied=[
 describe.each(supplied)('supplied Ravenfjord %s — %s',(number,name,sha)=>{
  const id=`hearthlands.viking.longhouse.${number}`;
  it('installs the exact supplied RGBA PNG once, with the requested manual-only metadata',async()=>{
-  const asset=assetById.get(id)!;expect(validateAssetRegistry()).toEqual([]);expect(customImageAssets.map(a=>a.id)).toEqual(supplied.map(([n])=>`hearthlands.viking.longhouse.${n}`));expect(starterPack.assets).toHaveLength(81);expect(demoImageAssets).toHaveLength(2);expect(buildingAssets).toHaveLength(86);
+  const asset=assetById.get(id)!;expect(validateAssetRegistry()).toEqual([]);expect(customImageAssets.map(a=>a.id)).toEqual(supplied.map(([n])=>`hearthlands.viking.longhouse.${n}`));expect(starterPack.assets).toHaveLength(81);expect(demoImageAssets).toHaveLength(2);expect(buildingAssets).toHaveLength(89);
   expect(asset).toMatchObject({id,name,kind:'longhouse',theme:'viking',automatic:false,canonicalOrientation:0,footprint:{nominal:[4,2]},artwork:{format:'bundled-image',pixelWidth:1024,pixelHeight:512,mime:'image/png'}});
   if(asset.artwork.format!=='bundled-image')throw Error('Expected bundled PNG');
   expect(asset.artwork.fallback.format).toBe('vector');const source=bundledImageSource(asset.artwork.source)!;expect(bundledImageInfo(asset.artwork.source)).toMatchObject({width:1024,height:512});

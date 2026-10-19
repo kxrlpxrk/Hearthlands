@@ -30,7 +30,18 @@ export const customImageAssets:readonly BuildingAsset[]=[{
  artwork:{format:'bundled-image',source:`buildings/hearthlands-viking-longhouse-${number}.png`,visibleBounds:rasterBounds[`hearthlands-viking-longhouse-${number}.png`],mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
 }))];
-export const buildingAssets:readonly BuildingAsset[]=[...starterPack.assets,...demoImageAssets,...customImageAssets];
+/** Sheet-extracted visual pilot: deliberately excluded from every automatic pool. */
+const sheet4Definitions:readonly {kind:BuildingKind;name:string;nominal:[number,number];pixels:[number,number]}[]=[
+ {kind:'cottage',name:'Viking Cottage – Sheet 4',nominal:[2,2],pixels:[768,768]},
+ {kind:'tavern',name:'Viking Tavern – Sheet 4',nominal:[3,2],pixels:[1024,768]},
+ {kind:'farm',name:'Viking Farmstead – Sheet 4',nominal:[4,3],pixels:[1024,768]},
+];
+export const sheet4PilotAssets:readonly BuildingAsset[]=sheet4Definitions.map(({kind,name,nominal,pixels}):BuildingAsset=>({
+ id:`hearthlands.sheet4.${kind}.01`,kind,name,theme:'viking',variation:'Sheet-extracted PNG pilot · manual only',
+ artwork:{format:'bundled-image',source:`buildings/hearthlands-sheet4-${kind}-01.png`,visibleBounds:rasterBounds[`hearthlands-sheet4-${kind}-01.png`],mime:'image/png',pixelWidth:pixels[0],pixelHeight:pixels[1],fallback:assets.find(a=>a.id===`starter.viking.${kind}.1`)!.artwork as import('./types').VectorArtwork},
+ thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal,aspectRange:[nominal[0]/nominal[1]*.4,nominal[0]/nominal[1]*2.5],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
+}));
+export const buildingAssets:readonly BuildingAsset[]=[...starterPack.assets,...demoImageAssets,...customImageAssets,...sheet4PilotAssets];
 export const assetById=new Map(buildingAssets.map(a=>[a.id,a]));
 const byKind=new Map(catalogue.map(b=>[b.kind,buildingAssets.filter(a=>a.kind===b.kind)]));
 export const assetsForKind=(kind:BuildingKind):readonly BuildingAsset[]=>byKind.get(kind)??[];

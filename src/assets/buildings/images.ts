@@ -3,9 +3,15 @@ import mossy from './png/hearthlands-viking-longhouse-03.png?inline';
 import ravenfjord from './png/hearthlands-viking-longhouse-01.png?inline';
 import timber from './png/demo-viking-timber-longhouse.png?inline';
 import turf from './png/demo-viking-turf-longhouse.png?inline';
+import sheet4Cottage from './png/hearthlands-sheet4-cottage-01.png?inline';
+import sheet4Tavern from './png/hearthlands-sheet4-tavern-01.png?inline';
+import sheet4Farm from './png/hearthlands-sheet4-farm-01.png?inline';
 /** Closed build-time allowlist. Vite inlines trusted PNG bytes; no runtime URL, fetch,
  * base-path assumption, CORS dependency or image blob is stored in project data. */
 const installedImages:Readonly<Record<string,string>>={
+ 'buildings/hearthlands-sheet4-cottage-01.png':sheet4Cottage,
+ 'buildings/hearthlands-sheet4-tavern-01.png':sheet4Tavern,
+ 'buildings/hearthlands-sheet4-farm-01.png':sheet4Farm,
  'buildings/hearthlands-viking-longhouse-02.png':painted,
  'buildings/hearthlands-viking-longhouse-03.png':mossy,
  'buildings/hearthlands-viking-longhouse-01.png':ravenfjord,

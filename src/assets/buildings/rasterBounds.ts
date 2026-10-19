@@ -13,6 +13,24 @@ export const rasterBounds:Readonly<Record<string,ImageBounds>>={
     "width": 850,
     "height": 379
   },
+  "hearthlands-sheet4-cottage-01.png": {
+    "x": 34,
+    "y": 133,
+    "width": 699,
+    "height": 502
+  },
+  "hearthlands-sheet4-farm-01.png": {
+    "x": 46,
+    "y": 123,
+    "width": 932,
+    "height": 522
+  },
+  "hearthlands-sheet4-tavern-01.png": {
+    "x": 46,
+    "y": 121,
+    "width": 932,
+    "height": 526
+  },
   "hearthlands-viking-longhouse-01.png": {
     "x": 110,
     "y": 31,
