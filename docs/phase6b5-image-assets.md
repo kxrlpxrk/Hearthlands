@@ -1,5 +1,7 @@
 # Phase 6B.5 — Installed transparent building PNGs
 
+Current raster sizing/shadows and optional alpha-bound authoring: [Phase 6B.6](phase6b6-raster-alignment.md). Raster pixels now always preserve their native proportions; the earlier fallback-coordinate fitting described below is superseded.
+
 The 81 existing vector entries and their automatic-selection pools are unchanged. Two **manual-only** Traditional Viking longhouse entries demonstrate original transparent raster artwork:
 
 - `demo.viking.longhouse.timber` — shingled timber gable with a structural cross-wing and chimney.

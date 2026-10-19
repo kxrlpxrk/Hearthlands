@@ -1,6 +1,6 @@
 import {bundledImageSource} from '../assets/buildings/images';
 import {useBundledImage} from '../rendering/bundledImages';
-import {vectorArtwork} from '../rendering/buildingArtwork';
+import {rasterGeometry} from '../rendering/rasterGeometry';
 import {useEffect,useState} from 'react';
 import type {Building} from '../model/document';
 import type {BuildingAsset,ArchitectureTheme} from '../assets/buildings/types';
@@ -11,8 +11,8 @@ import {assetTransform,artworkPaths} from '../rendering/buildingArtwork';
 import {useStudio} from './store';
 import {useVisualPreferences} from './visualPreferences';
 export function AssetThumbnail({asset}:{asset:BuildingAsset}){
- const [w,h]=asset.footprint.nominal,t=assetTransform({width:w,height:h},asset),image=useBundledImage(asset),[x,y,width,height]=vectorArtwork(asset).viewBox,source=asset.artwork.format==='bundled-image'?bundledImageSource(asset.artwork.source):undefined;
- return <svg style={{background:asset.thumbnail.background}} viewBox={`0 0 ${w} ${h}`} role="img" aria-label={`${asset.name} · ${architectureThemes[asset.theme]}`}><g transform={`translate(${t.x} ${t.y}) scale(${t.scaleX} ${t.scaleY})`}>{source&&image?<image href={source} x={x} y={y} width={width} height={height} preserveAspectRatio="none"/>:artworkPaths(asset).map((p,i)=><path key={i} d={p.data} fill={p.fill} stroke={p.stroke} strokeWidth={p.width??1} strokeLinejoin="round" strokeLinecap="round"/>)}</g></svg>;
+ const [w,h]=asset.footprint.nominal,t=assetTransform({width:w,height:h},asset),image=useBundledImage(asset),r=asset.artwork.format==='bundled-image'?rasterGeometry({width:w,height:h},asset):null,source=asset.artwork.format==='bundled-image'?bundledImageSource(asset.artwork.source):undefined;
+ return <svg style={{background:asset.thumbnail.background}} viewBox={`0 0 ${w} ${h}`} role="img" aria-label={`${asset.name} · ${architectureThemes[asset.theme]}`}>{source&&image&&r&&asset.artwork.format==='bundled-image'?<svg x={r.x} y={r.y} width={r.width} height={r.height} viewBox={`${r.crop.x} ${r.crop.y} ${r.crop.width} ${r.crop.height}`} preserveAspectRatio="xMidYMid meet" overflow="hidden"><image href={source} x={0} y={0} width={asset.artwork.pixelWidth} height={asset.artwork.pixelHeight} preserveAspectRatio="xMidYMid meet"/></svg>:<g transform={`translate(${t.x} ${t.y}) scale(${t.scaleX} ${t.scaleY})`}>{artworkPaths(asset).map((p,i)=><path key={i} d={p.data} fill={p.fill} stroke={p.stroke} strokeWidth={p.width??1} strokeLinejoin="round" strokeLinecap="round"/>)}</g>}</svg>;
 }
 export function BuildingAppearancePanel({building:b}:{building:Building}){
  const s=useStudio(),visual=useVisualPreferences(),current=resolveBuildingAsset(s.present,b),manual=b.appearance?.mode==='manual',unavailable=manual&&!assetById.has(b.appearance!.mode==='manual'?b.appearance!.assetId:''),[chosen,setChosen]=useState(current.id),[filter,setFilter]=useState<ArchitectureTheme|'all'>('all');

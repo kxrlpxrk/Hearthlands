@@ -1,3 +1,4 @@
+import {rasterGeometry,artworkHasShadow} from './rasterGeometry';
 import {imageFailed} from './bundledImages';
 import {bundledImageSource} from '../assets/buildings/images';
 import type {Building} from '../model/document';
@@ -11,4 +12,16 @@ export function assetTransform(b:Pick<Building,'width'|'height'>,asset:BuildingA
 /** Identical vector inputs feed Konva, thumbnails and full-map SVG/PNG. */
 export const artworkPaths=(asset:BuildingAsset,reduced=false):readonly ArtworkPath[]=>{const paths=vectorArtwork(asset).paths;return reduced?paths.filter(p=>p.level==='mass'||p.level==='structure'&&(p.width??1)>=2):paths;};
 export const artworkSilhouette=(asset:BuildingAsset)=>artworkPaths(asset,true).filter(p=>p.level==='mass'&&p.fill!=='none');
-export function artworkSvg(asset:BuildingAsset,reduced=false,shadow?:string):string{const source=!shadow&&!imageFailed(asset)&&asset.artwork.format==='bundled-image'?bundledImageSource(asset.artwork.source):undefined;if(source){const [x,y,w,h]=vectorArtwork(asset).viewBox;return `<image data-raster="${asset.id}" href="${source}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"/>`;}return (shadow?artworkSilhouette(asset):artworkPaths(asset,reduced)).map(p=>`<path d="${p.data}" fill="${shadow??p.fill}" ${p.stroke&&!shadow?`stroke="${p.stroke}" stroke-width="${p.width??1}"`:''} stroke-linejoin="round" stroke-linecap="round"/>`).join('');}
+/** Vectors use their viewBox; raster output is in local building tile coordinates.
+ * The optional size supplies exactly the same alpha crop/contain fit as the editor. */
+export function artworkSvg(asset:BuildingAsset,reduced=false,shadow?:string,size={width:asset.footprint.nominal[0],height:asset.footprint.nominal[1]}):string{
+ if(shadow&&!artworkHasShadow(asset))return '';
+ const source=!shadow&&!imageFailed(asset)&&asset.artwork.format==='bundled-image'?bundledImageSource(asset.artwork.source):undefined;
+ if(source&&asset.artwork.format==='bundled-image'){
+  const r=rasterGeometry(size,asset),c=r.crop;
+  return `<svg data-raster="${asset.id}" x="${r.x}" y="${r.y}" width="${r.width}" height="${r.height}" viewBox="${c.x} ${c.y} ${c.width} ${c.height}" preserveAspectRatio="xMidYMid meet" overflow="hidden"><image href="${source}" x="0" y="0" width="${asset.artwork.pixelWidth}" height="${asset.artwork.pixelHeight}" preserveAspectRatio="xMidYMid meet"/></svg>`;
+ }
+ const paths=(shadow?artworkSilhouette(asset):artworkPaths(asset,reduced)).map(p=>`<path d="${p.data}" fill="${shadow??p.fill}" ${p.stroke&&!shadow?`stroke="${p.stroke}" stroke-width="${p.width??1}"`:''} stroke-linejoin="round" stroke-linecap="round"/>`).join('');
+ if(asset.artwork.format==='bundled-image'){const t=assetTransform(size,asset);return `<g transform="translate(${t.x} ${t.y}) scale(${t.scaleX} ${t.scaleY})">${paths}</g>`;}
+ return paths;
+}

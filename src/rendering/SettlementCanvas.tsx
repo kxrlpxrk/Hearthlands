@@ -161,7 +161,7 @@ export function SettlementCanvas() {
           const warn = b===original?buildingWarningIds.has(b.id):buildingWarnings(doc,b).length>0, active = selectedId === b.id;
           return <Group key={b.id} name="building" buildingId={b.id} x={b.x * cell} y={b.y * cell}>
             <BuildingVisual building={b} seed={doc.seed} architecture={doc.architecture} style={style} reduced={reduced} cell={cell}/>
-            <Rect width={f.width*cell} height={f.height*cell} fill="rgba(0,0,0,0.001)" stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn?'#ef927b':active?'#ffe2a0':highlighted.has(b.id)?'#9ee5d5':undefined} strokeWidth={active||highlighted.has(b.id)?4:2}/>
+            <Rect name="building-footprint-hit" hitStrokeWidth={0} width={f.width*cell} height={f.height*cell} fill="rgba(0,0,0,0.001)" stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn?'#ef927b':active?'#ffe2a0':highlighted.has(b.id)?'#9ee5d5':undefined} strokeWidth={active||highlighted.has(b.id)?4:2}/>
 
           </Group>;
         })}

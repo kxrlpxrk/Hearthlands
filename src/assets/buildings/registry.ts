@@ -1,3 +1,4 @@
+import {rasterBounds} from './rasterBounds';
 import {safeImageReference,bundledImageInfo} from './images';
 import {catalogue,type BuildingKind} from '../../model/catalogue';
 import {symbolPaths} from '../../rendering/symbols';
@@ -17,16 +18,16 @@ for(const definition of catalogue)for(const theme of Object.keys(architectureThe
 export const starterPack:BuildingAssetPackManifest={version:1,id:'hearthlands.starter.v1',name:'Hearthlands overhead starter collection',assets};
 export const demoImageAssets:readonly BuildingAsset[]=['timber','turf'].map((material,i)=>({
  id:`demo.viking.longhouse.${material}`,kind:'longhouse',name:`Demo ${material==='timber'?'timber cross-wing':'turf-roof'} longhouse`,theme:'viking',variation:'Bundled transparent PNG · manual only',
- artwork:{format:'bundled-image',source:`buildings/demo-viking-${material}-longhouse.png`,mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id===`starter.viking.longhouse.${i===0?2:1}`)!.artwork as import('./types').VectorArtwork},
+ artwork:{format:'bundled-image',source:`buildings/demo-viking-${material}-longhouse.png`,visibleBounds:rasterBounds[`demo-viking-${material}-longhouse.png`],mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id===`starter.viking.longhouse.${i===0?2:1}`)!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
 }));
 export const customImageAssets:readonly BuildingAsset[]=[{
  id:'hearthlands.viking.longhouse.01',kind:'longhouse',name:'Ravenfjord Timber Longhouse',theme:'viking',variation:'Custom timber roof · manual only',
- artwork:{format:'bundled-image',source:'buildings/hearthlands-viking-longhouse-01.png',mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
+ artwork:{format:'bundled-image',source:'buildings/hearthlands-viking-longhouse-01.png',visibleBounds:rasterBounds['hearthlands-viking-longhouse-01.png'],mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
 },...([['02','Ravenfjord Painted Timber Hall','Painted timber roof'],['03','Ravenfjord Mossy Timber Hall','Mossy timber roof']] as const).map(([number,name,variation]):BuildingAsset=>({
  id:`hearthlands.viking.longhouse.${number}`,kind:'longhouse',name,theme:'viking',variation:`${variation} · manual only`,
- artwork:{format:'bundled-image',source:`buildings/hearthlands-viking-longhouse-${number}.png`,mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
+ artwork:{format:'bundled-image',source:`buildings/hearthlands-viking-longhouse-${number}.png`,visibleBounds:rasterBounds[`hearthlands-viking-longhouse-${number}.png`],mime:'image/png',pixelWidth:1024,pixelHeight:512,fallback:assets.find(a=>a.id==='starter.viking.longhouse.2')!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal:[4,2],aspectRange:[1.6,2.4],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
 }))];
 export const buildingAssets:readonly BuildingAsset[]=[...starterPack.assets,...demoImageAssets,...customImageAssets];
@@ -39,6 +40,7 @@ export function validateAssetRegistry(entries:readonly BuildingAsset[]=buildingA
   if(!catalogue.some(b=>b.kind===a.kind)||!Object.hasOwn(architectureThemes,a.theme)||!a.name||!a.variation||a.canonicalOrientation!==0||typeof a.automatic!=='boolean')errors.push(`Invalid asset metadata: ${a.id}`);
   const art=a.artwork,vector=art.format==='bundled-image'?art.fallback:art,installed=art.format==='bundled-image'?bundledImageInfo(art.source):undefined;
   if(art.format==='bundled-image'&&(!safeImageReference(art.source)||!installed||installed.width!==art.pixelWidth||installed.height!==art.pixelHeight||art.mime!=='image/png'||![art.pixelWidth,art.pixelHeight].every(n=>Number.isInteger(n)&&n>=32&&n<=4096)||art.pixelWidth*art.pixelHeight>8_388_608))errors.push(`Invalid bundled image: ${a.id}`);
+  if(art.format==='bundled-image'&&art.visibleBounds!==undefined){const b=art.visibleBounds;if(!b||![b.x,b.y,b.width,b.height].every(Number.isInteger)||b.x<0||b.y<0||b.width<=0||b.height<=0||b.x+b.width>art.pixelWidth||b.y+b.height>art.pixelHeight)errors.push(`Invalid image bounds: ${a.id}`);}
   if(!vector||vector.format!=='vector'||!Array.isArray(vector.viewBox)||vector.viewBox.length!==4||vector.viewBox.some(n=>!Number.isFinite(n))||vector.viewBox[2]<=0||vector.viewBox[3]<=0||!Array.isArray(vector.paths)||!vector.paths.length){errors.push(`Invalid vector artwork: ${a.id}`);continue;}
   for(const p of vector.paths)if(!/^[Mm]/.test(p.data)||/[^MmLlHhVvCcSsQqTtAaZz0-9eE.,+\s-]/.test(p.data)||!p.data.length||!/^#[0-9a-f]{6}$|^none$/i.test(p.fill)||p.stroke&&!/^#[0-9a-f]{6}$/i.test(p.stroke)||!['mass','structure','detail'].includes(p.level)||p.width!==undefined&&(!Number.isFinite(p.width)||p.width<=0))errors.push(`Invalid path: ${a.id}`);
   const [min,max]=a.footprint.aspectRange;if(a.footprint.nominal.some(n=>!Number.isFinite(n)||n<=0)||!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max<min||a.footprint.fit!=='adapt-or-contain'||a.thumbnail.view!=='artwork')errors.push(`Invalid footprint mapping: ${a.id}`);
