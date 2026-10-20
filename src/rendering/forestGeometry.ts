@@ -18,7 +18,7 @@ const resolution=4,step=1/resolution;
 const n=(v:number)=>Math.round(v*1000)/1000;
 /** Conservative sub-tile clearance field. Chebyshev distance never overestimates
  * Euclidean clearance; subtracting a pixel diagonal also protects cell corners. */
-function clearance(doc:SettlementDocument){
+export function forestClearance(doc:SettlementDocument){
  const {width,height}=doc.grid,w=width*resolution+2,h=height*resolution+2;
  const field=new Uint16Array(w*h),q=terrainQuery(doc),wet:Cell[]=[];let woodland=0;
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
@@ -53,7 +53,7 @@ function clearance(doc:SettlementDocument){
 }
 /** Camera-independent, bounded, spatially seeded canopy layout. No document writes. */
 export function forestCrowns(doc:SettlementDocument):ForestCrown[]{
- const available=clearance(doc),q=terrainQuery(doc),crowns:ForestCrown[]=[];
+ const available=forestClearance(doc),q=terrainQuery(doc),crowns:ForestCrown[]=[];
  function candidate(x:number,y:number,indexX:number,indexY:number,edge=false){
   const random=seededRandom(doc.seed^Math.imul(indexX+1,374761393)^Math.imul(indexY+1,668265263)^(edge?92171:0));
   const p={x:x+(random()-.5)*(edge?.55:.95),y:y+(random()-.5)*(edge?.55:.95)},space=available(p);
@@ -88,7 +88,7 @@ function outline(c:ForestCrown,scale=1,dx=0,dy=0){
 /** Each crown belongs to one 16-tile spatial chunk, with padded culling bounds.
  * Combining visible native paths before a single fill avoids duplicated curves,
  * clipping seams and alpha differences. Exports use the same complete curves. */
-function compose(crowns:readonly ForestCrown[]):ForestScene{
+export function composeForestCrowns(crowns:readonly ForestCrown[]):ForestScene{
  type Batch={parts:string[];chunks:Map<string,{bounds:TerrainChunk['bounds'];parts:string[]}>};
  const batch=():Batch=>({parts:[],chunks:new Map()});
  const bodies=forestPalette.map(batch),edges=forestPalette.map(batch),lights=forestPalette.map(batch),veins=forestPalette.map(batch);
@@ -118,5 +118,5 @@ const cache:{doc:SettlementDocument;scene:ForestScene}[]=[];
 export function forestScene(doc:SettlementDocument):ForestScene{
  const i=cache.findIndex(({doc:d})=>d.terrain===doc.terrain&&d.landscape===doc.landscape&&d.planning===doc.planning&&d.buildings===doc.buildings&&d.roads===doc.roads&&d.seed===doc.seed&&d.grid.width===doc.grid.width&&d.grid.height===doc.grid.height);
  if(i>=0){const [hit]=cache.splice(i,1);cache.push(hit);return hit.scene;}
- const scene=compose(forestCrowns(doc));cache.push({doc,scene});if(cache.length>2)cache.shift();return scene;
+ const scene=composeForestCrowns(forestCrowns(doc));cache.push({doc,scene});if(cache.length>2)cache.shift();return scene;
 }

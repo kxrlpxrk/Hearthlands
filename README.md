@@ -153,3 +153,5 @@ Bundled PNG artwork installation and iPhone checks: [Phase 6B.5](docs/phase6b5-i
 Illustrated canopy rendering, export parity, screenshots, performance and iPhone checks: [Phase 6C.1A](docs/phase6c1a-forests.md).
 
 Optional supplied Viking tree PNGs, enablement, screenshots and iPhone playtest: [Phase 6C.1B](docs/phase6c1b-forest-pilot.md).
+
+PNG-led woodland composition, matched before/after screenshots, performance and iPhone checks: [Phase 6C.1B.1](docs/phase6c1b1-forest-composition.md).

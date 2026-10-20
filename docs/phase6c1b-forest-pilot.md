@@ -1,5 +1,7 @@
 # Phase 6C.1B — Viking tree PNG pilot
 
+> Historical 6C.1B implementation notes. The current pilot composition is documented in [Phase 6C.1B.1](phase6c1b1-forest-composition.md).
+
 Release **6C.1B** installs the six supplied transparent PNGs as an **opt-in Illustrated forest pilot**. Every source file is unchanged and SHA-256 verified against the supplied manifest. No replacement artwork was generated.
 
 The original [installation instructions](phase6c1b-install-instructions.txt), [pack README](phase6c1b-pack-readme.txt) and [manifest](../src/assets/forests/manifest.json) are retained. This is installed artwork, not a runtime uploader or an asset-sheet importer.

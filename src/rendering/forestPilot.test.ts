@@ -1,11 +1,15 @@
 import {afterEach,describe,it,expect,vi} from 'vitest';
 import manifest from '../assets/forests/manifest.json';
 import {forestImageAssets,validateForestManifest} from '../assets/forests/registry';
-import {forestScene,type ForestCrown} from './forestGeometry';
-import {forestPilotScene,forestPilotSprites,fitForestSprite} from './forestPilot';
+import {forestScene,forestClearance,type ForestCrown} from './forestGeometry';
+import {forestPilotScene,forestPilotSprites,fitForestSprite,forestCanopySizes} from './forestPilot';
 import {createForestImageStore,forestImages,forestImageLevel} from './forestImages';
 import {terrainScene} from './scene';
 import {createDocument} from '../model/document';
+import {legacyTerrain,terrainQuery} from '../model/terrain';
+import {placeBuilding} from '../model/operations';
+import {roadContext,roadGeometry} from './roadGeometry';
+import {sampledPath} from '../model/infrastructure';
 import {serializeDocument,parseDocument} from '../exports/json';
 import {mapSvg} from '../exports/png';
 import {readVisualPreferences,defaultVisualPreferences,useVisualPreferences} from '../ui/visualPreferences';
@@ -36,38 +40,69 @@ describe('installed forest PNG pilot',()=>{
   expect(readVisualPreferences({getItem:()=>JSON.stringify({version:1,style:'illustrated',labels:true,detail:'auto'})}).forestPilot).toBe(false);
   expect(serializeDocument(d)).toBe(before);
  });
- it('selects a limited deterministic mix from the existing crowns, stable across ordering, IDs, JSON and zoom',()=>{
+ it('packs substantial overlapping canopies, stable across ordering, IDs, JSON and zoom',()=>{
   const d=fixture(),base=forestScene(d),a=forestPilotSprites(d,base.crowns),before=serializeDocument(d);
-  expect(a.length).toBeGreaterThan(100);expect(a.length).toBeLessThan(base.crowns.length*.2);
-  expect(new Set(a.map(s=>s.assetId)).size).toBe(6);
+  expect(a.length).toBeGreaterThan(100);expect(a.length).toBeLessThan(base.crowns.length);
+  expect(new Set(a.map(s=>s.assetId)).size).toBe(4);
+  expect(a.filter(s=>s.width>2).length/a.length).toBeGreaterThan(.5);
   expect(forestPilotSprites(d,[...base.crowns].reverse())).toEqual(a);
   expect(forestPilotSprites({...parseDocument(before),id:'duplicate',name:'Copy'},forestScene(parseDocument(before)).crowns)).toEqual(a);
-  const pilot=forestPilotScene(d,all);expect(pilot.crowns).toBe(base.crowns);expect(pilot.paths).toBe(base.paths);
+  const pilot=forestPilotScene(d,all);expect(pilot.crowns).toBe(base.crowns);expect(pilot.paths).not.toBe(base.paths);
+  expect(pilot.paths.every(p=>!p.stroke&&p.opacity!<=.22)).toBe(true);expect(pilot.detail).toEqual([]);
   for(const reduced of [true,false]){const p=terrainScene(d,{style:'illustrated',detail:true,contours:true,reduced,forestPilot:true,forestAssets:all});expect(p.find(p=>p.sprites)?.sprites).toBe(pilot.sprites);}
   expect(serializeDocument(d)).toBe(before);
  });
- it('fits every alpha-rectangle corner inside the original clearance circle at arbitrary rotations and caps native sizing',()=>{
+ it('fits every alpha rectangle proportionally inside its certified group circle at arbitrary rotations',()=>{
   const c:ForestCrown={x:10,y:20,radius:1.2,species:'oak',tone:0,variant:.3,angle:0,density:'edge'};
-  for(const a of forestImageAssets)for(const radius of [.3,.5,.9,1.2])for(const angle of [0,Math.PI/4,Math.PI/2,Math.PI,Math.PI*1.5]){
+  for(const a of forestImageAssets)for(const radius of [.3,.5,.9,1.2,2,3,8])for(const angle of [0,Math.PI/4,Math.PI/2,Math.PI,Math.PI*1.5]){
    const s=fitForestSprite({...c,radius},a,angle);if(!s)continue;
-   expect(s.width/s.height).toBeCloseTo(a.alpha.width/a.alpha.height,12);expect(Math.max(s.width,s.height)).toBeLessThanOrEqual(a.diameter+1e-12);
+   expect(s.width/s.height).toBeCloseTo(a.alpha.width/a.alpha.height,12);expect(Math.max(s.width,s.height)).toBeLessThanOrEqual((a.role==='single'?forestCanopySizes[a.species as keyof typeof forestCanopySizes]:a.diameter)+1e-12);
+   expect(s.radius).toBeLessThanOrEqual(radius+1e-12);
    for(const x of [s.left,s.left+s.width])for(const y of [s.top,s.top+s.height]){
     const px=x*Math.cos(angle)-y*Math.sin(angle),py=x*Math.sin(angle)+y*Math.cos(angle);expect(Math.hypot(px,py)).toBeLessThan(radius-.024);
    }
   }
  });
- it('places clusters sparsely, upright on suitable edges, never mass-stamping interiors or widening candidate envelopes',()=>{
-  const d=fixture(),base=forestScene(d),sprites=forestPilotSprites(d,base.crowns),clusters=sprites.filter(s=>s.assetId.includes('cluster')||s.assetId.includes('edge'));
-  expect(clusters.length).toBeGreaterThan(0);expect(clusters.length).toBeLessThan(sprites.length*.1);
-  for(const [i,s] of clusters.entries()){
-   expect(s.angle).toBe(0);const crown=base.crowns.find(c=>c.x===s.x&&c.y===s.y)!;expect(crown.density).toBe('edge');expect(s.radius).toBe(crown.radius);
-   for(const other of clusters.slice(i+1))expect(Math.hypot(s.x-other.x,s.y-other.y)).toBeGreaterThanOrEqual(7);
+ it('withholds flat-bottom clusters instead of mass-stamping cropped sheet edges; all originals remain installed',()=>{
+  const d=fixture(),sprites=forestPilotSprites(d,forestScene(d).crowns);
+  expect(forestImageAssets.filter(a=>a.role!=='single')).toHaveLength(2);
+  expect(sprites.every(s=>forestImageAssets.find(a=>a.id===s.assetId)?.role==='single')).toBe(true);
+ });
+ it('uses larger landscape-certified envelopes and suppresses most procedural interior crowns',()=>{
+  const d=fixture(),base=forestScene(d),sprites=forestPilotSprites(d,base.crowns),available=forestClearance(d);
+  let larger=0;for(const s of sprites){
+   expect(s.radius).toBeLessThanOrEqual(available(s)+1e-12);
+   const old=base.crowns.find(c=>c.x===s.x&&c.y===s.y)!;if(s.radius>old.radius*1.5)larger++;
   }
+  expect(larger/sprites.length).toBeGreaterThan(.5);
+  const pilot=forestPilotScene(d,all),ground=pilot.paths.filter(p=>p.opacity===.12),fringe=pilot.paths.filter(p=>p.opacity===.22);
+  const count=(paths:typeof ground)=>paths.reduce((n,p)=>n+(p.data.match(/M/g)?.length??0),0);
+  expect(count(ground)).toBe(base.crowns.length);expect(count(fringe)).toBeLessThan(base.crowns.length*.4);
+ });
+ it('certifies larger artwork against water, cultivated land, gathering spaces, rotated buildings, entrances and curved defenses',()=>{
+  let d=fixture();d=placeBuilding(d,{x:30,y:30},'longhouse','protected');d.buildings[0]={...d.buildings[0],rotation:90,locked:true};
+  d.landscape.cells=Array.from({length:32},(_,i)=>({...legacyTerrain({x:46+i%8,y:40+Math.floor(i/8)}),vegetation:1,ground:'soil' as const}));
+  d.planning={version:1,layout:'contextual',centre:{x:35,y:35},workshop:{x:35,y:35},farming:{x:35,y:35},clusters:[],primaryRoutes:[],openSpaces:[{kind:'gathering',cells:[{x:50,y:50},{x:51,y:50}]}]};
+  d.roads=[{id:'wall',layerId:'settlement',surface:'palisade',width:.4,style:'organic',editVersion:1,points:[{x:8,y:20},{x:60,y:20},{x:60,y:75}]},{id:'bridge',layerId:'settlement',surface:'wooden-bridge',width:1,editVersion:1,points:[{x:83,y:60},{x:91,y:60}]}];
+  const available=forestClearance(d),q=terrainQuery(d),sprites=forestPilotSprites(d,forestScene(d).crowns),context=roadContext(d);
+  expect(sprites.length).toBeGreaterThan(100);const invalid=[];
+  for(const s of sprites){
+   expect(s.radius).toBeLessThanOrEqual(available(s)+1e-12);
+   // Sample the entire rotated source rectangle, not just its anchor or opaque centre.
+   for(let v=0;v<=4;v++)for(let u=0;u<=4;u++){
+    const x=s.left+s.width*u/4,y=s.top+s.height*v/4,p={x:s.x+x*Math.cos(s.angle)-y*Math.sin(s.angle),y:s.y+x*Math.sin(s.angle)+y*Math.cos(s.angle)};
+    const t=q.at(p);if(!q.inside(p)||t.vegetation<.35||t.water>.05||t.ground==='soil'||!(p.x<29.7||p.x>32.3||p.y<29.7||p.y>35.3)||!(p.x<30.7||p.x>32.3||p.y<33.8||p.y>35.3))invalid.push({asset:s.assetId,p,t});
+   }
+  }
+  let margin=Infinity;for(const r of d.roads){const g=roadGeometry(d,r,context);for(const p of sampledPath(g.samples,.18))for(const s of sprites)margin=Math.min(margin,Math.hypot(s.x-p.x,s.y-p.y)-s.radius-g.width/2);}
+  expect(invalid).toEqual([]);expect(margin).toBeGreaterThan(.11);
  });
  it('falls back only for unavailable images without reassigning anything or editing terrain/buildings/roads',()=>{
   const d=fixture(),base=forestScene(d),planned=forestPilotScene(d,all),id=all[0],partial=forestPilotScene(d,all.filter(a=>a!==id));
   expect(forestPilotScene(d,[])).toBe(base);expect(partial.sprites).toEqual(planned.sprites!.filter(s=>s.assetId!==id));
   expect(partial.crowns).toBe(base.crowns);expect(partial.paths.every(p=>p.layer==='nature')).toBe(true);
+  expect(partial.paths.some(p=>p.opacity===1)).toBe(true);expect(planned.paths.some(p=>p.opacity===1)).toBe(false);
+  expect(forestPilotScene(d,all.slice(4))).toBe(base);
  });
  it('persists only a default-off browser preference, preserving projects, source geometry and history',()=>{
   const values=new Map<string,string>();vi.stubGlobal('localStorage',{getItem:(k:string)=>values.get(k)??null,setItem:(k:string,v:string)=>values.set(k,v)});
@@ -106,8 +141,9 @@ describe('bounded forest loading, LOD and export',()=>{
  it('embeds originals once, shares editor transforms at every export size, and leaves Planning untouched',async()=>{
   readyImages();await forestImages.prepare();const d=fixture(),source=serializeDocument(d),sprites=forestPilotScene(d,all).sprites!;
   for(const resolution of [1024,2048,4096])for(const reduced of [false,true]){
-   const svg=mapSvg(d,{style:'illustrated',forestPilot:true,resolution,reduced,labels:false,grid:false});expect(svg).not.toContain('data-forest-fallback');expect(svg).not.toContain('href="http');expect((svg.match(/id="forest-pilot-source-/g)??[]).length).toBe(6);
-   for(const s of sprites){expect(svg).toContain(`data-forest-asset="${s.assetId}" transform="translate(${s.x} ${s.y}) rotate(${s.angle*180/Math.PI})"`);expect(svg).toContain(`x="${s.left}" y="${s.top}" width="${s.width}" height="${s.height}"`);}
+   const svg=mapSvg(d,{style:'illustrated',forestPilot:true,resolution,reduced,labels:false,grid:false});expect(svg).not.toContain('data-forest-fallback');expect(svg).not.toContain('href="http');expect((svg.match(/id="forest-pilot-source-/g)??[]).length).toBe(4);
+   const actual=[...svg.matchAll(/<g data-forest-asset="[^"]+" transform="[^"]+"><svg x="[^"]+" y="[^"]+" width="[^"]+" height="[^"]+"/g)].map(m=>m[0]);
+   expect(actual).toEqual(sprites.map(s=>`<g data-forest-asset="${s.assetId}" transform="translate(${s.x} ${s.y}) rotate(${s.angle*180/Math.PI})"><svg x="${s.left}" y="${s.top}" width="${s.width}" height="${s.height}"`));
   }
   const o={style:'planning' as const,resolution:1024,labels:false,grid:false};expect(mapSvg(d,{...o,forestPilot:true})).toBe(mapSvg(d,o));expect(serializeDocument(d)).toBe(source);
  });
