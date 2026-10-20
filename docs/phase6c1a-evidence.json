@@ -1,0 +1,414 @@
+{
+  "release": "6C.1A",
+  "baselineCommit": "84905b00ad3dac42f8e0609af3d63c4e74562429",
+  "automated": {
+    "passedTests": 286,
+    "passedFiles": 27,
+    "durationSeconds": 94.65,
+    "commands": [
+      "npm test",
+      "npm run build",
+      "npm run verify:release"
+    ],
+    "buildWarning": "Existing >500kB chunk warning; no build failures",
+    "additionalDependencies": 0
+  },
+  "browser": {
+    "engine": "Chromium touch emulation (not physical iPhone/Safari)",
+    "viewports": [
+      [
+        375,
+        667
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        844,
+        390
+      ]
+    ],
+    "functionalChecks": [
+      "non-listening canopy batches",
+      "two-finger brush navigation leaves document and canopy scene functions unchanged",
+      "cancelled stroke leaves document unchanged",
+      "one-stroke terrain undo",
+      "cancelled terrain conflict preview leaves document unchanged",
+      "six custom building PNGs: thumbnails, auto reset/history, locks, centre/edge/outside touch selection, move/rotate/resize",
+      "PNG cache RGBA identity for existing custom artwork at overview and close zoom",
+      "JSON export/import project isolation",
+      "persistent browser close/reopen",
+      "complete-map PNG downloads",
+      "no page errors"
+    ],
+    "pngDownloads": [
+      {
+        "resolution": 1024,
+        "actualSize": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "resolution": 2048,
+        "actualSize": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "resolution": 4096,
+        "actualSize": [
+          4096,
+          4096
+        ],
+        "mode": "RGBA"
+      }
+    ],
+    "reducedPng": 2048
+  },
+  "comparison": {
+    "preset": "Viking Fishing Village",
+    "environment": "River",
+    "layout": "Contextual",
+    "seed": 1847,
+    "buildings": 35,
+    "mapSize": [
+      96,
+      96
+    ],
+    "fixtureNote": "Existing village with supplemental forest painted into unoccupied western land, same in both builds. Grid and districts hidden. Production builds; baseline built separately.",
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 2,
+    "beforeAfterBuildingAndCameraMeasurementsIdentical": true,
+    "views": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "rect": {
+          "x": 154.25,
+          "y": 242.85416666666669,
+          "width": 6.791666666666657,
+          "height": 6.791666666666657
+        },
+        "assetId": "hearthlands.sheet4.cottage.01",
+        "image": {
+          "rect": {
+            "x": 155.2158313543157,
+            "y": 242.86639166666671,
+            "width": 4.860003958035293,
+            "height": 6.7672166666666556
+          },
+          "width": 63.7696,
+          "height": 45.79733791130186,
+          "crop": {
+            "x": 2.8333333333333335,
+            "y": 11.083333333333334,
+            "width": 58.25,
+            "height": 41.833333333333336
+          },
+          "sourceWidth": 64,
+          "sourceHeight": 64,
+          "level": "distant",
+          "source": "buildings/hearthlands-sheet4-cottage-01.png"
+        },
+        "shadows": 0,
+        "hitStroke": 0
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.4000001284678047,
+        "rect": {
+          "x": 182.19999393253215,
+          "y": 274.20002640660834,
+          "width": 25.600008221939504,
+          "height": 25.600008221939504
+        },
+        "assetId": "hearthlands.sheet4.cottage.01",
+        "image": {
+          "rect": {
+            "x": 185.8405275194998,
+            "y": 274.2461064214078,
+            "width": 18.318941048004206,
+            "height": 25.507848192340532
+          },
+          "width": 63.7696,
+          "height": 45.79733791130186,
+          "crop": {
+            "x": 2.8333333333333335,
+            "y": 11.083333333333334,
+            "width": 58.25,
+            "height": 41.833333333333336
+          },
+          "sourceWidth": 64,
+          "sourceHeight": 64,
+          "level": "distant",
+          "source": "buildings/hearthlands-sheet4-cottage-01.png"
+        },
+        "shadows": 0,
+        "hitStroke": 0
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.799999959203155,
+        "rect": {
+          "x": 169.40001265128774,
+          "y": 261.40003182307714,
+          "width": 51.19999738900191,
+          "height": 51.19999738900191
+        },
+        "assetId": "hearthlands.sheet4.cottage.01",
+        "image": {
+          "rect": {
+            "x": 176.6810771154614,
+            "y": 261.49219181837736,
+            "width": 36.6378684606546,
+            "height": 51.01567739840152
+          },
+          "width": 63.7696,
+          "height": 45.79733791130186,
+          "crop": {
+            "x": 11.333333333333334,
+            "y": 44.333333333333336,
+            "width": 233,
+            "height": 167.33333333333334
+          },
+          "sourceWidth": 256,
+          "sourceHeight": 256,
+          "level": "medium",
+          "source": "buildings/hearthlands-sheet4-cottage-01.png"
+        },
+        "shadows": 0,
+        "hitStroke": 0
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999997487869863,
+        "rect": {
+          "x": 147.00003026584386,
+          "y": 239.00003855639466,
+          "width": 95.99998392236711,
+          "height": 95.99998392236711
+        },
+        "assetId": "hearthlands.sheet4.cottage.01",
+        "image": {
+          "rect": {
+            "x": 160.65202454599464,
+            "y": 239.17283852745493,
+            "width": 68.69599536206553,
+            "height": 95.65438398024662
+          },
+          "width": 63.7696,
+          "height": 45.79733791130186,
+          "crop": {
+            "x": 11.333333333333334,
+            "y": 44.333333333333336,
+            "width": 233,
+            "height": 167.33333333333334
+          },
+          "sourceWidth": 256,
+          "sourceHeight": 256,
+          "level": "medium",
+          "source": "buildings/hearthlands-sheet4-cottage-01.png"
+        },
+        "shadows": 0,
+        "hitStroke": 0
+      }
+    ]
+  },
+  "pixelParity": {
+    "method": "Complete shared forest paths versus production native visible chunk composition on transparent 1024px canvas; exact same curves/paints. Count channels with error >2/255.",
+    "results": [
+      {
+        "size": 96,
+        "buildings": 35,
+        "crowns": 4679,
+        "batches": 16,
+        "mismatchFraction": 9.298324584960938e-06,
+        "meanError": 0.0002849102020263672,
+        "maxError": 9
+      },
+      {
+        "size": 128,
+        "buildings": 75,
+        "crowns": 6794,
+        "batches": 16,
+        "mismatchFraction": 7.867813110351562e-06,
+        "meanError": 0.00024318695068359375,
+        "maxError": 12
+      },
+      {
+        "size": 192,
+        "buildings": 100,
+        "crowns": 14178,
+        "batches": 16,
+        "mismatchFraction": 4.5299530029296875e-06,
+        "meanError": 0.00028133392333984375,
+        "maxError": 15
+      }
+    ],
+    "planningGeometryByteIdenticalToBaseline": true,
+    "planningComparisons": 12
+  },
+  "performance": {
+    "protocol": "Sequential 120-frame samples during 40-event touch pans, 390x844, DPR3; no simultaneous build/test workload. Figures in ms, development machine.",
+    "maps": [
+      {
+        "buildings": 35,
+        "mapSize": 96,
+        "forestCells": 5444,
+        "count": 19,
+        "results": [
+          {
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.700000000000728,
+            "worst": 16.800000000000182
+          },
+          {
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.800000000000182,
+            "worst": 16.800000000000182
+          },
+          {
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 66.69999999999891,
+            "worst": 133.39999999999964
+          },
+          {
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50.100000000000364,
+            "worst": 66.69999999999891
+          }
+        ]
+      },
+      {
+        "buildings": 75,
+        "mapSize": 128,
+        "forestCells": 7442,
+        "count": 31,
+        "results": [
+          {
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.800000000000182,
+            "worst": 33.30000000000018
+          },
+          {
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.799999999999272,
+            "worst": 33.399999999999636
+          },
+          {
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 49.899999999999636,
+            "worst": 50
+          },
+          {
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50,
+            "worst": 50.100000000000364
+          }
+        ]
+      },
+      {
+        "buildings": 100,
+        "mapSize": 192,
+        "forestCells": 15016,
+        "count": 40,
+        "results": [
+          {
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 33.399999999999636,
+            "worst": 50
+          },
+          {
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 33.30000000000109,
+            "worst": 33.400000000001455
+          },
+          {
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 66.70000000000073,
+            "worst": 83.29999999999927
+          },
+          {
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 66.70000000000073,
+            "worst": 83.40000000000146
+          }
+        ]
+      }
+    ],
+    "coldAlmostAllForestWith100ProtectedFootprints": [
+      {
+        "mapSize": 96,
+        "coldMs": 234.8,
+        "scenePlus50CacheHitsMs": 37.7,
+        "crowns": 6173,
+        "terrainBatches": 28
+      },
+      {
+        "mapSize": 128,
+        "coldMs": 476.0,
+        "scenePlus50CacheHitsMs": 86.8,
+        "crowns": 11748,
+        "terrainBatches": 28
+      },
+      {
+        "mapSize": 192,
+        "coldMs": 1182.0,
+        "scenePlus50CacheHitsMs": 222.1,
+        "crowns": 27683,
+        "terrainBatches": 28
+      }
+    ],
+    "bundleIncreaseApproxRawBytes": 6590,
+    "bundleIncreaseApproxGzipBytes": 2630,
+    "notes": [
+      "16 forest Konva batches at full detail, 12 at reduced",
+      "No per-tree nodes or images; native off-screen chunk culling; two-entry layout cache",
+      "Cold/native parsing cost and close-up dropped frames remain; physical iPhone Safari not measured"
+    ]
+  }
+}

@@ -60,7 +60,7 @@ export function SettlementCanvas() {
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const gridLines=useMemo(()=>[...Array.from({length:doc.grid.width+1},(_,i)=>({id:`x${i}`,points:[i*cell,0,i*cell,height]})),...Array.from({length:doc.grid.height+1},(_,i)=>({id:`y${i}`,points:[0,i*cell,width,i*cell]}))],[doc.grid.width,doc.grid.height,cell,width,height]);
   useMemo(()=>tool==='terrain-editor'?terrainProtection(doc):null,[tool,doc]);
-  const terrainPaths=useMemo(()=>terrainScene(doc,{...doc.landscape,style,reduced}),[doc.terrain,doc.landscape,doc.grid.width,doc.grid.height,doc.seed,doc.planning,style,reduced]);
+  const terrainPaths=useMemo(()=>terrainScene(doc,{...doc.landscape,style,reduced}),[doc.terrain,doc.landscape,doc.buildings,doc.roads,doc.grid.width,doc.grid.height,doc.seed,doc.planning,style,reduced]);
   const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ road:r, id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.landscape, doc.buildings]);
   const districtView=doc.districtView??defaultDistrictView;
   const districtShapes=useMemo(()=>{const districts=district.detection??visibleDistricts(doc);return districts.map(d=>({district:d,...districtGeometry(doc,d)}));},[doc.districts,doc.districtView,doc.layers,doc.grid.width,doc.grid.height,district.detection]);

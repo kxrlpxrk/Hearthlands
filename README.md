@@ -149,3 +149,5 @@ Phase 6A adds Planning / Illustrated styles, shared visual layers, zoom-aware te
 Phase 6B adds a versioned building asset registry, themed automatic variations, manual appearance thumbnails and matching Illustrated exports. See [starter artwork, manifest architecture, validation and physical-iPhone steps](docs/phase6b-building-assets.md).
 
 Bundled PNG artwork installation and iPhone checks: [Phase 6B.5](docs/phase6b5-image-assets.md).
+
+Illustrated canopy rendering, export parity, screenshots, performance and iPhone checks: [Phase 6C.1A](docs/phase6c1a-forests.md).

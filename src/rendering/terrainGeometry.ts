@@ -1,9 +1,11 @@
+import {forestScene} from './forestGeometry';
 import {noise} from '../generator/noise';
 import type { VisualStyle, TerrainLayer } from './styles';
 import type { Cell, SettlementDocument } from '../model/document';
 import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 export const groundColors={grass:'#536447',dirt:'#806b4b',sand:'#b4a375',rock:'#737775',soil:'#66523b'};
-export interface TerrainPath { layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
+export interface TerrainChunk {data:string;bounds:{x:number;y:number;width:number;height:number}}
+export interface TerrainPath { chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
 export interface TerrainView { contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean }
 const tile=(x:number,y:number)=>`M${x} ${y}h1v1h-1Z`;
 const n=(v:number)=>Math.round(v*1000)/1000;
@@ -40,7 +42,7 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     }
     if(value>0&&value<.5)add(tile(x,y),fill,undefined,undefined,.1);
   }
-  layer='nature';for(const t of cells)coverage(t,'vegetation',illustrated?'#365d43':'#294c3e');
+  layer='nature';if(!illustrated)for(const t of cells)coverage(t,'vegetation','#294c3e');
   layer='water';for(const t of cells)coverage(t,'water',illustrated?'#477f88':'#355d69');
   // Small seeded details and material seams soften large painted surfaces without changing queries.
   if(fine)for(const t of cells){
@@ -48,8 +50,7 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     if(t.water>=.5){layer='water';if(illustrated&&r>.5)add(`M${n(x+.1)} ${n(y+.28)}q.35 -.08 .75 .02`,undefined,'#244f66',.12,.12);if(r>.72)add(`M${x+.15} ${y+.5}q.2 -.08 .4 0t.3 0`,undefined,'#7d9d9a',.025,.35);continue;}
     layer='nature';
     if(illustrated&&r>.65)add(`M${x} ${y}h1v1h-1Z`,'#b4b878',undefined,undefined,.06);
-    if(illustrated&&t.vegetation>=.5&&r>.28)add(`M${n(cx-.23)} ${n(cy+.2)}q-.12 -.2 .23 -.52q.34 .3 .19 .52Z`,'#142f29',undefined,undefined,.25);
-    if(t.vegetation>=.35&&r>.28)add(`M${n(cx-.2)} ${n(cy+.17)}Q${n(cx-.35)} ${n(cy-.05)} ${n(cx)} ${n(cy-.34)}Q${n(cx+.34)} ${n(cy-.06)} ${n(cx+.18)} ${n(cy+.17)}Z`,illustrated?'#638151':'#355e45','#1e4035',.035,.8);
+    if(!illustrated&&t.vegetation>=.35&&r>.28)add(`M${n(cx-.2)} ${n(cy+.17)}Q${n(cx-.35)} ${n(cy-.05)} ${n(cx)} ${n(cy-.34)}Q${n(cx+.34)} ${n(cy-.06)} ${n(cx+.18)} ${n(cy+.17)}Z`,illustrated?'#638151':'#355e45','#1e4035',.035,.8);
     if(t.rocks>.15&&r>.25)add(`M${x+.2} ${y+.67}l.14 -.3 .3 -.04 .16 .3-.28 .12Z`,'#92958b','#555e58',.035,t.rocks);
     if(t.ground==='soil'&&t.vegetation<.5)add(`M${x+.15} ${y+.2}l.7 .15M${x+.15} ${y+.5}l.7 .15`,undefined,'#ac9061',.04,.28);
     else if(r>.58)add(`M${n(cx-.16)} ${n(cy)}q.12 -.1 .28 0`,undefined,t.ground==='sand'?'#d3c392':t.ground==='rock'?'#aaa99b':'#acb17b',.025,.2);
@@ -72,6 +73,8 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     }
     add(contour.join(''),undefined,'#e7d6a2',.035,.5);
   }
-  return [...groups.values()].map(g=>({...g.path,data:g.parts.join('')}));
+  const paths=[...groups.values()].map(g=>({...g.path,data:g.parts.join('')}));
+  if(illustrated){const forest=forestScene(doc);paths.push(...forest.paths,...(fine?forest.detail:[]));}
+  return paths;
 }
 export function previewTerrainColor(t:LandscapeCell){return t.water>=.5?'#6cb8c1':t.vegetation>=.6?'#75b278':t.rocks>=.6?'#a5aea2':groundColors[t.ground];}
