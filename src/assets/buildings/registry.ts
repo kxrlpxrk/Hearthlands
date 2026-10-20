@@ -1,9 +1,10 @@
+import {pilotPresentations} from './pilotPresentation';
 import {rasterBounds} from './rasterBounds';
 import {safeImageReference,bundledImageInfo} from './images';
 import {catalogue,type BuildingKind} from '../../model/catalogue';
 import {symbolPaths} from '../../rendering/symbols';
 import {priorityArtwork,materials} from './artwork';
-import {architectureThemes,type BuildingAsset,type BuildingAssetPackManifest,type ArchitectureTheme} from './types';
+import {architectureThemes,type BuildingAsset,type BuildingAssetPackManifest,type ArchitectureTheme,type VectorArtwork} from './types';
 export const priorityKinds=['longhouse','cottage','blacksmith','tavern','farm','warehouse','watchtower','market'] as const;
 const names:Record<string,readonly [string,string]>={longhouse:['Bowed turf hall','Timber hall with side wing'],cottage:['Hipped-roof cottage','L-shaped homestead'],blacksmith:['Open forge yard','Enclosed chimney smithy'],tavern:['Alehouse and barrel yard','Courtyard tavern'],farm:['Long barn and cultivated yard','L-barn with round granary'],warehouse:['Loading shed','Twin store sheds'],watchtower:['Square timber lookout','Octagonal stone lookout'],market:['Market stall rows','Courtyard market']};
 const assets:BuildingAsset[]=[];
@@ -38,7 +39,7 @@ const sheet4Definitions:readonly {kind:BuildingKind;name:string;nominal:[number,
 ];
 export const sheet4PilotAssets:readonly BuildingAsset[]=sheet4Definitions.map(({kind,name,nominal,pixels}):BuildingAsset=>({
  id:`hearthlands.sheet4.${kind}.01`,kind,name,theme:'viking',variation:'Sheet-extracted PNG pilot · manual only',
- artwork:{format:'bundled-image',source:`buildings/hearthlands-sheet4-${kind}-01.png`,visibleBounds:rasterBounds[`hearthlands-sheet4-${kind}-01.png`],mime:'image/png',pixelWidth:pixels[0],pixelHeight:pixels[1],fallback:assets.find(a=>a.id===`starter.viking.${kind}.1`)!.artwork as import('./types').VectorArtwork},
+ artwork:{format:'bundled-image',source:`buildings/hearthlands-sheet4-${kind}-01.png`,visibleBounds:rasterBounds[`hearthlands-sheet4-${kind}-01.png`],mime:'image/png',pixelWidth:pixels[0],pixelHeight:pixels[1],presentation:pilotPresentations[kind],fallback:assets.find(a=>a.id===`starter.viking.${kind}.1`)!.artwork as import('./types').VectorArtwork},
  thumbnail:{view:'artwork',background:'#263a30'},footprint:{nominal,aspectRange:[nominal[0]/nominal[1]*.4,nominal[0]/nominal[1]*2.5],fit:'adapt-or-contain'},canonicalOrientation:0,automatic:false,
 }));
 export const buildingAssets:readonly BuildingAsset[]=[...starterPack.assets,...demoImageAssets,...customImageAssets,...sheet4PilotAssets];
@@ -52,9 +53,19 @@ export function validateAssetRegistry(entries:readonly BuildingAsset[]=buildingA
   const art=a.artwork,vector=art.format==='bundled-image'?art.fallback:art,installed=art.format==='bundled-image'?bundledImageInfo(art.source):undefined;
   if(art.format==='bundled-image'&&(!safeImageReference(art.source)||!installed||installed.width!==art.pixelWidth||installed.height!==art.pixelHeight||art.mime!=='image/png'||![art.pixelWidth,art.pixelHeight].every(n=>Number.isInteger(n)&&n>=32&&n<=4096)||art.pixelWidth*art.pixelHeight>8_388_608))errors.push(`Invalid bundled image: ${a.id}`);
   if(art.format==='bundled-image'&&art.visibleBounds!==undefined){const b=art.visibleBounds;if(!b||![b.x,b.y,b.width,b.height].every(Number.isInteger)||b.x<0||b.y<0||b.width<=0||b.height<=0||b.x+b.width>art.pixelWidth||b.y+b.height>art.pixelHeight)errors.push(`Invalid image bounds: ${a.id}`);}
-  if(!vector||vector.format!=='vector'||!Array.isArray(vector.viewBox)||vector.viewBox.length!==4||vector.viewBox.some(n=>!Number.isFinite(n))||vector.viewBox[2]<=0||vector.viewBox[3]<=0||!Array.isArray(vector.paths)||!vector.paths.length){errors.push(`Invalid vector artwork: ${a.id}`);continue;}
-  for(const p of vector.paths)if(!/^[Mm]/.test(p.data)||/[^MmLlHhVvCcSsQqTtAaZz0-9eE.,+\s-]/.test(p.data)||!p.data.length||!/^#[0-9a-f]{6}$|^none$/i.test(p.fill)||p.stroke&&!/^#[0-9a-f]{6}$/i.test(p.stroke)||!['mass','structure','detail'].includes(p.level)||p.width!==undefined&&(!Number.isFinite(p.width)||p.width<=0))errors.push(`Invalid path: ${a.id}`);
+  if(art.format==='bundled-image'&&art.presentation!==undefined){
+   const p=art.presentation,b=p?.bounds,o=p?.offset;
+   if(!p||p.version!==1||p.scale!==undefined&&(!Number.isFinite(p.scale)||p.scale<.25||p.scale>3)||p.offset!==undefined&&(!o||![o.x,o.y].every(n=>Number.isFinite(n)&&Math.abs(n)<=1))||p.bounds!==undefined&&(!b||![b.x,b.y,b.width,b.height].every(Number.isFinite)||b.x<0||b.y<0||b.width<=0||b.height<=0||b.x+b.width>1||b.y+b.height>1))errors.push(`Invalid raster presentation: ${a.id}`);
+   if(p?.overview!==undefined)validateVector(p.overview,a.id,errors);
+  }
+  if(!validateVector(vector,a.id,errors))continue;
   const [min,max]=a.footprint.aspectRange;if(a.footprint.nominal.some(n=>!Number.isFinite(n)||n<=0)||!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max<min||a.footprint.fit!=='adapt-or-contain'||a.thumbnail.view!=='artwork')errors.push(`Invalid footprint mapping: ${a.id}`);
  }
  return errors;
+}
+
+function validateVector(vector:VectorArtwork|undefined,id:string,errors:string[]):boolean{
+  if(!vector||vector.format!=='vector'||!Array.isArray(vector.viewBox)||vector.viewBox.length!==4||vector.viewBox.some(n=>!Number.isFinite(n))||vector.viewBox[2]<=0||vector.viewBox[3]<=0||!Array.isArray(vector.paths)||!vector.paths.length){errors.push(`Invalid vector artwork: ${id}`);return false;}
+  for(const p of vector.paths)if(!p||typeof p.data!=='string'||!/^[Mm]/.test(p.data)||/[^MmLlHhVvCcSsQqTtAaZz0-9eE.,+\s-]/.test(p.data)||!p.data.length||!/^#[0-9a-f]{6}$|^none$/i.test(p.fill)||p.stroke&&!/^#[0-9a-f]{6}$/i.test(p.stroke)||!['mass','structure','detail'].includes(p.level)||p.width!==undefined&&(!Number.isFinite(p.width)||p.width<=0))errors.push(`Invalid path: ${id}`);
+ return true;
 }

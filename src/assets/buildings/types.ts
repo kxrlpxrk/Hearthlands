@@ -5,8 +5,16 @@ export interface ArtworkPath {data:string;fill:string;stroke?:string;width?:numb
 export interface VectorArtwork {format:'vector';viewBox:readonly [number,number,number,number];paths:readonly ArtworkPath[]}
 /** Alpha-content rectangle in original PNG pixel coordinates; no document geometry. */
 export interface ImageBounds {x:number;y:number;width:number;height:number}
+/** Normalised unrotated footprint coordinates, distinct from source PNG pixels. */
+export interface PresentationBounds {x:number;y:number;width:number;height:number}
+/** Installed artwork metadata only, never project state. Bounds and offsets are
+ * fractions of the unrotated logical footprint. Bounds must stay inside [0,1]. */
+export interface RasterPresentation {
+ version:1;scale?:number;offset?:{x:number;y:number};bounds?:PresentationBounds;
+ overview?:VectorArtwork;
+}
 /** Only approved, statically imported PNGs are resolved. Never a runtime URL or upload. */
-export interface BundledImageArtwork {format:'bundled-image';source:string;mime:'image/png';pixelWidth:number;pixelHeight:number;visibleBounds?:ImageBounds;fallback:VectorArtwork}
+export interface BundledImageArtwork {format:'bundled-image';source:string;mime:'image/png';pixelWidth:number;pixelHeight:number;visibleBounds?:ImageBounds;presentation?:RasterPresentation;fallback:VectorArtwork}
 export type ArtworkDefinition=VectorArtwork|BundledImageArtwork;
 export interface BuildingAsset<A extends ArtworkDefinition=ArtworkDefinition> {
  id:string;kind:BuildingKind;name:string;theme:ArchitectureTheme;variation:string;

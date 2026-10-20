@@ -1,4 +1,4 @@
-import {rasterGeometry,artworkHasShadow} from './rasterGeometry';
+import {rasterGeometry,artworkHasShadow,rasterOverviewGeometry} from './rasterGeometry';
 import {imageFailed} from './bundledImages';
 import {bundledImageSource} from '../assets/buildings/images';
 import type {Building} from '../model/document';
@@ -16,6 +16,8 @@ export const artworkSilhouette=(asset:BuildingAsset)=>artworkPaths(asset,true).f
  * The optional size supplies exactly the same alpha crop/contain fit as the editor. */
 export function artworkSvg(asset:BuildingAsset,reduced=false,shadow?:string,size={width:asset.footprint.nominal[0],height:asset.footprint.nominal[1]}):string{
  if(shadow&&!artworkHasShadow(asset))return '';
+ const overview=!shadow&&reduced?rasterOverviewGeometry(size,asset):undefined;
+ if(overview){const r=overview.bounds;return `<svg data-raster-overview="${asset.id}" x="${r.x}" y="${r.y}" width="${r.width}" height="${r.height}" viewBox="${overview.vector.viewBox.join(' ')}" preserveAspectRatio="xMidYMid meet" overflow="hidden">${overview.vector.paths.map(p=>`<path d="${p.data}" fill="${p.fill}" ${p.stroke?`stroke="${p.stroke}" stroke-width="${p.width??1}"`:''} stroke-linejoin="round" stroke-linecap="round"/>`).join('')}</svg>`;}
  const source=!shadow&&!imageFailed(asset)&&asset.artwork.format==='bundled-image'?bundledImageSource(asset.artwork.source):undefined;
  if(source&&asset.artwork.format==='bundled-image'){
   const r=rasterGeometry(size,asset),c=r.crop;

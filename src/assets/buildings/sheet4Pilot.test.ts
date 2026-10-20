@@ -38,7 +38,7 @@ describe.each(supplied)('Sheet 4 $kind pilot',({kind,name,size,nominal,bounds,sh
   expect(artworkHasShadow(asset)).toBe(false);
   for(const rotation of [0,90,180,270])for(const resolution of [1024,2048,4096]){
    const doc=updateBuilding(chosen,'pilot',{rotation,width:nominal[0],height:nominal[1]}),b=doc.buildings[0],r=rasterGeometry(b,asset),f=footprint(b);
-   expect(r.width/r.height).toBeCloseTo(bounds.width/bounds.height,12);expect(r.x+r.width/2).toBeCloseTo(b.width/2);expect(r.y+r.height/2).toBeCloseTo(b.height/2);expect(r.x).toBeGreaterThanOrEqual(.059999);expect(r.y).toBeGreaterThanOrEqual(.059999);
+   expect(r.width/r.height).toBeCloseTo(bounds.width/bounds.height,12);expect(r.x+r.width/2).toBeCloseTo(b.width/2);expect(r.y+r.height/2).toBeCloseTo(b.height/2);expect(r.x).toBeGreaterThanOrEqual(0);expect(r.y).toBeGreaterThanOrEqual(0);expect(r.x+r.width).toBeLessThanOrEqual(b.width);expect(r.y+r.height).toBeLessThanOrEqual(b.height);
    const svg=mapSvg(doc,{resolution,style:'illustrated',grid:false,labels:false});expect(svg).toContain(`data-raster="${id}"`);expect(svg).toContain(bundledImageInfo(asset.artwork.source)!.source);expect(svg).toContain(`rotate(${rotation})`);expect(svg).toContain(`translate(${b.x+f.width/2} ${b.y+f.height/2})`);expect(svg).toContain(`viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}"`);expect(svg).not.toContain('data-building-shadow');
   }
   const options={resolution:1024,style:'planning' as const,grid:false,labels:false};expect(mapSvg(chosen,options)).toBe(mapSvg(base,options));
