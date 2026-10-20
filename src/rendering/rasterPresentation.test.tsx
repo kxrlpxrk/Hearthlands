@@ -2,7 +2,7 @@ import {describe,it,expect,vi} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {sheet4PilotAssets,customImageAssets,demoImageAssets,validateAssetRegistry} from '../assets/buildings/registry';
 import type {BuildingAsset,BundledImageArtwork} from '../assets/buildings/types';
-import {rasterGeometry,rasterOverviewGeometry,rasterOverview} from './rasterGeometry';
+import {rasterGeometry} from './rasterGeometry';
 import {artworkSvg} from './buildingArtwork';
 import {AssetThumbnail} from '../ui/BuildingAppearance';
 import {placeBuilding} from '../model/operations';
@@ -34,21 +34,18 @@ describe('safe installed artwork presentation',()=>{
   expect(r.x).toBeGreaterThanOrEqual(.2-1e-12);expect(r.y).toBeGreaterThanOrEqual(.4-1e-12);expect(r.x+r.width).toBeLessThanOrEqual(1.6+1e-12);expect(r.y+r.height).toBeLessThanOrEqual(1.6+1e-12);expect(r.crop).toEqual((a.artwork as BundledImageArtwork).visibleBounds);expect(r.width/r.height).toBeCloseTo(r.crop.width/r.crop.height,12);
  });
  it.each([...customImageAssets,...demoImageAssets])('$id retains its exact Phase 6B.6 fit and full/reduced artwork',asset=>{
-  const art=asset.artwork as BundledImageArtwork;expect(art.presentation).toBeUndefined();for(const size of [{width:4,height:2},{width:8,height:3},{width:1,height:20}]){const c=art.visibleBounds!,scale=Math.min(Math.max(.1,size.width-.12)/c.width,Math.max(.1,size.height-.12)/c.height),w=c.width*scale,h=c.height*scale;expect(rasterGeometry(size,asset)).toEqual({x:(size.width-w)/2,y:(size.height-h)/2,width:w,height:h,crop:c,scale});expect(rasterOverviewGeometry(size,asset)).toBeUndefined();expect(artworkSvg(asset,true)).toContain('data-raster=');expect(artworkSvg(asset,true)).not.toContain('data-raster-overview');}
+  const art=asset.artwork as BundledImageArtwork;expect(art.presentation).toBeUndefined();for(const size of [{width:4,height:2},{width:8,height:3},{width:1,height:20}]){const c=art.visibleBounds!,scale=Math.min(Math.max(.1,size.width-.12)/c.width,Math.max(.1,size.height-.12)/c.height),w=c.width*scale,h=c.height*scale;expect(rasterGeometry(size,asset)).toEqual({x:(size.width-w)/2,y:(size.height-h)/2,width:w,height:h,crop:c,scale});expect(artworkSvg(asset,true)).toContain('data-raster=');expect(artworkSvg(asset,true)).not.toContain('data-raster-overview');}
  });
  it('rejects unsafe scale, offset, bounds, versions and overview markup',()=>{
   const a=sheet4PilotAssets[0];for(const p of [null,{version:2},{version:1,scale:NaN},{version:1,scale:0},{version:1,scale:4},{version:1,offset:null},{version:1,offset:{x:Infinity,y:0}},{version:1,offset:{x:2,y:0}},{version:1,bounds:null},{version:1,bounds:{x:-.1,y:0,width:1,height:1}},{version:1,bounds:{x:0,y:0,width:1.1,height:1}},{version:1,bounds:{x:0,y:0,width:0,height:1}}])expect(validateAssetRegistry([scaled(a,p)])).toContain(`Invalid raster presentation: ${a.id}`);
   for(const overview of [null,{format:'vector',viewBox:[0,0,1,0],paths:[]},{format:'vector',viewBox:[0,0,10,10],paths:[{data:'M0 0<script>',fill:'#ffffff',level:'mass'}]}])expect(validateAssetRegistry([scaled(a,{version:1,overview})]).length).toBeGreaterThan(0);
   expect(validateAssetRegistry([scaled(a,{version:1})])).toEqual([]);
  });
- it('uses a bounded LOD flag at 11/44/83/100/150 percent and supports explicit reduced detail',()=>{
-  expect([.11,.44,.83,1,1.5].map(zoom=>rasterOverview(false,32*zoom))).toEqual([true,true,false,false,false]);expect(rasterOverview(false,16)).toBe(false);expect(rasterOverview(true,48)).toBe(true);
- });
  it.each(sheet4PilotAssets)('$kind shares safe bounds between thumbnail, PNG pixels and readable reduced-detail export',asset=>{
-  const [width,height]=asset.footprint.nominal,size={width,height},r=rasterGeometry(size,asset),o=rasterOverviewGeometry(size,asset)!;
+  const [width,height]=asset.footprint.nominal,size={width,height},r=rasterGeometry(size,asset);
   const thumb=renderToStaticMarkup(<AssetThumbnail asset={asset}/>);for(const attribute of [`x="${r.x}"`,`y="${r.y}"`,`width="${r.width}"`,`height="${r.height}"`,`viewBox="${r.crop.x} ${r.crop.y} ${r.crop.width} ${r.crop.height}"`]){expect(thumb).toContain(attribute);expect(artworkSvg(asset,false)).toContain(attribute);}
-  expect(o.scale).toBeGreaterThan(0);const reduced=artworkSvg(asset,true);expect(reduced).toContain(`data-raster-overview="${asset.id}"`);expect(reduced).toContain('overflow="hidden"');for(const p of o.vector.paths)expect(reduced).toContain(p.data);expect(artworkSvg(asset,true,'#000000')).toBe('');
-  const base=placeBuilding(createDocument(),{x:10,y:10},asset.kind,'test'),doc=setBuildingAppearance(base,'test',asset.id);for(const resolution of [1024,2048,4096]){expect(mapSvg(doc,{style:'illustrated',resolution,grid:false,labels:false,reduced:false})).toContain(`data-raster="${asset.id}"`);expect(mapSvg(doc,{style:'illustrated',resolution,grid:false,labels:false,reduced:true})).toContain(`data-raster-overview="${asset.id}"`);}
+  const reduced=artworkSvg(asset,true);expect(reduced).toContain(`data-raster="${asset.id}"`);expect(reduced).not.toContain('data-raster-overview');expect(reduced).toBe(artworkSvg(asset,false));expect(artworkSvg(asset,true,'#000000')).toBe('');
+  const base=placeBuilding(createDocument(),{x:10,y:10},asset.kind,'test'),doc=setBuildingAppearance(base,'test',asset.id);for(const resolution of [1024,2048,4096]){expect(mapSvg(doc,{style:'illustrated',resolution,grid:false,labels:false,reduced:false})).toContain(`data-raster="${asset.id}"`);expect(mapSvg(doc,{style:'illustrated',resolution,grid:false,labels:false,reduced:true})).toContain(`data-raster="${asset.id}"`);}
   for(const reduced of [true,false]){const options={resolution:1024,style:'planning' as const,grid:true,labels:true,reduced};expect(mapSvg(doc,options)).toBe(mapSvg(base,options));}
  });
 });

@@ -11,6 +11,7 @@ export interface PresentationBounds {x:number;y:number;width:number;height:numbe
  * fractions of the unrotated logical footprint. Bounds must stay inside [0,1]. */
 export interface RasterPresentation {
  version:1;scale?:number;offset?:{x:number;y:number};bounds?:PresentationBounds;
+ /** Legacy manifest field, validated for compatibility but never used for raster LOD. */
  overview?:VectorArtwork;
 }
 /** Only approved, statically imported PNGs are resolved. Never a runtime URL or upload. */

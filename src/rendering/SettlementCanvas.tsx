@@ -1,4 +1,5 @@
-import {rasterOverview} from './rasterGeometry';
+import {resolveBuildingAsset} from '../model/appearance';
+import {rasterPixelBucket} from './rasterDetail';
 import { InfrastructureVisual } from './InfrastructureVisual';
 import { TerrainVisual } from './TerrainVisual';
 import { useVisualPreferences } from '../ui/visualPreferences';
@@ -54,7 +55,8 @@ export function SettlementCanvas() {
   const developmentActive=!!development.preview||development.busy||development.applying||expansionActive;
   const visual=useVisualPreferences(),style=visual.style;
   const reduced=reducedDetail(style,doc.grid.cellSize*view.scale,visual.detail);
-  const overview=rasterOverview(reduced,doc.grid.cellSize*view.scale);
+  const pixelsPerTile=style==='illustrated'?rasterPixelBucket(doc.grid.cellSize*view.scale*(globalThis.devicePixelRatio||1)):Infinity;
+  const rasterIds=useMemo(()=>new Set(style==='illustrated'?doc.buildings.filter(b=>resolveBuildingAsset(doc,b).artwork.format==='bundled-image').map(b=>b.id):[]),[style,doc.buildings,doc.seed,doc.architecture]);
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const gridLines=useMemo(()=>[...Array.from({length:doc.grid.width+1},(_,i)=>({id:`x${i}`,points:[i*cell,0,i*cell,height]})),...Array.from({length:doc.grid.height+1},(_,i)=>({id:`y${i}`,points:[0,i*cell,width,i*cell]}))],[doc.grid.width,doc.grid.height,cell,width,height]);
   useMemo(()=>tool==='terrain-editor'?terrainProtection(doc):null,[tool,doc]);
@@ -162,7 +164,7 @@ export function SettlementCanvas() {
           const f = footprint(b);
           const warn = b===original?buildingWarningIds.has(b.id):buildingWarnings(doc,b).length>0, active = selectedId === b.id;
           return <Group key={b.id} name="building" buildingId={b.id} x={b.x * cell} y={b.y * cell}>
-            <BuildingVisual building={b} seed={doc.seed} architecture={doc.architecture} style={style} reduced={reduced} overview={overview} cell={cell}/>
+            <BuildingVisual building={b} seed={doc.seed} architecture={doc.architecture} style={style} reduced={reduced} pixelsPerTile={rasterIds.has(b.id)?pixelsPerTile:undefined} cell={cell}/>
             <Rect name="building-footprint-hit" hitStrokeWidth={0} width={f.width*cell} height={f.height*cell} fill="rgba(0,0,0,0.001)" stroke={conflictIds.has(`building:${b.id}`)?'#ff7059':warn?'#ef927b':active?'#ffe2a0':highlighted.has(b.id)?'#9ee5d5':undefined} strokeWidth={active||highlighted.has(b.id)?4:2}/>
 
           </Group>;
@@ -185,7 +187,7 @@ export function SettlementCanvas() {
           {!!districtBoundary.length&&(tool==='districts'||district.camera)&&<Group><Line listening={false} points={districtBoundary.flatMap(p=>[p.x,p.y])} closed={districtBoundary.length>=3} stroke="#ffe2a0" fill="#c3b16a" opacity={.6} strokeWidth={2/view.scale/cell}/>{districtBoundary.map((p,i)=><Circle key={i} districtPointIndex={i} x={p.x} y={p.y} radius={7/view.scale/cell} hitStrokeWidth={30/view.scale/cell} fill={district.corner===i?'#a7ead5':'#ffe2a0'} stroke="#253a2d" strokeWidth={2/view.scale/cell}/>)}</Group>}
         </Group>
       </Layer>
-      <Layer name="proposal-interactions" listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview} style={style} reduced={reduced} overview={overview}/><ExpansionOverlay doc={doc} proposal={expansion.preview} style={style} reduced={reduced} overview={overview} cachePixels={terrainCachePixels(cell*view.scale)}/></Layer>
+      <Layer name="proposal-interactions" listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile}/><ExpansionOverlay doc={doc} proposal={expansion.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile} cachePixels={terrainCachePixels(cell*view.scale)}/></Layer>
       <Layer listening={false}>
         <Group listening={false} scaleX={cell} scaleY={cell}>{patchPaths.map(p=><Path key={p.color} data={p.data} fill={p.color} opacity={.58}/>)}
           {tool==='terrain-editor'&&brushPoint&&(terrainEditor.settings.shape==='circle'?<Circle x={brushPoint.x} y={brushPoint.y} radius={terrainEditor.settings.size/2} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>:<Rect x={brushPoint.x-terrainEditor.settings.size/2} y={brushPoint.y-terrainEditor.settings.size/2} width={terrainEditor.settings.size} height={terrainEditor.settings.size} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>)}

@@ -92,3 +92,5 @@ Physical iPhone Safari and device-specific memory/download limits require these 
 Final automated checks: **216 tests across 21 files passed**; `npm run build` and `npm run verify:release` passed with the visible **6B.5** marker and bundled demo identifiers verified in the production entry. The build retains Vite's large-chunk advisory (approximately 982 kB minified / 348 kB gzip).
 
 For optional installed per-asset scale, offset, safe bounds and distant-zoom symbols, see [Phase 6B.7 presentation metadata](phase6b7-artwork-readability.md). These settings are bundled catalogue metadata, never settlement geometry or JSON fields.
+
+Current raster detail behavior is documented in [Phase 6B.8 zoom consistency](phase6b8-zoom-consistency.md): HIGH/MEDIUM/DISTANT all use the installed PNG; legacy vector overview metadata never substitutes for a selected PNG. Full exports keep the original artwork.

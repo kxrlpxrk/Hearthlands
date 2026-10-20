@@ -1,5 +1,7 @@
 # Phase 6B.7 — Building artwork scale and readability
 
+> Historical behavior: [Phase 6B.8](phase6b8-zoom-consistency.md) replaces the vector overview switch with same-PNG cached detail levels. The safe scales, bounds and geometry guarantees described here still apply.
+
 The three Sheet 4 pilots now use slightly larger, footprint-safe PNG fitting at close zoom and colour-matched roof/yard symbols at overview zoom. The source PNG files, asset IDs, manual appearance choices, gameplay geometry and project schema are unchanged. The release marker is **6B.7**, with the deployment commit in the footer.
 
 ## Cause and safe sizing limits

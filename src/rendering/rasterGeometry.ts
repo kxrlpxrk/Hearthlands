@@ -15,16 +15,6 @@ export function rasterGeometry(size:{width:number;height:number},asset:BuildingA
  const y=clamp((size.height-height)/2+(p?.offset?.y??0)*size.height,safe.y,safe.y+safe.height-height);
  return {x,y,width,height,crop,scale};
 }
-/** A quantised LOD flag keeps memoised buildings stable during pan/zoom. CSS
- * pixels, independent of device pixel ratio. Existing assets opt in individually. */
-export const rasterOverview=(reduced:boolean,cellPixels:number)=>reduced||cellPixels<16;
-/** Uniform fitting of a lightweight overview within the same safe raster bounds. */
-export function rasterOverviewGeometry(size:{width:number;height:number},asset:BuildingAsset){
- const art=asset.artwork;if(art.format!=='bundled-image'||!art.presentation?.overview)return;
- const r=rasterGeometry(size,asset),vector=art.presentation.overview,[vx,vy,vw,vh]=vector.viewBox;
- const scale=Math.min(r.width/vw,r.height/vh);
- return {vector,bounds:r,x:r.x+(r.width-vw*scale)/2-vx*scale,y:r.y+(r.height-vh*scale)/2-vy*scale,scale};
-}
 /** Same crop when using the shared reduced-resolution image instead of the original. */
 export function rasterSourceCrop(asset:BuildingAsset,source:{width:number;height:number}){
  const {crop}=rasterGeometry({width:1,height:1},asset);

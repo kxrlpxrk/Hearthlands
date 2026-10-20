@@ -1,0 +1,472 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "devicePixelRatio": 2,
+  "sourceFixture": "Viking / River / Contextual / 1847 / 96\u00d796 / 35 buildings; six manual appearances",
+  "samples": [
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.01",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        64
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        64
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        64
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 768\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        256
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 768\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        256
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 768\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        256
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.cottage.01",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 768\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        256
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        48
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        48
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "vector symbol",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 1024\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 1024\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 1024\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.tavern.01",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 1024\u00d7768",
+      "after": "high",
+      "bitmap": [
+        1024,
+        768
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        48
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "vector symbol",
+      "after": "distant",
+      "bitmap": [
+        64,
+        48
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "vector symbol",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 1024\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 1024\u00d7768",
+      "after": "medium",
+      "bitmap": [
+        256,
+        192
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 1024\u00d7768",
+      "after": "high",
+      "bitmap": [
+        1024,
+        768
+      ]
+    },
+    {
+      "assetId": "hearthlands.sheet4.farm.01",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 1024\u00d7768",
+      "after": "high",
+      "bitmap": [
+        1024,
+        768
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.02",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": "fit",
+      "actualScale": 0.10612,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 0.2,
+      "actualScale": 0.2,
+      "before": "PNG 256\u00d7128",
+      "after": "distant",
+      "bitmap": [
+        64,
+        32
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 0.4,
+      "actualScale": 0.4,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 0.6,
+      "actualScale": 0.6,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 0.8,
+      "actualScale": 0.8,
+      "before": "PNG 1024\u00d7512",
+      "after": "medium",
+      "bitmap": [
+        256,
+        128
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 1,
+      "actualScale": 1.0,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    },
+    {
+      "assetId": "hearthlands.viking.longhouse.03",
+      "zoom": 1.5,
+      "actualScale": 1.5,
+      "before": "PNG 1024\u00d7512",
+      "after": "high",
+      "bitmap": [
+        1024,
+        512
+      ]
+    }
+  ]
+}
