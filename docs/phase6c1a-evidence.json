@@ -2,9 +2,9 @@
   "release": "6C.1A",
   "baselineCommit": "84905b00ad3dac42f8e0609af3d63c4e74562429",
   "automated": {
-    "passedTests": 286,
+    "passedTests": 287,
     "passedFiles": 27,
-    "durationSeconds": 94.65,
+    "durationSeconds": 89.31,
     "commands": [
       "npm test",
       "npm run build",
@@ -383,22 +383,22 @@
     "coldAlmostAllForestWith100ProtectedFootprints": [
       {
         "mapSize": 96,
-        "coldMs": 234.8,
-        "scenePlus50CacheHitsMs": 37.7,
+        "coldMs": 267.2,
+        "scenePlus50CacheHitsMs": 48.2,
         "crowns": 6173,
         "terrainBatches": 28
       },
       {
         "mapSize": 128,
-        "coldMs": 476.0,
-        "scenePlus50CacheHitsMs": 86.8,
+        "coldMs": 574.0,
+        "scenePlus50CacheHitsMs": 152.7,
         "crowns": 11748,
         "terrainBatches": 28
       },
       {
         "mapSize": 192,
-        "coldMs": 1182.0,
-        "scenePlus50CacheHitsMs": 222.1,
+        "coldMs": 1337.8,
+        "scenePlus50CacheHitsMs": 154.6,
         "crowns": 27683,
         "terrainBatches": 28
       }
@@ -409,6 +409,26 @@
       "16 forest Konva batches at full detail, 12 at reduced",
       "No per-tree nodes or images; native off-screen chunk culling; two-entry layout cache",
       "Cold/native parsing cost and close-up dropped frames remain; physical iPhone Safari not measured"
+    ]
+  },
+  "clearanceGuard": {
+    "case": "192\u00b2 forest; long organic palisade with renderer sample gaps up to 3.394 tiles",
+    "beforeMinimumCrownToWallMarginTiles": -0.5968467654116529,
+    "afterMinimumCrownToWallMarginTiles": 0.4709829363079291,
+    "fix": "Densify visual route samples to <=0.18 tiles for clearance only; never change stored or rendered routes",
+    "referenceCrownLayoutsUnchanged": [
+      {
+        "buildings": 35,
+        "same": true
+      },
+      {
+        "buildings": 75,
+        "same": true
+      },
+      {
+        "buildings": 100,
+        "same": true
+      }
     ]
   }
 }

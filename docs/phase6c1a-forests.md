@@ -11,7 +11,7 @@ Placement uses a spatially seeded, jittered 1.13-tile sampling lattice, plus a s
 A quarter-tile clearance field measures distance inside the vegetation mask. Vegetation below 0.35 is excluded; this retains the existing partial-coverage brush appearance without changing the gameplay woodland threshold of 0.6. Water coverage above 0.05 and cultivated soil are excluded. A small additional shoreline inset protects interpolated water corners and the illustrated bank stroke. Forests also leave clearance around:
 
 - Rotated building footprints and entrance approaches, including locked buildings.
-- Actual smoothed road/path strokes, bridges, walls, gates and fences.
+- Actual smoothed road/path strokes, bridges, walls, gates and fences. Sparse samples on long manual curves are densified to at most 0.18 tiles for the visual clearance mask; the stored and rendered route is unchanged.
 - Existing planned gathering grounds, working areas, yards and fields.
 - Map boundaries and natural/painted clearings.
 
@@ -27,7 +27,7 @@ At most **16 forest Konva batches** represent the entire forest: four body palet
 
 Each crown belongs to one 16-tile spatial chunk with a padded envelope. Native `Path2D` curves are parsed once. Close views cull off-screen chunks and combine visible native curves into one fill/stroke per paint batch; this avoids repeated alpha blending and clipped chunk seams. Combined paths are reused until the visible chunk set changes. Pan/pinch do not regenerate crown placement. On browsers lacking native paths the existing complete-vector fallback remains usable, with less performance optimisation.
 
-Full-map SVG and PNG use the exact same complete canopy path data, palette and detail rules through `terrainScene`. Export is independent of editor viewport. Existing grid, labels, districts, 1024/2048/4096 resolution limits and allocation failure handling are preserved. A browser comparison of complete paths against combined native chunk paths found only tiny anti-aliasing differences; see the evidence file. Planning geometry was also compared byte-for-byte against the previous main revision across full/reduced and detailed/clean modes on 96/128/192 maps.
+Full-map SVG and PNG use the exact same complete canopy path data, palette and detail rules through `terrainScene`. Export is independent of editor viewport. Existing grid, labels, districts, 1024/2048/4096 resolution limits and allocation failure handling are preserved. A long-curved-palisade regression verifies clearance between renderer samples more than three tiles apart; this guard leaves the reference village crown layouts exactly unchanged. A browser comparison of complete paths against combined native chunk paths found only tiny anti-aliasing differences; see the evidence file. Planning geometry was also compared byte-for-byte against the previous main revision across full/reduced and detailed/clean modes on 96/128/192 maps.
 
 ## Verification and performance
 
@@ -42,7 +42,7 @@ Production Chromium touch checks covered:
 
 The forest-heavy browser fixtures use the existing seed-1847 river village and its real 75/100-building expansions. Additional woodland was painted into unoccupied western land for stress coverage; application generation was not changed. The three map sizes are 96×96, 128×128 and 192×192. Measurements use Chromium mobile touch emulation, 390×844, DPR 3, with 120 animation-frame samples per view during a 40-event touch pan. These are development-machine measurements, **not physical iPhone Safari guarantees**.
 
-**286 tests in 27 files pass**; production build and release verification pass. Vite retains the existing large-chunk warning from bundled building artwork. This phase adds approximately 6.6 kB raw / 2.6 kB gzip to the entry bundle and no dependencies or image files.
+**287 tests in 27 files pass**; production build and release verification pass. Vite retains the existing large-chunk warning from bundled building artwork. This phase adds approximately 6.6 kB raw / 2.6 kB gzip to the entry bundle and no dependencies or image files.
 
 | Forest-heavy settlement | Illustrated Fit median / p95 | Illustrated 80% median / p95 |
 | --- | --- | --- |
@@ -50,7 +50,7 @@ The forest-heavy browser fixtures use the existing seed-1847 river village and i
 | 75 buildings, 128², 7,442 forest cells | 16.7 / 16.8 ms | 16.7 / 50.0 ms |
 | 100 buildings, 192², 15,016 forest cells | 16.7 / 33.3 ms | 16.7 / 66.7 ms |
 
-Almost-all-forest adversarial masks with 100 protected footprints took approximately **235 / 476 / 1,182 ms** to construct cold at 96² / 128² / 192² (up to 27,683 crowns, 28 total terrain batches). Those numbers include layout/path composition, not just a single frame; cached pan avoids that work. The browser's worst 100-building Illustrated close-view sample was 83.4 ms. See [machine-readable evidence](phase6c1a-evidence.json) for all style/frame measurements and pixel comparisons.
+Almost-all-forest adversarial masks with 100 protected footprints took approximately **267 / 574 / 1,338 ms** to construct cold at 96² / 128² / 192² (up to 27,683 crowns, 28 total terrain batches). Those numbers include layout/path composition, not just a single frame; cached pan avoids that work. The browser's worst 100-building Illustrated close-view sample was 83.4 ms. See [machine-readable evidence](phase6c1a-evidence.json) for all style/frame measurements and pixel comparisons.
 
 Limitations: first scene construction and native-path preparation cost more than a cached pan, especially on nearly all-forest 192×192 maps. Dense close-up views can still drop frames. The artwork is a procedural illustrated foundation, not final painted tree PNGs. Small clearances can produce sparse edges. Forest masks remain based on existing tile data; this phase does not change their generation. No physical iPhone was available for verification.
 
@@ -85,7 +85,7 @@ This phase defines the extension boundary only. It does **not** install tree ima
 
 ## Physical iPhone Safari acceptance
 
-1. Open the deployed application in Safari and verify the footer says **6C.1A**. Reload if an older tab still shows 6B.8. Duplicate Ravenfjord in Projects before testing edits.
+1. Open the deployed application in Safari and verify the footer says **6C.1A** and its short commit matches the reported release. Reload if an older tab still shows 6B.8. Duplicate Ravenfjord in Projects before testing edits.
 2. Choose **Illustrated**. Open **Terrain → Nature** if you need more forest, paint a patch outside buildings/roads, then use **Explore**. For a clean comparison, turn off Grid and district overlays.
 3. Tap **Fit**, then pinch near one forest edge to approximately **40%, 80% and 150%**. Track the same crown groups, clearings and colour patches. They must not rearrange, flicker or turn into tile symbols.
 4. Inspect woodland beside cottages, paths, bridge banks, fields and water. Crowns should remain clear of functional footprints and access routes. Select a nearby building in **Select**, rotate/resize/move it, then undo. Selection and entrances must remain accurate; clearance updates after committed edits.

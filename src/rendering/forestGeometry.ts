@@ -1,5 +1,6 @@
 import type {Cell,SettlementDocument} from '../model/document';
 import {terrainQuery} from '../model/terrain';
+import {sampledPath} from '../model/infrastructure';
 import {footprint} from '../model/buildings';
 import {entrance} from '../generator/navigation';
 import {seededRandom} from '../generator/random';
@@ -37,9 +38,10 @@ function clearance(doc:SettlementDocument){
  for(const space of doc.planning?.openSpaces??[])if(space.kind!=='expansion')for(const p of space.cells)block(p.x,p.y,p.x+1,p.y+1);
  for(const b of doc.buildings){const f=footprint(b);block(b.x-.3,b.y-.3,b.x+f.width+.3,b.y+f.height+.3);const e=entrance(b);block(e.x-.3,e.y-.2,e.x+1.3,e.y+1.3);}
  // Use the exact rendered/smoothed route, including bridge rails and defensive sections.
- // Samples are <= .2 tiles apart; expanded boxes cover the entire intervening stroke.
+ // Densify sparse curve samples too: long manual walls can have >3-tile gaps.
+ // Expanded boxes cover the intervals without changing the stored/rendered route.
  const context=doc.roads.length?roadContext(doc):undefined;
- for(const r of doc.roads){const g=roadGeometry(doc,r,context),radius=g.width/2+.32;for(const p of g.samples)block(p.x-radius,p.y-radius,p.x+radius,p.y+radius);}
+ for(const r of doc.roads){const g=roadGeometry(doc,r,context),radius=g.width/2+.32;for(const p of sampledPath(g.samples,.18))block(p.x-radius,p.y-radius,p.x+radius,p.y+radius);}
  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;if(field[i])field[i]=Math.min(field[i],field[i-1]+1,field[i-w-1]+1,field[i-w]+1,field[i-w+1]+1);}
  for(let y=h-2;y>0;y--)for(let x=w-2;x>0;x--){const i=y*w+x;if(field[i])field[i]=Math.min(field[i],field[i+1]+1,field[i+w-1]+1,field[i+w]+1,field[i+w+1]+1);}
  return (p:Cell)=>{

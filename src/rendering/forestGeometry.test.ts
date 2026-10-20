@@ -5,6 +5,7 @@ import {defaultSettings} from '../generator/settings';
 import {createDocument,type SettlementDocument} from '../model/document';
 import {legacyTerrain,terrainQuery} from '../model/terrain';
 import {placeBuilding} from '../model/operations';
+import {sampledPath} from '../model/infrastructure';
 import {updateBuilding} from '../model/buildings';
 import {nativeTerrainChunks,terrainChunkVisible,visibleTerrainPath} from './nativeTerrain';
 import {vi} from 'vitest';
@@ -61,6 +62,14 @@ describe('deterministic illustrated forest layout',()=>{
    expect(rectangleDistance(c,9.25,12.25)).toBeGreaterThan(c.radius);
    for(const g of roads)for(const p of g.samples)expect(Math.hypot(c.x-p.x,c.y-p.y)).toBeGreaterThan(c.radius+g.width/2+.11);
   }
+ });
+ it('clears the intervals between sparse samples on long curved defensive walls',()=>{
+  const d=createDocument();d.grid={...d.grid,width:192,height:192};d.terrain=Array.from({length:192*192},(_,i)=>({x:i%192,y:Math.floor(i/192),kind:'forest'}));
+  const r={id:'wall',layerId:'settlement',surface:'palisade' as const,width:.3,style:'organic' as const,editVersion:1 as const,points:[{x:1,y:1},{x:190,y:1},{x:190,y:190}]};d.roads=[r];
+  const g=roadGeometry(d,r);expect(g.data).toContain('Q');expect(g.samples.some((p,i)=>i&&Math.hypot(p.x-g.samples[i-1].x,p.y-g.samples[i-1].y)>3)).toBe(true);
+  const crowns=forestCrowns(d).filter(c=>c.x>145&&c.y<47),samples=sampledPath(g.samples,.1).filter(p=>p.x>145&&p.y<47);let margin=Infinity;
+  for(const c of crowns)for(const p of samples)margin=Math.min(margin,Math.hypot(c.x-p.x,c.y-p.y)-c.radius-g.width/2);
+  expect(margin).toBeGreaterThan(.11);
  });
  it('follows partial vegetation, tiny patches and irregular shorelines without creating crowns over water',()=>{
   const d=createDocument();d.grid={...d.grid,width:24,height:24};d.landscape.cells=[];
