@@ -5,7 +5,7 @@ import {sceneLayers} from './styles';
  * Interaction colours/previews are deliberately outside this scene and never cached here. */
 const cache:{terrain:SettlementDocument['terrain'];landscape:SettlementDocument['landscape'];planning:SettlementDocument['planning'];buildings:SettlementDocument['buildings'];roads:SettlementDocument['roads'];width:number;height:number;seed:number;key:string;paths:TerrainPath[]}[]=[];
 export function terrainScene(doc:SettlementDocument,options:TerrainView):TerrainPath[]{
- const key=JSON.stringify({contours:options.contours,detail:options.detail,style:options.style??'planning',reduced:options.reduced??false});
+ const key=JSON.stringify({contours:options.contours,detail:options.detail,style:options.style??'planning',reduced:options.reduced??false,...(options.style==='illustrated'&&options.forestPilot?{forestAssets:[...(options.forestAssets??[])].sort()}: {})});
  const index=cache.findIndex(c=>c.terrain===doc.terrain&&c.landscape===doc.landscape&&c.planning===doc.planning&&(options.style!=='illustrated'||c.buildings===doc.buildings&&c.roads===doc.roads)&&c.width===doc.grid.width&&c.height===doc.grid.height&&c.seed===doc.seed&&c.key===key);
  if(index>=0){const [entry]=cache.splice(index,1);cache.push(entry);return entry.paths;}
  const paths=terrainGeometry(doc,options).sort((a,b)=>sceneLayers.indexOf(a.layer??'base')-sceneLayers.indexOf(b.layer??'base'));

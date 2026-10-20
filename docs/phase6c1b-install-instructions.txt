@@ -1,0 +1,26 @@
+HEARTHLANDS — PHASE 6C.1B CUSTOM TREE PNG PILOT
+
+Repository: kxrlpxrk/Hearthlands. Continue current main, follow AGENTS.md. The attached ZIP contains the SIX REQUIRED original-artwork transparent PNGs and manifest.json.
+
+Stop and request the missing ZIP/files if assets aren't accessible; never regenerate/synthesize substitutes.
+
+MISSION
+Build a non-destructive, opt-in pilot of user-owned Viking tree sprites in the existing Phase 6C.1A deterministic illustrated forest renderer. Keep 6C.1A procedural trees as the baseline/fallback. This is an art-source swap, NOT forest terrain regeneration.
+
+ASSETS
+Read manifest.json. Import ALL SIX transparent images with stable unique IDs (Beech 02, Birch 13, Oak 02, Pine 05, Mixed Tree Cluster, Forest Edge Cluster). Preserve aspect ratio, alpha crop, origin/anchor metadata. Never stretch or add black/cream backgrounds. Cluster sprites come from a sheet and have a cropped straight lower edge; DO NOT tile or mass-stamp clusters; use only with safe sparse edge-aware placement.
+
+RENDERING + PROCEDURAL RULES
+- Keep existing deterministic woodland candidate positions, seed, terrain masks, clearances, species definitions and no-obstruction bounds. New images MUST FIT WITHIN already-certified clearance envelopes including branches, rocks and rotated corners. Skip PNG/keep procedural crown where not safe.
+- Stable seeded choice independent of project ID, zoom, render order and camera. Do not re-randomize existing forests by default.
+- Start pilot with LIMITED PNG usage (e.g. 10–20% of eligible safe canopy candidates) behind an explicit Illustrated visual option / feature flag that defaults OFF for existing projects. Do not change document schema or saved data without necessity. Same PNG artwork is used at all zoom levels via LOD image pyramid/caching; no generic icon switch.
+- Native source detail is limited. Cap visible size to preserve quality; at Fit small sprites may only be texture. Maintain smooth iPhone Safari performance on 96²,128²,192² maps and 100-building scenes.
+- Existing 6C.1A canopies stay if images fail or asset flag off. No external image/network requests. Respect base path and browser loading cache.
+- Editor, capture and SVG/PNG exports MUST use the SAME seed and art placements; embed PNGs for vector export or use documented safe fallback if raster embedding unavailable (never silently substitute unrelated artwork). Planning mode remains unchanged.
+- Keep roads, water, infrastructure, buildings, farms, terrain edits, locks, restore points, save/reopen, and legacy JSON fully safe.
+
+ACCEPTANCE
+Test opt-in OFF baseline parity, ON forest visual continuity, seed stability after reopen, various zooms Fit/40/80/150, path/bridge/building clearances including rotated assets and clusters, alpha without matte, PNG/SVG export, graceful load failure, and iPhone-sized pan/pinch performance in 35/75/100-building forest-heavy maps.
+
+DELIVERY
+Run full tests/build/release checks; commit/push safely with release marker 6C.1B; report changed files, test count, exact iPhone enablement and playtest steps. No new unrelated features or artwork.

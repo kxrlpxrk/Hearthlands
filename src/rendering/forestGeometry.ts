@@ -13,7 +13,7 @@ export interface ForestCrown extends Cell {
  radius:number; species:ForestSpecies; tone:number; variant:number; angle:number;
  density:'interior'|'edge'|'fringe';
 }
-export interface ForestScene { crowns:readonly ForestCrown[]; paths:TerrainPath[]; detail:TerrainPath[] }
+export interface ForestScene { sprites?:import('./forestPilot').ForestSprite[]; crowns:readonly ForestCrown[]; paths:TerrainPath[]; detail:TerrainPath[] }
 const resolution=4,step=1/resolution;
 const n=(v:number)=>Math.round(v*1000)/1000;
 /** Conservative sub-tile clearance field. Chebyshev distance never overestimates

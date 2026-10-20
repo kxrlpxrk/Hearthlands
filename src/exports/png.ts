@@ -1,3 +1,6 @@
+import {forestImages} from '../rendering/forestImages';
+import {forestImageById,forestImageAssets} from '../assets/forests/registry';
+import type {ForestSprite} from '../rendering/forestPilot';
 import {artworkHasShadow} from '../rendering/rasterGeometry';
 import {prepareBundledImages} from '../rendering/bundledImages';
 import {resolveBuildingAsset} from '../model/appearance';
@@ -13,7 +16,7 @@ import { footprint } from '../model/buildings';
 import { buildingDefinition } from '../model/catalogue';
 import { symbolPaths } from '../rendering/symbols';
 import { roadContext, roadGeometry } from '../rendering/roadGeometry';
-export interface ImageOptions { style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
+export interface ImageOptions { forestPilot?:boolean; style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
 export function imageDimensions(doc: SettlementDocument, resolution: number) {
   if (!Number.isInteger(resolution) || resolution < 256 || resolution > 4096) throw new Error('Choose a PNG resolution from 256 to 4096 pixels.');
   const scale=resolution/Math.max(doc.grid.width,doc.grid.height),width=Math.round(doc.grid.width*scale),height=Math.round(doc.grid.height*scale);
@@ -26,7 +29,13 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
   const size=imageDimensions(doc,options.resolution),style=options.style??'planning';
   if(!['planning','illustrated'].includes(style))throw new Error('Choose Planning or Illustrated PNG style.');
   const reduced=options.reduced??reducedDetail(style,options.resolution/Math.max(doc.grid.width,doc.grid.height));
-  const terrain=terrainScene(doc,{style,reduced,contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail}).map(t=>`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
+  const pilot=style==='illustrated'&&options.forestPilot===true,images=forestImages.snapshot();
+  const paths=terrainScene(doc,{style,reduced,forestPilot:pilot,forestAssets:pilot?images.ready:[],contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail});
+  const used=new Set(paths.flatMap(p=>p.sprites?.map(s=>s.assetId)??[]));
+  const definitions=[...used].map(id=>{const a=forestImageById.get(id)!,source=images.images.get(id)!.source;return `<image id="forest-pilot-source-${forestImageAssets.indexOf(a)}" width="${a.pixelWidth}" height="${a.pixelHeight}" href="${source}"/>`;}).join('');
+  const spriteSvg=(s:ForestSprite)=>{const a=forestImageById.get(s.assetId)!,b=a.alpha;return `<g data-forest-asset="${a.id}" transform="translate(${s.x} ${s.y}) rotate(${s.angle*180/Math.PI})"><svg x="${s.left}" y="${s.top}" width="${s.width}" height="${s.height}" viewBox="${b.x} ${b.y} ${b.width} ${b.height}" preserveAspectRatio="xMidYMid meet"><use href="#forest-pilot-source-${forestImageAssets.indexOf(a)}"/></svg></g>`;};
+  const fallback=pilot&&images.ready.length<6?'<desc data-forest-fallback="true">Some pilot images are unavailable. Their original procedural crowns are retained.</desc>':'';
+  const terrain=(definitions?`<defs>${definitions}</defs>`:'')+fallback+paths.map(t=>t.sprites?t.sprites.map(spriteSvg).join(''):`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
   const visible=(id:string)=>doc.layers.find(l=>l.id===id)?.visible;
   const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).sort((a,b)=>Number(isBridge(a)||isDefense(a))-Number(isBridge(b)||isDefense(b))).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}" data-layer="${isBridge(r)||isDefense(r)?'infrastructure':'roads'}">${infrastructureStrokes(r,g,style,reduced).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
@@ -47,7 +56,7 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
 }
 export async function renderPng(doc: SettlementDocument, options: ImageOptions): Promise<Blob> {
   const {width,height}=imageDimensions(doc,options.resolution);
-  if(options.style==='illustrated')await prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b)));
+  if(options.style==='illustrated')await Promise.all([prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b))),options.forestPilot?forestImages.prepare():Promise.resolve()]);
   const url=URL.createObjectURL(new Blob([mapSvg(doc,options)],{type:'image/svg+xml;charset=utf-8'}));
   const canvas=document.createElement('canvas');
   try {

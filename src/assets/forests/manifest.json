@@ -1,0 +1,170 @@
+{
+  "packId": "hearthlands.viking.forest-pilot.6c1b",
+  "version": "1.0-pilot",
+  "origin": "Exact artwork cut out of two user-supplied Midjourney asset sheets; not newly generated illustrations.",
+  "note": "Clusters have a flattened lower source-sheet edge and require sparse/edge-aware placement; asset size hints require clearance validation by the renderer.",
+  "assets": [
+    {
+      "id": "hearthlands.viking.tree.beech-02",
+      "name": "Beech 02",
+      "file": "assets/hearthlands-tree-beech-02.png",
+      "species": "beech",
+      "role": "single",
+      "sourceSheet": "Viking Tree Assets: BEECH 02",
+      "sourceFilename": "6E18ABA3-3E3F-4B22-BECB-A44BA592F6E8.jpeg",
+      "sourceCropPixels": [
+        215,
+        99,
+        398,
+        200
+      ],
+      "pixelWidth": 408,
+      "pixelHeight": 269,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 1.35,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "76f4757aff15b1d7fca93610e6044b816a41035443a8871965506c5c743fdfc7"
+    },
+    {
+      "id": "hearthlands.viking.tree.birch-13",
+      "name": "Birch 13",
+      "file": "assets/hearthlands-tree-birch-13.png",
+      "species": "birch",
+      "role": "single",
+      "sourceSheet": "Viking Tree Assets: BIRCH 13",
+      "sourceFilename": "6E18ABA3-3E3F-4B22-BECB-A44BA592F6E8.jpeg",
+      "sourceCropPixels": [
+        421,
+        694,
+        591,
+        775
+      ],
+      "pixelWidth": 408,
+      "pixelHeight": 230,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 1.3,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "8ba9db334467f12f31c70ab107ed90a3aab95547b2e1ab763118840219fe5b85"
+    },
+    {
+      "id": "hearthlands.viking.tree.oak-02",
+      "name": "Oak 02",
+      "file": "assets/hearthlands-tree-oak-02.png",
+      "species": "oak",
+      "role": "single",
+      "sourceSheet": "Viking Tree Assets: OAK 02",
+      "sourceFilename": "6E18ABA3-3E3F-4B22-BECB-A44BA592F6E8.jpeg",
+      "sourceCropPixels": [
+        213,
+        817,
+        403,
+        925
+      ],
+      "pixelWidth": 408,
+      "pixelHeight": 272,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 1.55,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "0668ede67ca61a98997e5916ca0bdfdc1a49d28f180cb0cde03c2f5783deceb7"
+    },
+    {
+      "id": "hearthlands.viking.tree.pine-05",
+      "name": "Pine 05",
+      "file": "assets/hearthlands-tree-pine-05.png",
+      "species": "pine",
+      "role": "single",
+      "sourceSheet": "Viking Tree Assets: PINE 05",
+      "sourceFilename": "6E18ABA3-3E3F-4B22-BECB-A44BA592F6E8.jpeg",
+      "sourceCropPixels": [
+        817,
+        1184,
+        973,
+        1292
+      ],
+      "pixelWidth": 408,
+      "pixelHeight": 328,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 1.3,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "83642dae76d43ec36b72d1b5bc66c353e81c60b5c51944176df21dd76ed9c0a7"
+    },
+    {
+      "id": "hearthlands.viking.tree.mixed-cluster-01",
+      "name": "Mixed Tree Cluster",
+      "file": "assets/hearthlands-tree-mixed-cluster-01.png",
+      "species": "mixed",
+      "role": "cluster",
+      "sourceSheet": "Viking Nature Assets: MIXED TREE CLUSTER",
+      "sourceFilename": "A61AE145-A3EC-43DD-B75C-CB56BDA6F8C0(1).jpeg",
+      "sourceCropPixels": [
+        26,
+        551,
+        479,
+        749
+      ],
+      "pixelWidth": 1052,
+      "pixelHeight": 468,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 3.2,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "cb6fa18a255498cbc04f5a56db67652789cc200a03cac1649d45eeee4bb5e427"
+    },
+    {
+      "id": "hearthlands.viking.tree.forest-edge-01",
+      "name": "Forest Edge Cluster",
+      "file": "assets/hearthlands-tree-forest-edge-01.png",
+      "species": "mixed",
+      "role": "edge",
+      "sourceSheet": "Viking Nature Assets: FOREST EDGE CLUSTER",
+      "sourceFilename": "A61AE145-A3EC-43DD-B75C-CB56BDA6F8C0(1).jpeg",
+      "sourceCropPixels": [
+        480,
+        550,
+        1011,
+        749
+      ],
+      "pixelWidth": 1052,
+      "pixelHeight": 416,
+      "anchorNormalized": [
+        0.5,
+        0.5
+      ],
+      "suggestedDiameterTiles": 3.5,
+      "placementWeight": "pilot-limited",
+      "manualApproved": false,
+      "automaticEnabled": false,
+      "notes": "Pilot art only. Respect full-alpha envelope and forest region clearance.",
+      "sha256": "21f2369fc14a19702f0dd0fe0aa36405fe7c582507e742e84bc3518b09b2a9a9"
+    }
+  ]
+}

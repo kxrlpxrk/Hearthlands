@@ -1,12 +1,20 @@
-import { readFileSync } from 'node:fs';
+import {createHash} from 'node:crypto';
+import { readFileSync, readdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
 const read=file=>readFileSync(join('dist',file),'utf8');
 const release=JSON.parse(read('release.json')),html=read('index.html');
 const script=html.match(/<script[^>]+src="([^"]+\.js)"/);
 if(!script)throw new Error('Production entry script is missing.');
 const bundle=read(join('assets',basename(script[1])));
-if(release.release!=='6C.1A'||!release.commit||!html.includes(`6C.1A ${release.commit}`))throw new Error('HTML and release metadata disagree.');
+if(release.release!=='6C.1B'||!release.commit||!html.includes(`6C.1B ${release.commit}`))throw new Error('HTML and release metadata disagree.');
 if(process.env.GITHUB_SHA&&release.commit!==process.env.GITHUB_SHA.slice(0,7))throw new Error('Release marker does not match this deployment commit.');
-for(const text of ['Develop district','Development mode','Expand settlement','Illustrated','Planning','Apply appearance','Architecture theme','demo.viking.longhouse.','hearthlands.viking.longhouse.01','Ravenfjord Timber Longhouse','Ravenfjord Painted Timber Hall','Ravenfjord Mossy Timber Hall','Viking Cottage – Sheet 4','Viking Tavern – Sheet 4','Viking Farmstead – Sheet 4','data:image/png;base64,','building-footprint-hit','rasterLevel','rasterSource','forest-canopy-batch','xMidYMid meet','6C.1A'])if(!bundle.includes(text))throw new Error(`Production bundle is missing ${text}.`);
+for(const text of ['Develop district','Development mode','Expand settlement','Illustrated','Planning','Apply appearance','Architecture theme','demo.viking.longhouse.','hearthlands.viking.longhouse.01','Ravenfjord Timber Longhouse','Ravenfjord Painted Timber Hall','Ravenfjord Mossy Timber Hall','Viking Cottage – Sheet 4','Viking Tavern – Sheet 4','Viking Farmstead – Sheet 4','data:image/png;base64,','building-footprint-hit','rasterLevel','rasterSource','forest-canopy-batch','forest-pilot-images','Viking tree PNG pilot','xMidYMid meet','6C.1B'])if(!bundle.includes(text))throw new Error(`Production bundle is missing ${text}.`);
 if(bundle.includes('raster-overview'))throw new Error('Production bundle still contains the obsolete raster-to-vector overview substitution.');
 console.log(`Verified Hearthlands ${release.release} (${release.commit}): matching HTML, release metadata and Planning/Illustrated styles and preserved development/expansion controls in ${basename(script[1])}.`);
+
+const trees=JSON.parse(readFileSync('src/assets/forests/manifest.json','utf8'));
+const lazy=readdirSync('dist/assets').filter(n=>n.endsWith('.js')&&n!==basename(script[1])).map(n=>read(join('assets',n))).find(source=>trees.assets.every(a=>source.includes(a.id))&&source.includes('data:image/png;base64,'));
+if(!lazy)throw new Error('The lazy six-image forest pilot bundle is missing.');
+const hashes=[...lazy.matchAll(/data:image\/png;base64,([A-Za-z0-9+/=]+)/g)].map(m=>createHash('sha256').update(Buffer.from(m[1],'base64')).digest('hex'));
+if(hashes.length!==6||!trees.assets.every(a=>hashes.includes(a.sha256)))throw new Error('Bundled forest PNGs differ from the approved manifest.');
+console.log('Verified all six original forest PNGs in the opt-in lazy bundle.');
