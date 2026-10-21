@@ -1,5 +1,7 @@
 # Phase 6C.1B.1 — PNG-led forest composition
 
+> This rendering remains available as Original Viking trees. The opt-in [Phase 6C.1C canopy comparison](phase6c1c-forest-variety.md) adds twenty new designs without replacing this baseline.
+
 ## Cause and visual changes
 
 6C.1B admitted roughly 15% of the existing crowns before size filtering. Each PNG was limited by both a 1.3–1.55-tile source hint and an individual procedural crown's radius. The entire opaque procedural canopy remained underneath. On the reference map, 606 small sprites decorated 4,679 dominant procedural crowns.

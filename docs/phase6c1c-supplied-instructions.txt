@@ -1,0 +1,42 @@
+Phase 6C.1C — Refine illustrated forests using the new canopy-only Viking tree sprites.
+
+Goal:
+Upgrade the illustrated woodland renderer so forests use the newly separated canopy sprites instead of the previous mixed tree set. Keep the brighter colour palette currently in 6C.1B.1, but make forestland look more natural, more varied and more cohesive.
+
+Use these assets:
+- assets/beech_01.png to assets/beech_05.png
+- assets/birch_01.png to assets/birch_05.png
+- assets/oak_01.png to assets/oak_05.png
+- assets/pine_01.png to assets/pine_05.png
+
+Implementation requirements:
+1. Treat these as canopy-only top-down sprites with transparent backgrounds.
+2. Build woodland from a weighted mix of the 20 sprites so repeated patterns are reduced.
+3. Favour broadleaf trees (beech/oak/birch) in brighter woodland zones, with pine used as a darker accent and in denser clusters.
+4. Preserve the current 6C.1A/6C.1B strengths:
+   - stable forest layout across Fit, 40%, 80% and 150%
+   - no zoom flicker or tree swapping
+   - roads, buildings, bridges and water must remain unobstructed
+   - painting/removing woodland updates correctly
+   - Undo/Redo, save/reload and Illustrated PNG export must preserve the same forest appearance
+5. Improve forest composition:
+   - overlapping canopies
+   - softer, less blocky woodland edges
+   - varied density with small gaps and occasional darker conifer pockets
+   - avoid obvious rows, checkerboards or repeated single-sprite patches
+6. Keep performance acceptable on iPhone for large settlements.
+7. Keep Planning mode unchanged.
+
+Suggested placement logic:
+- Use deterministic seeded placement tied to tile/world coordinates so the same forest stays visually identical at all zoom levels.
+- Use 4–5 sprite variants per species with weighted random selection.
+- Use sprite scale variation only if subtle and stable; do not cause hitbox or selection issues.
+- Use a denser interior mix and a more irregular, broken edge mix near the woodland boundary.
+
+Acceptance target for my iPhone playtest:
+- Forests keep the brighter current look
+- Woodland appears more illustrated and less muddy than 6C.1B
+- Variety is obvious when zoomed in, but the forest still reads as one coherent mass from Fit view
+- No flicker, no rearranging, no obstruction bugs, and no export/save regressions
+
+If needed, add a small developer preview/test hook so I can quickly compare forest density/variant weighting before finalising.

@@ -155,3 +155,5 @@ Illustrated canopy rendering, export parity, screenshots, performance and iPhone
 Optional supplied Viking tree PNGs, enablement, screenshots and iPhone playtest: [Phase 6C.1B](docs/phase6c1b-forest-pilot.md).
 
 PNG-led woodland composition, matched before/after screenshots, performance and iPhone checks: [Phase 6C.1B.1](docs/phase6c1b1-forest-composition.md).
+
+Opt-in twenty-design bright canopy comparison, natural edges, screenshots and iPhone checks: [Phase 6C.1C](docs/phase6c1c-forest-variety.md).

@@ -1,0 +1,448 @@
+{
+  "packId": "hearthlands.viking.canopies.6c1c",
+  "version": 1,
+  "comparisonOnly": true,
+  "archiveSha256": "facaf36f6b941d5c57ee6378da260af9d677a1ad058bf7a09ca94f6675b36fd4",
+  "assets": [
+    {
+      "id": "hearthlands.viking.canopy.beech.01",
+      "name": "Beech canopy 01",
+      "species": "beech",
+      "variation": 1,
+      "file": "assets/beech_01.png",
+      "pixelWidth": 403,
+      "pixelHeight": 420,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 395,
+        "height": 412
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.8,
+      "weight": 1.1,
+      "sha256": "365e0c18468bfbcfffbb3bff13b249d863462d81bf7390856996e87f1d2f7edd"
+    },
+    {
+      "id": "hearthlands.viking.canopy.beech.02",
+      "name": "Beech canopy 02",
+      "species": "beech",
+      "variation": 2,
+      "file": "assets/beech_02.png",
+      "pixelWidth": 408,
+      "pixelHeight": 400,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 400,
+        "height": 392
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.8,
+      "weight": 1,
+      "sha256": "397f7c2fa82d95988d2ed9f6c18066ffaae86c0eaf2b42e2aed18fc1abce8811"
+    },
+    {
+      "id": "hearthlands.viking.canopy.beech.03",
+      "name": "Beech canopy 03",
+      "species": "beech",
+      "variation": 3,
+      "file": "assets/beech_03.png",
+      "pixelWidth": 394,
+      "pixelHeight": 405,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 386,
+        "height": 397
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.8,
+      "weight": 1.05,
+      "sha256": "3b0be871620456539074de04c89acc8450209caae11696249bca17596b386f62"
+    },
+    {
+      "id": "hearthlands.viking.canopy.beech.04",
+      "name": "Beech canopy 04",
+      "species": "beech",
+      "variation": 4,
+      "file": "assets/beech_04.png",
+      "pixelWidth": 584,
+      "pixelHeight": 499,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 576,
+        "height": 491
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.8,
+      "weight": 0.95,
+      "sha256": "7c969b1c6afce39654d10dd14d81ec20b25d68621e7df78e0e481f47d31bd12a"
+    },
+    {
+      "id": "hearthlands.viking.canopy.beech.05",
+      "name": "Beech canopy 05",
+      "species": "beech",
+      "variation": 5,
+      "file": "assets/beech_05.png",
+      "pixelWidth": 546,
+      "pixelHeight": 491,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 538,
+        "height": 483
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.8,
+      "weight": 0.9,
+      "sha256": "96ea9e60de4851a3c2dbf13923bf4a077158b086664b66940c51379abbb1c1bf"
+    },
+    {
+      "id": "hearthlands.viking.canopy.birch.01",
+      "name": "Birch canopy 01",
+      "species": "birch",
+      "variation": 1,
+      "file": "assets/birch_01.png",
+      "pixelWidth": 428,
+      "pixelHeight": 467,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 420,
+        "height": 459
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.6,
+      "weight": 1.1,
+      "sha256": "9764d788575b21eafbd4f1298d1c331a0a492b54603213b591f315598498cb65"
+    },
+    {
+      "id": "hearthlands.viking.canopy.birch.02",
+      "name": "Birch canopy 02",
+      "species": "birch",
+      "variation": 2,
+      "file": "assets/birch_02.png",
+      "pixelWidth": 398,
+      "pixelHeight": 436,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 390,
+        "height": 428
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.6,
+      "weight": 1,
+      "sha256": "c8f3ec071487fe873db5e582e7c216b9f11b45d28a8e3f879d24aca679eb4634"
+    },
+    {
+      "id": "hearthlands.viking.canopy.birch.03",
+      "name": "Birch canopy 03",
+      "species": "birch",
+      "variation": 3,
+      "file": "assets/birch_03.png",
+      "pixelWidth": 411,
+      "pixelHeight": 441,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 403,
+        "height": 433
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.6,
+      "weight": 1.05,
+      "sha256": "fa143af7466540e13286942f1a74ff9d9be1ee164997ef7a2293ca61095c9741"
+    },
+    {
+      "id": "hearthlands.viking.canopy.birch.04",
+      "name": "Birch canopy 04",
+      "species": "birch",
+      "variation": 4,
+      "file": "assets/birch_04.png",
+      "pixelWidth": 544,
+      "pixelHeight": 474,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 536,
+        "height": 466
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.6,
+      "weight": 0.95,
+      "sha256": "bf80e1f1b77af615400bbe936297bfda896a619ae0a8097263d00f5875aa0189"
+    },
+    {
+      "id": "hearthlands.viking.canopy.birch.05",
+      "name": "Birch canopy 05",
+      "species": "birch",
+      "variation": 5,
+      "file": "assets/birch_05.png",
+      "pixelWidth": 521,
+      "pixelHeight": 458,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 513,
+        "height": 450
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.6,
+      "weight": 0.9,
+      "sha256": "0a0021a2da7f622b9be6e351748a9969ed4ed691d76cf8d3734cb6a83698cd5b"
+    },
+    {
+      "id": "hearthlands.viking.canopy.oak.01",
+      "name": "Oak canopy 01",
+      "species": "oak",
+      "variation": 1,
+      "file": "assets/oak_01.png",
+      "pixelWidth": 429,
+      "pixelHeight": 450,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 421,
+        "height": 442
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 4.2,
+      "weight": 1.1,
+      "sha256": "0c3c185bd3de419a374ee6bb50700761410e63256f53a4ed1315c1f0e1dfc3b1"
+    },
+    {
+      "id": "hearthlands.viking.canopy.oak.02",
+      "name": "Oak canopy 02",
+      "species": "oak",
+      "variation": 2,
+      "file": "assets/oak_02.png",
+      "pixelWidth": 395,
+      "pixelHeight": 462,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 387,
+        "height": 454
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 4.2,
+      "weight": 1,
+      "sha256": "f309651632aa7ec0a54d907d4166c4018a457a8e14be3a64e8fe95e051757536"
+    },
+    {
+      "id": "hearthlands.viking.canopy.oak.03",
+      "name": "Oak canopy 03",
+      "species": "oak",
+      "variation": 3,
+      "file": "assets/oak_03.png",
+      "pixelWidth": 405,
+      "pixelHeight": 439,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 397,
+        "height": 431
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 4.2,
+      "weight": 1.05,
+      "sha256": "5c588e7bbcbccd0257a4034ae71dc55a48460f5f960bd9f42b3a50d7691db352"
+    },
+    {
+      "id": "hearthlands.viking.canopy.oak.04",
+      "name": "Oak canopy 04",
+      "species": "oak",
+      "variation": 4,
+      "file": "assets/oak_04.png",
+      "pixelWidth": 572,
+      "pixelHeight": 500,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 564,
+        "height": 492
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 4.2,
+      "weight": 0.95,
+      "sha256": "a16275e8340b150d50c8b10776f32c5cb6fd8b5a2924c43b96cdeb10c863ce84"
+    },
+    {
+      "id": "hearthlands.viking.canopy.oak.05",
+      "name": "Oak canopy 05",
+      "species": "oak",
+      "variation": 5,
+      "file": "assets/oak_05.png",
+      "pixelWidth": 532,
+      "pixelHeight": 463,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 524,
+        "height": 455
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 4.2,
+      "weight": 0.9,
+      "sha256": "989b4cc6e180ca5642a146c48574ec9bb50f20e0326c3347a0048d78a3789765"
+    },
+    {
+      "id": "hearthlands.viking.canopy.pine.01",
+      "name": "Pine canopy 01",
+      "species": "pine",
+      "variation": 1,
+      "file": "assets/pine_01.png",
+      "pixelWidth": 406,
+      "pixelHeight": 442,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 398,
+        "height": 434
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.2,
+      "weight": 1.1,
+      "sha256": "4db0d3df24c0f8e52dd38c5e64e6f3b5bf02144eb9916b95213f4a4e6014d1c9"
+    },
+    {
+      "id": "hearthlands.viking.canopy.pine.02",
+      "name": "Pine canopy 02",
+      "species": "pine",
+      "variation": 2,
+      "file": "assets/pine_02.png",
+      "pixelWidth": 414,
+      "pixelHeight": 401,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 406,
+        "height": 393
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.2,
+      "weight": 1,
+      "sha256": "06705087942c83725b945632e2bcb4f3c36cf11fccab3b04f38255cedc8261e4"
+    },
+    {
+      "id": "hearthlands.viking.canopy.pine.03",
+      "name": "Pine canopy 03",
+      "species": "pine",
+      "variation": 3,
+      "file": "assets/pine_03.png",
+      "pixelWidth": 368,
+      "pixelHeight": 397,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 360,
+        "height": 389
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.2,
+      "weight": 1.05,
+      "sha256": "77e89e8acfd86c90645c48fdf7c938af40fb4c7d787e3966b7dad10c2d062f3d"
+    },
+    {
+      "id": "hearthlands.viking.canopy.pine.04",
+      "name": "Pine canopy 04",
+      "species": "pine",
+      "variation": 4,
+      "file": "assets/pine_04.png",
+      "pixelWidth": 577,
+      "pixelHeight": 564,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 569,
+        "height": 556
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.2,
+      "weight": 0.95,
+      "sha256": "c8e687e01833e1a45b5a8288120b0744fc24bc59b9492a7f6af24ec7be8a975e"
+    },
+    {
+      "id": "hearthlands.viking.canopy.pine.05",
+      "name": "Pine canopy 05",
+      "species": "pine",
+      "variation": 5,
+      "file": "assets/pine_05.png",
+      "pixelWidth": 594,
+      "pixelHeight": 509,
+      "alpha": {
+        "x": 4,
+        "y": 4,
+        "width": 586,
+        "height": 501
+      },
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "diameter": 3.2,
+      "weight": 0.9,
+      "sha256": "1edf9d7c2c9e2f1d81a242045746b6bc0dcf027070a236c80c7a36490c7ef864"
+    }
+  ]
+}

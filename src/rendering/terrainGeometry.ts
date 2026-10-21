@@ -1,5 +1,7 @@
 import {forestPilotScene,type ForestSprite} from './forestPilot';
 import {forestScene} from './forestGeometry';
+import {forestCanopyScene} from './forestCanopies';
+import type {ForestPack} from '../assets/forests/catalogue';
 import {noise} from '../generator/noise';
 import type { VisualStyle, TerrainLayer } from './styles';
 import type { Cell, SettlementDocument } from '../model/document';
@@ -7,7 +9,7 @@ import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 export const groundColors={grass:'#536447',dirt:'#806b4b',sand:'#b4a375',rock:'#737775',soil:'#66523b'};
 export interface TerrainChunk {data:string;bounds:{x:number;y:number;width:number;height:number}}
 export interface TerrainPath { sprites?:readonly ForestSprite[]; chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
-export interface TerrainView { contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean; forestPilot?:boolean; forestAssets?:readonly string[] }
+export interface TerrainView { contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean; forestPilot?:boolean; forestPack?:ForestPack; forestAssets?:readonly string[] }
 const tile=(x:number,y:number)=>`M${x} ${y}h1v1h-1Z`;
 const n=(v:number)=>Math.round(v*1000)/1000;
 function hash(seed:number,x:number,y:number){let h=seed^Math.imul(x,374761393)^Math.imul(y,668265263);h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967296;}
@@ -75,7 +77,7 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     add(contour.join(''),undefined,'#e7d6a2',.035,.5);
   }
   const paths=[...groups.values()].map(g=>({...g.path,data:g.parts.join('')}));
-  if(illustrated){const forest=options.forestPilot?forestPilotScene(doc,options.forestAssets??[]):forestScene(doc);paths.push(...forest.paths,...(fine?forest.detail:[]));if(forest.sprites?.length)paths.push({layer:'nature',data:'',sprites:forest.sprites});}
+  if(illustrated){const forest=options.forestPilot?(options.forestPack==='canopies'?forestCanopyScene:forestPilotScene)(doc,options.forestAssets??[]):forestScene(doc);paths.push(...forest.paths,...(fine?forest.detail:[]));if(forest.sprites?.length)paths.push({layer:'nature',data:'',sprites:forest.sprites});}
   return paths;
 }
 export function previewTerrainColor(t:LandscapeCell){return t.water>=.5?'#6cb8c1':t.vegetation>=.6?'#75b278':t.rocks>=.6?'#a5aea2':groundColors[t.ground];}
