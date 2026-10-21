@@ -1,0 +1,91 @@
+{
+  "pack_id": "hearthlands-grassland-6c2-lite",
+  "release_target": "6C.2",
+  "notes": "These are artwork samples, NOT verified mathematically seamless. WebP supported by modern iPhone Safari. These are 896x896 lossy-quality-84 optimized textures, all RGB opaque ground tiles. Weights are illustrative, not requirements; start in limited coverage.",
+  "assets": [
+    {
+      "id": "hearthlands.terrain.grassland.base.01",
+      "name": "Base meadow",
+      "file": "assets/hearthlands-grassland-base-meadow-01.webp",
+      "type": "base",
+      "preferred_use": "common meadow, woodland clearing",
+      "suggested_weight": 45,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    },
+    {
+      "id": "hearthlands.terrain.grassland.flower.01",
+      "name": "Wildflower meadow A",
+      "file": "assets/hearthlands-grassland-wildflower-01.webp",
+      "type": "flower",
+      "preferred_use": "flower-rich open meadow",
+      "suggested_weight": 12,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    },
+    {
+      "id": "hearthlands.terrain.grassland.flower.02",
+      "name": "Wildflower meadow B",
+      "file": "assets/hearthlands-grassland-wildflower-02.webp",
+      "type": "flower",
+      "preferred_use": "flower-rich open meadow with bare-soil spots",
+      "suggested_weight": 8,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    },
+    {
+      "id": "hearthlands.terrain.grassland.scrub.01",
+      "name": "Scrub grass",
+      "file": "assets/hearthlands-grassland-scrubby-01.webp",
+      "type": "scrub",
+      "preferred_use": "drier marginal grassland",
+      "suggested_weight": 15,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    },
+    {
+      "id": "hearthlands.terrain.grassland.rocky.01",
+      "name": "Rocky grass",
+      "file": "assets/hearthlands-grassland-rocky-01.webp",
+      "type": "rocky",
+      "preferred_use": "hills and scattered rock zones",
+      "suggested_weight": 10,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    },
+    {
+      "id": "hearthlands.terrain.grassland.marsh.01",
+      "name": "Marsh meadow",
+      "file": "assets/hearthlands-grassland-marsh-01.webp",
+      "type": "marsh",
+      "preferred_use": "wet lowlands by water, only outside water cells",
+      "suggested_weight": 10,
+      "image_dimensions": [
+        896,
+        896
+      ],
+      "format": "image/webp",
+      "source": "selected original grassland tile art (visually inspected); 1254px source, downsampled to 896px"
+    }
+  ]
+}

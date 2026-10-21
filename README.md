@@ -157,3 +157,5 @@ Optional supplied Viking tree PNGs, enablement, screenshots and iPhone playtest:
 PNG-led woodland composition, matched before/after screenshots, performance and iPhone checks: [Phase 6C.1B.1](docs/phase6c1b1-forest-composition.md).
 
 Opt-in twenty-design bright canopy comparison, natural edges, screenshots and iPhone checks: [Phase 6C.1C](docs/phase6c1c-forest-variety.md).
+
+Opt-in restrained bright meadow patches, source-border audit, comparisons, performance and iPhone checks: [Phase 6C.2](docs/phase6c2-grassland.md).

@@ -1,3 +1,4 @@
+import {GrasslandVisual} from './GrasslandVisual';
 import {ForestRasterVisual} from './ForestRasterVisual';
 import type Konva from 'konva';
 import {memo,useMemo,useRef,useLayoutEffect} from 'react';
@@ -21,5 +22,5 @@ export const TerrainVisual=memo(function TerrainVisual({paths,cell,width,height,
  // A disposable overview bitmap speeds camera redraws. It is presentation only,
  // bounded to 2048px per edge, never saved/exported; close zoom keeps native vectors.
  useLayoutEffect(()=>{const group=root.current;if(!group)return;group.clearCache();if(cachePixels>0&&paths.length){try{group.cache({x:0,y:0,width,height,pixelRatio:Math.min(cachePixels,2048/Math.max(width,height)),hitCanvasPixelRatio:1});}catch{group.clearCache();}}return()=>{group.clearCache();};},[paths,width,height,cachePixels]);
- return <Group ref={root} listening={false} scaleX={cell} scaleY={cell}>{(['base','nature','water','relief'] as const).map(layer=><Group key={layer} name={layer}>{paths.filter(p=>(p.layer??'base')===layer).map((p,i)=>p.sprites?<ForestRasterVisual key={i} sprites={p.sprites}/>:<TerrainBatch key={i} path={p}/>)}</Group>)}</Group>;
+ return <Group ref={root} listening={false} scaleX={cell} scaleY={cell}>{(['base','nature','water','relief'] as const).map(layer=><Group key={layer} name={layer}>{paths.filter(p=>(p.layer??'base')===layer).map((p,i)=>p.grassland?<GrasslandVisual key={i} patches={p.grassland}/>:p.sprites?<ForestRasterVisual key={i} sprites={p.sprites}/>:<TerrainBatch key={i} path={p}/>)}</Group>)}</Group>;
 });

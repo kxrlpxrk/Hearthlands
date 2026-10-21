@@ -1,3 +1,5 @@
+import {grasslandImages} from '../rendering/grasslandImages';
+import type {GrasslandMode} from '../assets/grassland/registry';
 import {forestImagesForPack} from '../rendering/forestImages';
 import {forestAssetsById,allForestAssets,forestPackAssets,type ForestPack} from '../assets/forests/catalogue';
 import type {ForestSprite} from '../rendering/forestPilot';
@@ -16,7 +18,7 @@ import { footprint } from '../model/buildings';
 import { buildingDefinition } from '../model/catalogue';
 import { symbolPaths } from '../rendering/symbols';
 import { roadContext, roadGeometry } from '../rendering/roadGeometry';
-export interface ImageOptions { forestPilot?:boolean; forestPack?:ForestPack; style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
+export interface ImageOptions {grassland?:GrasslandMode; forestPilot?:boolean; forestPack?:ForestPack; style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
 export function imageDimensions(doc: SettlementDocument, resolution: number) {
   if (!Number.isInteger(resolution) || resolution < 256 || resolution > 4096) throw new Error('Choose a PNG resolution from 256 to 4096 pixels.');
   const scale=resolution/Math.max(doc.grid.width,doc.grid.height),width=Math.round(doc.grid.width*scale),height=Math.round(doc.grid.height*scale);
@@ -30,12 +32,17 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
   if(!['planning','illustrated'].includes(style))throw new Error('Choose Planning or Illustrated PNG style.');
   const reduced=options.reduced??reducedDetail(style,options.resolution/Math.max(doc.grid.width,doc.grid.height));
   const pilot=style==='illustrated'&&options.forestPilot===true,pack=options.forestPack==='canopies'?'canopies':'pilot',images=forestImagesForPack(pack).snapshot();
-  const paths=terrainScene(doc,{style,reduced,forestPilot:pilot,forestPack:pack,forestAssets:pilot?images.ready:[],contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail});
+  const meadow=grasslandImages.snapshot(),grassland=style==='illustrated'?options.grassland:'off';
+  const paths=terrainScene(doc,{style,reduced,forestPilot:pilot,forestPack:pack,forestAssets:pilot?images.ready:[],grassland,grasslandAssets:meadow.ready,contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail});
   const used=new Set(paths.flatMap(p=>p.sprites?.map(s=>s.assetId)??[]));
   const definitions=[...used].map(id=>{const a=forestAssetsById.get(id)!,source=images.images.get(id)!.source;return `<image id="forest-pilot-source-${allForestAssets.indexOf(a)}" width="${a.pixelWidth}" height="${a.pixelHeight}" href="${source}"/>`;}).join('');
   const spriteSvg=(s:ForestSprite)=>{const a=forestAssetsById.get(s.assetId)!,b=a.alpha;return `<g data-forest-asset="${a.id}" transform="translate(${s.x} ${s.y}) rotate(${s.angle*180/Math.PI})"><svg x="${s.left}" y="${s.top}" width="${s.width}" height="${s.height}" viewBox="${b.x} ${b.y} ${b.width} ${b.height}" preserveAspectRatio="xMidYMid meet"><use href="#forest-pilot-source-${allForestAssets.indexOf(a)}"/></svg></g>`;};
   const fallback=pilot&&images.ready.length<forestPackAssets[pack].length?'<desc data-forest-fallback="true">Some pilot images are unavailable. Their original procedural crowns are retained.</desc>':'';
-  const terrain=(definitions?`<defs>${definitions}</defs>`:'')+fallback+paths.map(t=>t.sprites?t.sprites.map(spriteSvg).join(''):`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
+  const meadowUsed=new Map(paths.flatMap(t=>(t.grassland??[]).map(p=>[p.assetId+':'+p.variant,p] as const)));
+  const meadowIds=new Map([...meadowUsed.keys()].map((k,i)=>[k,`grassland-source-${i}`]));
+  const meadowDefs=[...meadowUsed].map(([key,p])=>`<image id="${meadowIds.get(key)}" width="384" height="384" href="${meadow.images.get(p.assetId)![p.variant].source}"/>`).join('');
+  const meadowFallback=grassland&&grassland!=='off'&&meadow.failed.length?'<desc data-grassland-fallback="true">Unavailable meadow artwork retains the original quiet terrain.</desc>':'';
+  const terrain=(meadowDefs?`<defs>${meadowDefs}</defs>`:'')+meadowFallback+(definitions?`<defs>${definitions}</defs>`:'')+fallback+paths.map(t=>t.grassland?t.grassland.map(p=>`<g data-grassland-asset="${p.assetId}" transform="translate(${p.x} ${p.y}) rotate(${p.angle*180/Math.PI})"><svg x="${-p.radius}" y="${-p.radius}" width="${2*p.radius}" height="${2*p.radius}" viewBox="0 0 384 384"><use href="#${meadowIds.get(p.assetId+':'+p.variant)}"/></svg></g>`).join(''):t.sprites?t.sprites.map(spriteSvg).join(''):`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
   const visible=(id:string)=>doc.layers.find(l=>l.id===id)?.visible;
   const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).sort((a,b)=>Number(isBridge(a)||isDefense(a))-Number(isBridge(b)||isDefense(b))).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}" data-layer="${isBridge(r)||isDefense(r)?'infrastructure':'roads'}">${infrastructureStrokes(r,g,style,reduced).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
@@ -56,7 +63,7 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
 }
 export async function renderPng(doc: SettlementDocument, options: ImageOptions): Promise<Blob> {
   const {width,height}=imageDimensions(doc,options.resolution);
-  if(options.style==='illustrated')await Promise.all([prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b))),options.forestPilot?forestImagesForPack(options.forestPack).prepare():Promise.resolve()]);
+  if(options.style==='illustrated')await Promise.all([prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b))),options.forestPilot?forestImagesForPack(options.forestPack).prepare():Promise.resolve(),options.grassland&&options.grassland!=='off'?grasslandImages.prepare():Promise.resolve()]);
   const url=URL.createObjectURL(new Blob([mapSvg(doc,options)],{type:'image/svg+xml;charset=utf-8'}));
   const canvas=document.createElement('canvas');
   try {
