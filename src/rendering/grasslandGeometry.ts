@@ -8,17 +8,20 @@ import {sampledPath} from '../model/infrastructure';
 import {roadContext,roadGeometry} from './roadGeometry';
 import {grasslandAssets,type GrasslandMode,type GrasslandKind} from '../assets/grassland/registry';
 export interface GrasslandPatch extends Cell {assetId:string;radius:number;angle:number;variant:number}
-export const grasslandMaskEdge=384,grasslandMaskVariants=3;
+export const grasslandMaskEdge=384,grasslandMaskVariants=3,grasslandFeather=.13;
+export function grasslandRadius(angle:number,variant:number){
+ const phase=variant*2.17;return .72+.16*Math.cos(2*angle+phase)+.055*Math.sin(5*angle-phase)+.03*Math.cos(7*angle+phase)+.02*Math.sin(11*angle+phase);
+}
 /** One shared feather definition, baked once per asset/variant. All alpha is
  * inside the certified unit circle; no blur/filter can leak over obstacles. */
 export function grasslandAlpha(x:number,y:number,variant:number){
- const a=Math.atan2(y,x),phase=variant*2.17,r=.76+.10*Math.sin(3*a+phase)+.065*Math.sin(5*a-phase)+.035*Math.cos(7*a+phase);
- const d=Math.hypot(x,y)/r,t=Math.max(0,Math.min(1,(1-d)/.43));
+ const r=grasslandRadius(Math.atan2(y,x),variant);
+ const d=Math.hypot(x,y)/r,t=Math.max(0,Math.min(1,(1-d)/grasslandFeather));
  return t*t*(3-2*t);
 }
 /** Quarter-tile conservative distance field for decorative OPEN LAND only.
  * Independent from forest geometry: enabling the pilot cannot move a tree. */
-export function grasslandClearance(doc:SettlementDocument){
+function buildGrasslandClearance(doc:SettlementDocument){
  const {width,height}=doc.grid,w=width*4+2,h=height*4+2,field=new Uint16Array(w*h),q=terrainQuery(doc);
  const block=(x0:number,y0:number,x1:number,y1:number)=>{
   const left=Math.max(0,Math.min(width*4,Math.floor(x0*4))),right=Math.max(0,Math.min(width*4,Math.ceil(x1*4)));if(right<=left)return;
@@ -39,6 +42,12 @@ export function grasslandClearance(doc:SettlementDocument){
  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;if(field[i])field[i]=Math.min(field[i],field[i-1]+1,field[i-w-1]+1,field[i-w]+1,field[i-w+1]+1);}
  for(let y=h-2;y>0;y--)for(let x=w-2;x>0;x--){const i=y*w+x;if(field[i])field[i]=Math.min(field[i],field[i+1]+1,field[i+w-1]+1,field[i+w]+1,field[i+w+1]+1);}
  return (p:Cell)=>p.x<0||p.y<0||p.x>=width||p.y>=height?0:Math.max(0,field[(Math.floor(p.y*4)+1)*w+Math.floor(p.x*4)+1]/4-Math.SQRT2/4);
+}
+function sameGround(a:SettlementDocument,b:SettlementDocument){return a.terrain===b.terrain&&a.landscape===b.landscape&&a.planning===b.planning&&a.buildings===b.buildings&&a.roads===b.roads&&a.seed===b.seed&&a.grid.width===b.grid.width&&a.grid.height===b.grid.height;}
+const clearanceCache:{doc:SettlementDocument;available:ReturnType<typeof buildGrasslandClearance>}[]=[];
+export function grasslandClearance(doc:SettlementDocument){
+ const found=clearanceCache.find(c=>sameGround(c.doc,doc));if(found)return found.available;
+ const available=buildGrasslandClearance(doc);clearanceCache.push({doc,available});if(clearanceCache.length>4)clearanceCache.shift();return available;
 }
 const cache:{doc:SettlementDocument;mode:GrasslandMode;patches:readonly GrasslandPatch[]}[]=[];
 /** Bounded seeded proposals, not repeating texture tiles. Camera/readiness never

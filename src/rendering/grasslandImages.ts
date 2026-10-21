@@ -1,7 +1,7 @@
 import {useEffect,useSyncExternalStore} from 'react';
 import {grasslandAssets,type GrasslandAsset} from '../assets/grassland/registry';
 import {grasslandAlpha,grasslandMaskEdge,grasslandMaskVariants} from './grasslandGeometry';
-export interface GrasslandImage {image:HTMLCanvasElement;source:string}
+export interface GrasslandImage {image:HTMLCanvasElement;source:string;original?:HTMLImageElement;originalSource?:string}
 export interface GrasslandSnapshot {status:'idle'|'loading'|'ready';ready:readonly string[];failed:readonly string[];images:ReadonlyMap<string,readonly GrasslandImage[]>}
 const empty:GrasslandSnapshot={status:'idle',ready:[],failed:[],images:new Map()};
 export function approvedGrasslandUrl(url:string,a:GrasslandAsset){
@@ -15,6 +15,7 @@ export function maskGrasslandImage(image:CanvasImageSource,a:GrasslandAsset,vari
  const canvas=document.createElement('canvas');canvas.width=canvas.height=grasslandMaskEdge;
  try{
   const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('Meadow cache unavailable');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   const c=a.crop;ctx.drawImage(image,c.x,c.y,c.size,c.size,0,0,canvas.width,canvas.height);
   const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);
   for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)pixels.data[(y*canvas.width+x)*4+3]=Math.round(255*grasslandAlpha((x+.5)/canvas.width*2-1,(y+.5)/canvas.height*2-1,variant));
@@ -23,14 +24,14 @@ export function maskGrasslandImage(image:CanvasImageSource,a:GrasslandAsset,vari
   return {image:canvas,source};
  }catch(error){canvas.width=canvas.height=0;throw error;}
 }
-/** At most two original WebPs decode concurrently; originals are then released.
+/** At most two original WebPs decode concurrently; six originals are shared for close detail.
  * Eighteen 384px masked surfaces (~10.1MiB) are shared by all maps and patches. */
 export function createGrasslandImageStore(load=()=>import('../assets/grassland/images')){
  let state=empty,pending:Promise<GrasslandSnapshot>|undefined;const listeners=new Set<()=>void>();
  const publish=(next:GrasslandSnapshot)=>{state=next;for(const f of listeners)f();};
  async function decode(url:string,a:GrasslandAsset):Promise<GrasslandImage[]>{
   if(!approvedGrasslandUrl(url,a))throw new Error('Unapproved meadow URL');
-  const controller=new AbortController(),image=new Image();let objectUrl:string|undefined;
+  const controller=new AbortController(),image=new Image();let retained=false;
   let timer:ReturnType<typeof setTimeout>;
   const deadline=new Promise<never>((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('Meadow preparation timed out'));},10000);});
   try{return await Promise.race([deadline,(async()=>{
@@ -38,12 +39,13 @@ export function createGrasslandImageStore(load=()=>import('../assets/grassland/i
    const bytes=new Uint8Array(await response.arrayBuffer());
    if(bytes.length<30||bytes.length>1_048_576||String.fromCharCode(...bytes.subarray(0,4))!=='RIFF'||String.fromCharCode(...bytes.subarray(8,12))!=='WEBP')throw new Error('Invalid meadow WebP');
    if(controller.signal.aborted)throw new Error('Meadow preparation cancelled');
-   objectUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
-   await new Promise<void>((resolve,reject)=>{image.onload=()=>image.naturalWidth===a.width&&image.naturalHeight===a.height?resolve():reject(new Error('Wrong meadow dimensions'));image.onerror=()=>reject(new Error('Meadow decode failed'));image.src=objectUrl!;});
+   let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+   const originalSource='data:image/webp;base64,'+btoa(binary);
+   await new Promise<void>((resolve,reject)=>{image.onload=()=>image.naturalWidth===a.width&&image.naturalHeight===a.height?resolve():reject(new Error('Wrong meadow dimensions'));image.onerror=()=>reject(new Error('Meadow decode failed'));image.src=originalSource;});
    const result:GrasslandImage[]=[];
-   try{for(let i=0;i<grasslandMaskVariants;i++){if(controller.signal.aborted)throw new Error('Meadow preparation cancelled');result.push(maskGrasslandImage(image,a,i));await new Promise<void>(r=>setTimeout(r,0));}return result;}
+   try{for(let i=0;i<grasslandMaskVariants;i++){if(controller.signal.aborted)throw new Error('Meadow preparation cancelled');result.push({...maskGrasslandImage(image,a,i),original:image,originalSource});await new Promise<void>(r=>setTimeout(r,0));}retained=true;return result;}
    catch(error){for(const v of result)v.image.width=v.image.height=0;throw error;}
-  })()]);}finally{clearTimeout(timer!);controller.abort();image.onload=image.onerror=null;image.src='';if(objectUrl)URL.revokeObjectURL(objectUrl);}
+  })()]);}finally{clearTimeout(timer!);controller.abort();image.onload=image.onerror=null;if(!retained)image.src='';}
  }
  return {
   snapshot:()=>state,subscribe:(f:()=>void)=>{listeners.add(f);return()=>{listeners.delete(f);};},

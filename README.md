@@ -159,3 +159,5 @@ PNG-led woodland composition, matched before/after screenshots, performance and 
 Opt-in twenty-design bright canopy comparison, natural edges, screenshots and iPhone checks: [Phase 6C.1C](docs/phase6c1c-forest-variety.md).
 
 Opt-in restrained bright meadow patches, source-border audit, comparisons, performance and iPhone checks: [Phase 6C.2](docs/phase6c2-grassland.md).
+
+Sharper meadow edges, continuous Fit shading, source-detail rendering and iPhone checks: [Phase 6C.2.1](docs/phase6c21-grassland-clarity.md).

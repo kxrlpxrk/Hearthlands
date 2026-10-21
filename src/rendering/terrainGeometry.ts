@@ -1,3 +1,4 @@
+import {grasslandGround} from './grasslandGround';
 import {grasslandPatches,type GrasslandPatch} from './grasslandGeometry';
 import type {GrasslandMode} from '../assets/grassland/registry';
 import {forestPilotScene,type ForestSprite} from './forestPilot';
@@ -10,7 +11,7 @@ import type { Cell, SettlementDocument } from '../model/document';
 import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 export const groundColors={grass:'#536447',dirt:'#806b4b',sand:'#b4a375',rock:'#737775',soil:'#66523b'};
 export interface TerrainChunk {data:string;bounds:{x:number;y:number;width:number;height:number}}
-export interface TerrainPath { grassland?:readonly GrasslandPatch[]; sprites?:readonly ForestSprite[]; chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
+export interface TerrainPath { grassland?:readonly GrasslandPatch[]; grasslandGround?:readonly TerrainPath[]; sprites?:readonly ForestSprite[]; chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
 export interface TerrainView { grassland?:GrasslandMode; grasslandAssets?:readonly string[]; contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean; forestPilot?:boolean; forestPack?:ForestPack; forestAssets?:readonly string[] }
 const tile=(x:number,y:number)=>`M${x} ${y}h1v1h-1Z`;
 const n=(v:number)=>Math.round(v*1000)/1000;
@@ -79,7 +80,7 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     add(contour.join(''),undefined,'#e7d6a2',.035,.5);
   }
   const paths=[...groups.values()].map(g=>({...g.path,data:g.parts.join('')}));
-  if(illustrated&&options.grassland&&options.grassland!=='off'){const ready=new Set(options.grasslandAssets??[]),patches=grasslandPatches(doc,options.grassland).filter(p=>ready.has(p.assetId));if(patches.length)paths.push({layer:'base',data:'',grassland:patches});}
+  if(illustrated&&options.grassland&&options.grassland!=='off'){const ready=new Set(options.grasslandAssets??[]),patches=grasslandPatches(doc,options.grassland).filter(p=>ready.has(p.assetId));if(ready.size){const ground=grasslandGround(doc,options.grassland);if(patches.length||ground.length)paths.push({layer:'base',data:'',grassland:patches,grasslandGround:ground});}}
   if(illustrated){const forest=options.forestPilot?(options.forestPack==='canopies'?forestCanopyScene:forestPilotScene)(doc,options.forestAssets??[]):forestScene(doc);paths.push(...forest.paths,...(fine?forest.detail:[]));if(forest.sprites?.length)paths.push({layer:'nature',data:'',sprites:forest.sprites});}
   return paths;
 }

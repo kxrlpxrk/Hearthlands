@@ -6,9 +6,9 @@ const release=JSON.parse(read('release.json')),html=read('index.html');
 const script=html.match(/<script[^>]+src="([^"]+\.js)"/);
 if(!script)throw new Error('Production entry script is missing.');
 const bundle=read(join('assets',basename(script[1])));
-if(release.release!=='6C.2'||!release.commit||!html.includes(`6C.2 ${release.commit}`))throw new Error('HTML and release metadata disagree.');
+if(release.release!=='6C.2.1'||!release.commit||!html.includes(`6C.2.1 ${release.commit}`))throw new Error('HTML and release metadata disagree.');
 if(process.env.GITHUB_SHA&&release.commit!==process.env.GITHUB_SHA.slice(0,7))throw new Error('Release marker does not match this deployment commit.');
-for(const text of ['Develop district','Development mode','Expand settlement','Illustrated','Planning','Apply appearance','Architecture theme','demo.viking.longhouse.','hearthlands.viking.longhouse.01','Ravenfjord Timber Longhouse','Ravenfjord Painted Timber Hall','Ravenfjord Mossy Timber Hall','Viking Cottage – Sheet 4','Viking Tavern – Sheet 4','Viking Farmstead – Sheet 4','data:image/png;base64,','building-footprint-hit','rasterLevel','rasterSource','forest-canopy-batch','forest-pilot-images','Viking tree PNG pilot','Layered single-tree canopies enabled; cropped clusters withheld.','xMidYMid meet','6C.2'])if(!bundle.includes(text))throw new Error(`Production bundle is missing ${text}.`);
+for(const text of ['Develop district','Development mode','Expand settlement','Illustrated','Planning','Apply appearance','Architecture theme','demo.viking.longhouse.','hearthlands.viking.longhouse.01','Ravenfjord Timber Longhouse','Ravenfjord Painted Timber Hall','Ravenfjord Mossy Timber Hall','Viking Cottage – Sheet 4','Viking Tavern – Sheet 4','Viking Farmstead – Sheet 4','data:image/png;base64,','building-footprint-hit','rasterLevel','rasterSource','forest-canopy-batch','forest-pilot-images','Viking tree PNG pilot','Layered single-tree canopies enabled; cropped clusters withheld.','xMidYMid meet','6C.2.1'])if(!bundle.includes(text))throw new Error(`Production bundle is missing ${text}.`);
 if(bundle.includes('raster-overview'))throw new Error('Production bundle still contains the obsolete raster-to-vector overview substitution.');
 console.log(`Verified Hearthlands ${release.release} (${release.commit}): matching HTML, release metadata and Planning/Illustrated styles and preserved development/expansion controls in ${basename(script[1])}.`);
 
@@ -41,5 +41,5 @@ for(const a of meadow.assets){
  const bytes=readFileSync(join('dist/assets',files[0]));
  if(bytes.toString('ascii',0,4)!=='RIFF'||bytes.toString('ascii',8,12)!=='WEBP'||bytes.toString('ascii',12,16)!=='VP8 '||(bytes.readUInt16LE(26)&0x3fff)!==896||(bytes.readUInt16LE(28)&0x3fff)!==896||createHash('sha256').update(bytes).digest('hex')!==meadowHashes[a.id])throw new Error(`Grassland source changed: ${a.id}`);
 }
-for(const text of ['Illustrated grassland pilot','Illustrated grassland in PNG','grassland-pilot-images','All six meadow textures ready. Sparse feathered patches; original colours preserved.'])if(!bundle.includes(text))throw new Error(`Grassland controls/batch missing: ${text}`);
+for(const text of ['Illustrated grassland pilot','Illustrated grassland in PNG','grassland-pilot-images','grassland-ground-cache','grasslandTextureOpacity','data-grassland-source-detail','All six meadow textures ready. Quiet ground at Fit; crisp artwork nearby.'])if(!bundle.includes(text))throw new Error(`Grassland controls/batch missing: ${text}`);
 console.log('Verified six unchanged WebPs, base-safe lazy URLs, opt-in meadow controls and shared image batch.');

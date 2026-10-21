@@ -1,0 +1,352 @@
+{
+  "release": "6C.2.1",
+  "reference": {
+    "seed": 1847,
+    "buildings": 35,
+    "map": [
+      96,
+      96
+    ],
+    "forestSprites": 2241,
+    "canopyDesigns": 20,
+    "patches": 7,
+    "closeFocus": [
+      60.45548701216467,
+      38.05336521624122
+    ]
+  },
+  "browser": "Chromium touch emulation; not physical iPhone Safari",
+  "viewports": [
+    [
+      375,
+      667
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "pixelComparisons": {
+    "offUnchanged": {
+      "identical": true,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "allFailureFallback": {
+      "identical": true,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "forestInteriorUnchanged": {
+      "identical": true
+    },
+    "waterInteriorUnchanged": {
+      "identical": true
+    },
+    "documentLandscapeOverrides": 0,
+    "buildingFootprintInteriorUnchanged": {
+      "identical": true
+    }
+  },
+  "zoomChecks": [
+    {
+      "zoom": "fit",
+      "scale": 0.10611979166666667,
+      "textureOpacity": 0,
+      "originalSourceDrawCalls": 0,
+      "groundCache": {
+        "self": false,
+        "parent": true
+      },
+      "forestSprites": 2241
+    },
+    {
+      "zoom": 0.5,
+      "scale": 0.4999998480530923,
+      "textureOpacity": 1,
+      "originalSourceDrawCalls": 0,
+      "groundCache": {
+        "self": true,
+        "parent": false
+      },
+      "forestSprites": 2241
+    },
+    {
+      "zoom": 1,
+      "scale": 1.0000000682717969,
+      "textureOpacity": 1,
+      "originalSourceDrawCalls": 1,
+      "groundCache": {
+        "self": true,
+        "parent": false
+      },
+      "forestSprites": 2241
+    },
+    {
+      "zoom": 0.4,
+      "scale": 0.4000001773951788,
+      "textureOpacity": 1,
+      "originalSourceDrawCalls": 0,
+      "groundCache": {
+        "self": true,
+        "parent": false
+      },
+      "forestSprites": 2241
+    },
+    {
+      "zoom": 0.8,
+      "scale": 0.8000000570578668,
+      "textureOpacity": 1,
+      "originalSourceDrawCalls": 0,
+      "groundCache": {
+        "self": true,
+        "parent": false
+      },
+      "forestSprites": 2241
+    },
+    {
+      "zoom": 1.5,
+      "scale": 1.4999999322645494,
+      "textureOpacity": 1,
+      "originalSourceDrawCalls": 1,
+      "groundCache": {
+        "self": true,
+        "parent": false
+      },
+      "forestSprites": 2241
+    }
+  ],
+  "cameraPairsMatch": true,
+  "browserChecks": {
+    "selectionRotationLocksHistory": true,
+    "autosaveAndProfileReopen": true,
+    "jsonImportSeparateProject": true,
+    "sourceDocumentUnchanged": true,
+    "planningOffUnchanged": true,
+    "terrainCancelAndUndo": true,
+    "twoFingerNavigationWithoutPainting": true,
+    "terrainConflictCancel": true,
+    "allSixImageFailureFallback": true,
+    "pngDownloads": [
+      1024,
+      2048,
+      4096
+    ]
+  },
+  "performance": [
+    {
+      "buildings": 35,
+      "width": 96,
+      "buildingPngs": 19,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.699999999999818,
+          "p95": 16.800000000000182,
+          "worst": 33.30000000000018
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.799999999999272,
+          "worst": 33.19999999999891
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.799999999999272,
+          "worst": 16.80000000000109
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.399999999999636,
+          "worst": 33.400000000001455
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50,
+          "worst": 50.10000000000218
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50.10000000000218,
+          "worst": 66.70000000000073
+        }
+      ]
+    },
+    {
+      "buildings": 75,
+      "width": 128,
+      "buildingPngs": 31,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.699999999999818,
+          "p95": 33.399999999999636,
+          "worst": 33.400000000000546
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.80000000000109,
+          "worst": 33.399999999999636
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 33.29999999999927,
+          "worst": 50.100000000000364
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.400000000001455,
+          "worst": 33.400000000001455
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.400000000001455,
+          "worst": 50
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.400000000001455,
+          "worst": 33.400000000001455
+        }
+      ]
+    },
+    {
+      "buildings": 100,
+      "width": 192,
+      "buildingPngs": 40,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 33.30000000000109,
+          "worst": 33.399999999999636
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.80000000000109,
+          "worst": 33.400000000001455
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.399999999999636,
+          "worst": 33.400000000001455
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 66.69999999999709,
+          "worst": 83.39999999999782
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50,
+          "worst": 66.60000000000218
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50,
+          "worst": 50.099999999998545
+        }
+      ]
+    }
+  ],
+  "largeMapExports": [
+    {
+      "resolution": 2048,
+      "elapsedMs": 3405,
+      "bytes": 5125644
+    },
+    {
+      "resolution": 4096,
+      "elapsedMs": 3014,
+      "bytes": 18143416
+    }
+  ],
+  "limitations": [
+    "No physical Safari test in cloud.",
+    "Some overview tail frames slower than Off; not a 60fps guarantee.",
+    "Source art is non-seamless; close-view accents remain local and recognizable."
+  ],
+  "automatedTests": {
+    "files": 31,
+    "passed": 345,
+    "durationSeconds": 104.58
+  },
+  "sourceArtworkAudit": "All six original WebP hashes and RGB dimensions preserved."
+}

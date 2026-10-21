@@ -89,7 +89,7 @@ describe('restrained, context-aware deterministic composition',()=>{
   const areas:number[]=[];
   for(let v=0;v<3;v++){let coverage=0,partial=0;
    for(let y=-1;y<=1;y+=.025)for(let x=-1;x<=1;x+=.025){const a=grasslandAlpha(x,y,v);expect(a).toBeGreaterThanOrEqual(0);expect(a).toBeLessThanOrEqual(1);if(Math.hypot(x,y)>=1)expect(a).toBe(0);if(a>0&&a<1)partial++;coverage+=a;}
-   expect(partial).toBeGreaterThan(500);areas.push(coverage);expect(grasslandAlpha(0,0,v)).toBe(1);expect(grasslandAlpha(.65,0,v)).not.toBe(grasslandAlpha(0,.65,v));
+   expect(partial).toBeGreaterThan(500);areas.push(coverage);expect(grasslandAlpha(0,0,v)).toBe(1);expect(new Set(Array.from({length:24},(_,i)=>grasslandAlpha(Math.cos(i*Math.PI/12)*.76,Math.sin(i*Math.PI/12)*.76,v))).size).toBeGreaterThan(2);
   }expect(new Set(areas).size).toBe(3);
  });
  it.each([96,128,192])('bounds %s² forest-heavy/100-building work, reuses geometry and handles fully blocked land',size=>{
@@ -121,7 +121,7 @@ async function sourceMocks(){const data=await inlineSources(),urls=(await import
 }
 describe('bounded loading, feather caches and export parity',()=>{
  it('decodes six textures once, builds eighteen shared masks, modifies alpha only, and embeds identical transforms at every resolution',async()=>{
-  const counts=browserMocks();await sourceMocks();const notify=vi.fn();grasslandImages.subscribe(notify);const images=await grasslandImages.prepare();expect(await grasslandImages.prepare()).toBe(images);expect(images.ready).toEqual(all);expect(images.failed).toEqual([]);expect(counts().decodes).toBe(6);expect(counts().draws).toBe(18);expect(notify).toHaveBeenCalledTimes(2);expect(fetch).toHaveBeenCalledTimes(6);
+  const counts=browserMocks();await sourceMocks();const notify=vi.fn();grasslandImages.subscribe(notify);const images=await grasslandImages.prepare();expect(await grasslandImages.prepare()).toBe(images);expect(images.ready).toEqual(all);expect(images.failed).toEqual([]);expect(counts().decodes).toBe(6);expect(new Set([...images.images.values()].flatMap(v=>v.map(i=>i.original))).size).toBe(6);for(const v of images.images.values()){expect(v.every(i=>i.original===v[0].original)).toBe(true);expect(v[0].originalSource).toMatch(/^data:image\/webp;base64,/);}expect(counts().draws).toBe(18);expect(notify).toHaveBeenCalledTimes(2);expect(fetch).toHaveBeenCalledTimes(6);
   for(const pixels of counts().pixels){expect(pixels[0]).toBe(81);expect(pixels[1]).toBe(81);expect(pixels[2]).toBe(81);expect(pixels[3]).toBe(0);expect(pixels[(192*384+192)*4+3]).toBe(255);}
   const d=fixture(),before=serializeDocument(d),patches=grasslandPatches(d,'restrained');
   for(const resolution of [1024,2048,4096]){const svg=mapSvg(d,{style:'illustrated',grassland:'restrained',resolution,grid:false,labels:false});expect(svg).not.toContain('href="http');expect(svg).not.toContain('<filter');expect(svg).not.toContain('data-grassland-fallback');expect((svg.match(/data-grassland-asset=/g)??[]).length).toBe(patches.length);
