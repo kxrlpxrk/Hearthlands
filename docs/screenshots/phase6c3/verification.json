@@ -1,0 +1,581 @@
+{
+  "release": "6C.3",
+  "browser": "Chromium touch emulation, not physical Safari",
+  "automatedTests": {
+    "files": 32,
+    "passed": 360,
+    "durationSeconds": 112.13
+  },
+  "reference": {
+    "seed": 1847,
+    "map": [
+      96,
+      96
+    ],
+    "buildings": 35,
+    "forestSprites": 2241,
+    "canopyDesigns": 20,
+    "closeFocus": [
+      60.45548701216467,
+      38.05336521624122
+    ]
+  },
+  "pixelProof": {
+    "offRestores6C21RestrainedExactly": true,
+    "forestInteriorUnchanged": true,
+    "waterInteriorUnchanged": true,
+    "buildingsInteriorUnchanged": true
+  },
+  "cameraPairsMatch": true,
+  "views": [
+    {
+      "zoom": "fit",
+      "scale": 0.10611979166666667,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 0,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    },
+    {
+      "zoom": 0.5,
+      "scale": 0.4999998480530923,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 0,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    },
+    {
+      "zoom": 1,
+      "scale": 1.0000000682717969,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 6,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    },
+    {
+      "zoom": 0.4,
+      "scale": 0.4000001773951788,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 0,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    },
+    {
+      "zoom": 0.8,
+      "scale": 0.8000000570578668,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 6,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    },
+    {
+      "zoom": 1.5,
+      "scale": 1.4999999322645494,
+      "ground": {
+        "status": "ready",
+        "bytes": 9437184,
+        "buildMs": 743,
+        "detailTiles": 4,
+        "pending": false,
+        "listening": false
+      },
+      "forest": {
+        "nodes": 1,
+        "sprites": 2241,
+        "assets": [
+          "hearthlands.viking.canopy.beech.01",
+          "hearthlands.viking.canopy.beech.02",
+          "hearthlands.viking.canopy.beech.03",
+          "hearthlands.viking.canopy.beech.04",
+          "hearthlands.viking.canopy.beech.05",
+          "hearthlands.viking.canopy.birch.01",
+          "hearthlands.viking.canopy.birch.02",
+          "hearthlands.viking.canopy.birch.03",
+          "hearthlands.viking.canopy.birch.04",
+          "hearthlands.viking.canopy.birch.05",
+          "hearthlands.viking.canopy.oak.01",
+          "hearthlands.viking.canopy.oak.02",
+          "hearthlands.viking.canopy.oak.03",
+          "hearthlands.viking.canopy.oak.04",
+          "hearthlands.viking.canopy.oak.05",
+          "hearthlands.viking.canopy.pine.01",
+          "hearthlands.viking.canopy.pine.02",
+          "hearthlands.viking.canopy.pine.03",
+          "hearthlands.viking.canopy.pine.04",
+          "hearthlands.viking.canopy.pine.05"
+        ],
+        "listening": false
+      }
+    }
+  ],
+  "browserChecks": {
+    "forest": {
+      "count": 2241,
+      "ids": [
+        "hearthlands.viking.canopy.beech.01",
+        "hearthlands.viking.canopy.beech.02",
+        "hearthlands.viking.canopy.beech.03",
+        "hearthlands.viking.canopy.beech.04",
+        "hearthlands.viking.canopy.beech.05",
+        "hearthlands.viking.canopy.birch.01",
+        "hearthlands.viking.canopy.birch.02",
+        "hearthlands.viking.canopy.birch.03",
+        "hearthlands.viking.canopy.birch.04",
+        "hearthlands.viking.canopy.birch.05",
+        "hearthlands.viking.canopy.oak.01",
+        "hearthlands.viking.canopy.oak.02",
+        "hearthlands.viking.canopy.oak.03",
+        "hearthlands.viking.canopy.oak.04",
+        "hearthlands.viking.canopy.oak.05",
+        "hearthlands.viking.canopy.pine.01",
+        "hearthlands.viking.canopy.pine.02",
+        "hearthlands.viking.canopy.pine.03",
+        "hearthlands.viking.canopy.pine.04",
+        "hearthlands.viking.canopy.pine.05"
+      ],
+      "listening": false
+    },
+    "downloads": [
+      "/tmp/hearthlands-6c3-off-1024.png",
+      "/tmp/hearthlands-6c3-on-1024.png",
+      "/tmp/hearthlands-6c3-on-2048.png",
+      "/tmp/hearthlands-6c3-on-4096.png"
+    ],
+    "treeModuleRequestsBeforeOptIn": 0,
+    "afterCanopyOptIn": 1,
+    "afterOriginalComparison": 2,
+    "afterMeadowOptIn": 3,
+    "profileReopen": true,
+    "projectIsolation": true,
+    "sourceUnchanged": true,
+    "mobileViewports": [
+      [
+        375,
+        667
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        844,
+        390
+      ]
+    ],
+    "legacyGrasslandAtBaseline": {
+      "count": 7,
+      "ids": [
+        "hearthlands.terrain.grassland.base.01",
+        "hearthlands.terrain.grassland.flower.01",
+        "hearthlands.terrain.grassland.flower.02",
+        "hearthlands.terrain.grassland.scrub.01"
+      ],
+      "listening": false
+    },
+    "ground63OptInPersisted": true,
+    "terrainCancellationAndUndo": true,
+    "twoFingerNavigationWithoutPainting": true,
+    "terrainConflictCancel": true,
+    "allSixTextureFailureProceduralFallback": true
+  },
+  "largeMapExports": [
+    {
+      "resolution": 2048,
+      "elapsedMs": 4509,
+      "bytes": 8951863
+    },
+    {
+      "resolution": 4096,
+      "elapsedMs": 6658,
+      "bytes": 32089264
+    }
+  ],
+  "performance": [
+    {
+      "buildings": 35,
+      "width": 96,
+      "buildingPngs": 19,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.699999999999818,
+          "p95": 16.799999999999272,
+          "worst": 50.099999999999454,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.799999999999272,
+          "worst": 33.399999999999636,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 16.700000000000728,
+          "worst": 16.80000000000109,
+          "ground": {
+            "bytes": 9437184,
+            "buildMs": 944.1000000089407,
+            "status": "ready"
+          }
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.399999999999636,
+          "worst": 33.5,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50.099999999998545,
+          "worst": 66.70000000000073,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50.10000000000218,
+          "worst": 66.70000000000073,
+          "ground": {
+            "bytes": 9437184,
+            "buildMs": 944.1000000089407,
+            "status": "ready"
+          }
+        }
+      ]
+    },
+    {
+      "buildings": 75,
+      "width": 128,
+      "buildingPngs": 31,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.699999999999818,
+          "p95": 33.29999999999927,
+          "worst": 33.400000000000546,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.30000000000109,
+          "worst": 33.399999999999636,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 33.39999999999782,
+          "worst": 33.400000000001455,
+          "ground": {
+            "bytes": 16777216,
+            "buildMs": 2272.2000000029802,
+            "status": "ready"
+          }
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.400000000001455,
+          "worst": 50,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50,
+          "worst": 66.60000000000218,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50,
+          "worst": 66.70000000000073,
+          "ground": {
+            "bytes": 16777216,
+            "buildMs": 2272.2000000029802,
+            "status": "ready"
+          }
+        }
+      ]
+    },
+    {
+      "buildings": 100,
+      "width": 192,
+      "buildingPngs": 40,
+      "results": [
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.30000000000109,
+          "worst": 33.400000000001455,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.69999999999891,
+          "p95": 33.399999999999636,
+          "worst": 33.399999999999636,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": "fit",
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 33.39999999999782,
+          "worst": 33.400000000001455,
+          "ground": {
+            "bytes": 16777216,
+            "buildMs": 2395.9000000059605,
+            "status": "ready"
+          }
+        },
+        {
+          "state": "planning",
+          "style": "planning",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50.10000000000218,
+          "worst": 66.60000000000218,
+          "ground": null
+        },
+        {
+          "state": "illustrated-off",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 50.099999999998545,
+          "worst": 66.69999999999709,
+          "ground": null
+        },
+        {
+          "state": "illustrated-on",
+          "style": "illustrated",
+          "zoom": 0.8,
+          "dpr": 3,
+          "median": 16.700000000000728,
+          "p95": 66.60000000000218,
+          "worst": 66.70000000000073,
+          "ground": {
+            "bytes": 16777216,
+            "buildMs": 2395.9000000059605,
+            "status": "ready"
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Physical iPhone Safari not tested.",
+    "On has slower tail frames on the 192-square scene.",
+    "Bounded detail caches sharpen after gestures settle.",
+    "Non-seamless motifs can remain identifiable under close inspection."
+  ]
+}

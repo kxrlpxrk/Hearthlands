@@ -161,3 +161,5 @@ Opt-in twenty-design bright canopy comparison, natural edges, screenshots and iP
 Opt-in restrained bright meadow patches, source-border audit, comparisons, performance and iPhone checks: [Phase 6C.2](docs/phase6c2-grassland.md).
 
 Sharper meadow edges, continuous Fit shading, source-detail rendering and iPhone checks: [Phase 6C.2.1](docs/phase6c21-grassland-clarity.md).
+
+Phase 6C.3 ground composition, comparisons, resource limits and iPhone tests: [Illustrated ground](docs/phase6c3-illustrated-ground.md).
