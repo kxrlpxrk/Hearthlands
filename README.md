@@ -167,3 +167,5 @@ Phase 6C.3 ground composition, comparisons, resource limits and iPhone tests: [I
 Phase 6C.3.1 Flat / Subtle / Rich ground modes, preserved preferences, matched screenshots and iPhone checks: [Ground Detail](docs/phase6c31-ground-detail.md).
 
 Phase 6C.4 stylised Illustrated water, shared shoreline/export geometry, comparisons and iPhone checks: [Water, rivers and coastlines](docs/phase6c4-water.md).
+
+Phase 6C.4.1 pinch/Fit handling, native water cache isolation, regression evidence and physical Safari checks: [Water zoom stability](docs/phase6c41-water-zoom.md).

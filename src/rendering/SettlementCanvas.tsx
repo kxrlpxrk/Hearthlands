@@ -1,3 +1,4 @@
+import {fitScale,minimumScale,zoomCamera,pinchCamera,touchPinch} from './camera';
 import {groundUsesImages} from './groundDetail';
 import {useGrasslandImages} from './grasslandImages';
 import {resolveBuildingAsset} from '../model/appearance';
@@ -76,10 +77,11 @@ export function SettlementCanvas() {
   const buildingWarningIds=useMemo(()=>new Set(doc.buildings.filter(b=>buildingWarnings(doc,b).length).map(b=>b.id)),[doc.buildings,doc.grid.width,doc.grid.height,doc.terrain,doc.landscape]);
   const selected = doc.buildings.find(b => b.id === selectedId);
   const warnings = selected ? buildingWarnings(doc, preview?.id === selected.id ? { ...selected, ...preview } : selected) : [];
+  const fitZoom=fitScale(size,{width:(expansion.preview?.document.grid.width??doc.grid.width)*cell,height:(expansion.preview?.document.grid.height??doc.grid.height)*cell}),minZoom=minimumScale(fitZoom);
   function zoom(factor: number, anchor = { x: size.width / 2, y: size.height / 2 }) {
-    setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * factor)); return { scale, x: anchor.x - (anchor.x - v.x) * scale / v.scale, y: anchor.y - (anchor.y - v.y) * scale / v.scale }; });
+    setView(v => zoomCamera(v,factor,anchor,minZoom));
   }
-  function fit() { const w=(expansion.preview?.document.grid.width??doc.grid.width)*cell,h=(expansion.preview?.document.grid.height??doc.grid.height)*cell;const scale = Math.min((size.width - 64) / w, (size.height - 64) / h); setView({ scale, x: (size.width - w * scale) / 2, y: (size.height - h * scale) / 2 }); }
+  function fit() { const w=(expansion.preview?.document.grid.width??doc.grid.width)*cell,h=(expansion.preview?.document.grid.height??doc.grid.height)*cell;const scale = fitZoom; setView({ scale, x: (size.width - w * scale) / 2, y: (size.height - h * scale) / 2 }); }
   const selectedRoad=roadPreview??doc.roads.find(r=>r.id===infra.roadId);
   const infrastructureActive=tool==='infrastructure';
   const worldPoint=(p:{x:number;y:number},exclude?:string):Cell=>{
@@ -156,9 +158,9 @@ export function SettlementCanvas() {
         if (tool === 'select' && g.id) select(g.id);
         if (tool === 'select' && g.id && !doc.buildings.find(b => b.id === g.id)?.locked) setPreview({ id: g.id, x: snapPosition(g.x! + dx / g.view.scale / cell, doc.grid.snap), y: snapPosition(g.y! + dy / g.view.scale / cell, doc.grid.snap) });
       }} onPointerUp={finish} onPointerCancel={() => { gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); }}
-      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); pinch.current = null; } }}
-      onTouchMove={e => { const t = e.evt.touches; if (t.length !== 2) return; e.evt.preventDefault(); const rect = host.current!.getBoundingClientRect(); const point = { x: (t[0].clientX + t[1].clientX) / 2 - rect.left, y: (t[0].clientY + t[1].clientY) / 2 - rect.top }; const distance = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); if (pinch.current) { const old = pinch.current; setView(v => { const scale = Math.max(.12, Math.min(3, v.scale * distance / old.distance)); return { scale, x: point.x - (old.x - v.x) * scale / v.scale, y: point.y - (old.y - v.y) * scale / v.scale }; }); } pinch.current = { ...point, distance }; }}
-      onTouchEnd={() => { pinch.current = null; }}>
+      onTouchStart={e => { if (e.evt.touches.length === 2) { suppress.current = true; gesture.current = null; districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain(); setPreview(null); setRoadPreview(null); pinch.current = touchPinch(e.evt.touches,host.current!.getBoundingClientRect()); }else pinch.current=null; }}
+      onTouchMove={e => { const next=touchPinch(e.evt.touches,host.current!.getBoundingClientRect());if(!next){pinch.current=null;return;}e.evt.preventDefault();const old=pinch.current;if(old)setView(v=>pinchCamera(v,old,next,minZoom));pinch.current=next; }}
+      onTouchEnd={() => { pinch.current = null; }} onTouchCancel={() => { pinch.current=null;gesture.current=null;districtStroke.current=null;setDistrictPatch([]);setDistrictCorner(null);cancelTerrain();setPreview(null);setRoadPreview(null); }}>
       <Layer name="world-presentation"><Rect width={width} height={height} fill={styleBackground(style)} stroke="#728062" strokeWidth={2}/>
         <TerrainVisual viewport={{x:-view.x/cell/view.scale,y:-view.y/cell/view.scale,width:size.width/cell/view.scale,height:size.height/cell/view.scale}} pixelsPerTile={cell*view.scale} paths={terrainPaths} cell={cell} width={doc.grid.width} height={doc.grid.height} cachePixels={terrainCachePixels(cell*view.scale)}/>
         {doc.grid.visible&&<Group name="grid" listening={false}>{gridLines.map(l=><Line key={l.id} points={l.points} stroke="#a5b78e" opacity={.13} strokeWidth={1}/>)}</Group>}
