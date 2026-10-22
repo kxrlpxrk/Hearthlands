@@ -1,3 +1,4 @@
+import {groundUsesImages} from './groundDetail';
 import {useGrasslandImages} from './grasslandImages';
 import {resolveBuildingAsset} from '../model/appearance';
 import {rasterPixelBucket} from './rasterDetail';
@@ -56,7 +57,7 @@ export function SettlementCanvas() {
   const expansionActive=!!expansion.preview||expansion.busy||expansion.applying;
   const developmentActive=!!development.preview||development.busy||development.applying||expansionActive;
   const visual=useVisualPreferences(),style=visual.style;
-  const meadow=useGrasslandImages(style==='illustrated'&&(visual.grassland!=='off'||visual.ground63));
+  const meadow=useGrasslandImages(style==='illustrated'&&groundUsesImages(visual));
   const forest=useForestImages(style==='illustrated'&&visual.forestPilot,visual.forestPack);
   const reduced=reducedDetail(style,doc.grid.cellSize*view.scale,visual.detail);
   const pixelsPerTile=style==='illustrated'?rasterPixelBucket(doc.grid.cellSize*view.scale*(globalThis.devicePixelRatio||1)):Infinity;
@@ -64,7 +65,7 @@ export function SettlementCanvas() {
   const cell = doc.grid.cellSize, width = doc.grid.width * cell, height = doc.grid.height * cell;
   const gridLines=useMemo(()=>[...Array.from({length:doc.grid.width+1},(_,i)=>({id:`x${i}`,points:[i*cell,0,i*cell,height]})),...Array.from({length:doc.grid.height+1},(_,i)=>({id:`y${i}`,points:[0,i*cell,width,i*cell]}))],[doc.grid.width,doc.grid.height,cell,width,height]);
   useMemo(()=>tool==='terrain-editor'?terrainProtection(doc):null,[tool,doc]);
-  const terrainPaths=useMemo(()=>terrainScene(doc,{...doc.landscape,style,reduced,forestPilot:visual.forestPilot,forestPack:visual.forestPack,forestAssets:forest.ready,ground63:visual.ground63,grassland:visual.grassland,grasslandAssets:meadow.ready}),[doc.terrain,doc.landscape,doc.buildings,doc.roads,doc.grid.width,doc.grid.height,doc.seed,doc.planning,style,reduced,visual.forestPilot,visual.forestPack,forest.ready,visual.grassland,visual.ground63,meadow.ready]);
+  const terrainPaths=useMemo(()=>terrainScene(doc,{...doc.landscape,style,reduced,forestPilot:visual.forestPilot,forestPack:visual.forestPack,forestAssets:forest.ready,groundDetail:visual.groundDetail,ground63:visual.ground63,grassland:visual.grassland,grasslandAssets:meadow.ready}),[doc.terrain,doc.landscape,doc.buildings,doc.roads,doc.grid.width,doc.grid.height,doc.seed,doc.planning,style,reduced,visual.forestPilot,visual.forestPack,forest.ready,visual.grassland,visual.groundDetail,visual.ground63,meadow.ready]);
   const roads = useMemo(() => { const context=roadContext(doc); return doc.roads.filter(r => doc.layers.find(l => l.id === r.layerId)?.visible).map(r => ({ road:r, id: r.id, ...roadGeometry(doc, r, context) })); }, [doc.roads, doc.layers, doc.seed, doc.terrain, doc.landscape, doc.buildings]);
   const districtView=doc.districtView??defaultDistrictView;
   const districtShapes=useMemo(()=>{const districts=district.detection??visibleDistricts(doc);return districts.map(d=>({district:d,...districtGeometry(doc,d)}));},[doc.districts,doc.districtView,doc.layers,doc.grid.width,doc.grid.height,district.detection]);
@@ -191,7 +192,7 @@ export function SettlementCanvas() {
           {!!districtBoundary.length&&(tool==='districts'||district.camera)&&<Group><Line listening={false} points={districtBoundary.flatMap(p=>[p.x,p.y])} closed={districtBoundary.length>=3} stroke="#ffe2a0" fill="#c3b16a" opacity={.6} strokeWidth={2/view.scale/cell}/>{districtBoundary.map((p,i)=><Circle key={i} districtPointIndex={i} x={p.x} y={p.y} radius={7/view.scale/cell} hitStrokeWidth={30/view.scale/cell} fill={district.corner===i?'#a7ead5':'#ffe2a0'} stroke="#253a2d" strokeWidth={2/view.scale/cell}/>)}</Group>}
         </Group>
       </Layer>
-      <Layer name="proposal-interactions" listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile}/><ExpansionOverlay groundViewport={{x:-view.x/cell/view.scale,y:-view.y/cell/view.scale,width:size.width/cell/view.scale,height:size.height/cell/view.scale}} ground63={visual.ground63} grassland={visual.grassland} grasslandAssets={meadow.ready} forestPack={visual.forestPack} forestPilot={visual.forestPilot} forestAssets={forest.ready} doc={doc} proposal={expansion.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile} cachePixels={terrainCachePixels(cell*view.scale)} terrainPixelsPerTile={cell*view.scale}/></Layer>
+      <Layer name="proposal-interactions" listening={false}><DevelopmentOverlay doc={doc} proposal={development.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile}/><ExpansionOverlay groundViewport={{x:-view.x/cell/view.scale,y:-view.y/cell/view.scale,width:size.width/cell/view.scale,height:size.height/cell/view.scale}} groundDetail={visual.groundDetail} ground63={visual.ground63} grassland={visual.grassland} grasslandAssets={meadow.ready} forestPack={visual.forestPack} forestPilot={visual.forestPilot} forestAssets={forest.ready} doc={doc} proposal={expansion.preview} style={style} reduced={reduced} pixelsPerTile={pixelsPerTile} cachePixels={terrainCachePixels(cell*view.scale)} terrainPixelsPerTile={cell*view.scale}/></Layer>
       <Layer listening={false}>
         <Group listening={false} scaleX={cell} scaleY={cell}>{patchPaths.map(p=><Path key={p.color} data={p.data} fill={p.color} opacity={.58}/>)}
           {tool==='terrain-editor'&&brushPoint&&(terrainEditor.settings.shape==='circle'?<Circle x={brushPoint.x} y={brushPoint.y} radius={terrainEditor.settings.size/2} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>:<Rect x={brushPoint.x-terrainEditor.settings.size/2} y={brushPoint.y-terrainEditor.settings.size/2} width={terrainEditor.settings.size} height={terrainEditor.settings.size} stroke="#ffe2a0" strokeWidth={1.5/view.scale/cell}/>)}

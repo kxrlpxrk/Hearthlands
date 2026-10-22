@@ -1,3 +1,4 @@
+import {SubtleGroundVisual} from './SubtleGroundVisual';
 import type {GroundRegion} from './illustratedGround';
 import {IllustratedGroundVisual} from './IllustratedGroundVisual';
 import {GrasslandVisual} from './GrasslandVisual';
@@ -28,7 +29,7 @@ const TerrainSurface=memo(function TerrainSurface({paths,cell,width,height,cache
  * Ground is cached at <=4px/tile; the approved forest/water/relief cache retains
  * its original resolution. Close views keep the original native terrain paths. */
 export const TerrainVisual=memo(function TerrainVisual({paths,cell,width,height,cachePixels=0,pixelsPerTile=Infinity,viewport}:{paths:TerrainPath[];cell:number;width:number;height:number;cachePixels?:number;pixelsPerTile?:number;viewport?:GroundRegion}){
- const groups=useMemo(()=>({base:paths.filter(p=>!p.grassland&&!p.ground63&&(p.layer??'base')==='base'),top:paths.filter(p=>!p.grassland&&!p.ground63&&(p.layer??'base')!=='base'),ground:paths.flatMap(p=>p.grasslandGround??[]),countryside:paths.filter(p=>p.ground63),meadows:paths.filter(p=>p.grassland)}),[paths]);
- if(!groups.meadows.length&&!groups.countryside.length)return <TerrainSurface paths={paths} cell={cell} width={width} height={height} cachePixels={cachePixels}/>;
- return <><TerrainSurface extraPaths={groups.ground} paths={groups.base} cell={cell} width={width} height={height} cachePixels={cachePixels?Math.min(cachePixels,4):0}/><Group listening={false} scaleX={cell} scaleY={cell}>{groups.countryside.map((p,i)=><IllustratedGroundVisual key={i} plan={p.ground63!} pixelsPerTile={pixelsPerTile} fine={p.groundFine} viewport={viewport}/>)}{groups.meadows.map((p,i)=><GrasslandVisual key={i} patches={p.grassland!} pixelsPerTile={pixelsPerTile}/>)}</Group><TerrainSurface paths={groups.top} cell={cell} width={width} height={height} cachePixels={cachePixels}/></>;
+ const groups=useMemo(()=>({base:paths.filter(p=>!p.grassland&&!p.ground63&&!p.subtle&&(p.layer??'base')==='base'),top:paths.filter(p=>!p.grassland&&!p.ground63&&!p.subtle&&(p.layer??'base')!=='base'),ground:paths.flatMap(p=>p.grasslandGround??[]),subtle:paths.filter(p=>p.subtle),countryside:paths.filter(p=>p.ground63),meadows:paths.filter(p=>p.grassland)}),[paths]);
+ if(!groups.meadows.length&&!groups.countryside.length&&!groups.subtle.length)return <TerrainSurface paths={paths} cell={cell} width={width} height={height} cachePixels={cachePixels}/>;
+ return <><TerrainSurface extraPaths={groups.ground} paths={groups.base} cell={cell} width={width} height={height} cachePixels={cachePixels?Math.min(cachePixels,4):0}/><Group listening={false} scaleX={cell} scaleY={cell}>{groups.subtle.map((p,i)=><SubtleGroundVisual key={`subtle-${i}`} scene={p.subtle!} pixelsPerTile={pixelsPerTile}/>)}{groups.countryside.map((p,i)=><IllustratedGroundVisual key={i} plan={p.ground63!} pixelsPerTile={pixelsPerTile} fine={p.groundFine} viewport={viewport}/>)}{groups.meadows.map((p,i)=><GrasslandVisual key={i} patches={p.grassland!} pixelsPerTile={pixelsPerTile}/>)}</Group><TerrainSurface paths={groups.top} cell={cell} width={width} height={height} cachePixels={cachePixels}/></>;
 });

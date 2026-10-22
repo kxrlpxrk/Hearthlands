@@ -1,3 +1,4 @@
+import {groundUsesImages,groundMode,subtleOpacity,type GroundDetail} from '../rendering/groundDetail';
 import {illustratedGroundPlan} from '../rendering/illustratedGround';
 import {prepareGroundSurface,groundSurfaceSvg} from '../rendering/illustratedGroundSurface';
 import {grasslandSvg} from '../rendering/grasslandSvg';
@@ -21,7 +22,7 @@ import { footprint } from '../model/buildings';
 import { buildingDefinition } from '../model/catalogue';
 import { symbolPaths } from '../rendering/symbols';
 import { roadContext, roadGeometry } from '../rendering/roadGeometry';
-export interface ImageOptions {ground63?:boolean;grassland?:GrasslandMode; forestPilot?:boolean; forestPack?:ForestPack; style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
+export interface ImageOptions {groundDetail?:GroundDetail;ground63?:boolean;grassland?:GrasslandMode; forestPilot?:boolean; forestPack?:ForestPack; style?:VisualStyle; reduced?:boolean; resolution: number; grid: boolean; labels: boolean; contours?:boolean; detail?:boolean; districts?:boolean; districtNames?:boolean }
 export function imageDimensions(doc: SettlementDocument, resolution: number) {
   if (!Number.isInteger(resolution) || resolution < 256 || resolution > 4096) throw new Error('Choose a PNG resolution from 256 to 4096 pixels.');
   const scale=resolution/Math.max(doc.grid.width,doc.grid.height),width=Math.round(doc.grid.width*scale),height=Math.round(doc.grid.height*scale);
@@ -36,14 +37,14 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
   const reduced=options.reduced??reducedDetail(style,options.resolution/Math.max(doc.grid.width,doc.grid.height));
   const pilot=style==='illustrated'&&options.forestPilot===true,pack=options.forestPack==='canopies'?'canopies':'pilot',images=forestImagesForPack(pack).snapshot();
   const meadow=grasslandImages.snapshot(),grassland=style==='illustrated'?options.grassland:'off';
-  const paths=terrainScene(doc,{ground63:options.ground63,style,reduced,forestPilot:pilot,forestPack:pack,forestAssets:pilot?images.ready:[],grassland,grasslandAssets:meadow.ready,contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail});
+  const paths=terrainScene(doc,{groundDetail:options.groundDetail,ground63:options.ground63,style,reduced,forestPilot:pilot,forestPack:pack,forestAssets:pilot?images.ready:[],grassland,grasslandAssets:meadow.ready,contours:options.contours??doc.landscape.contours,detail:options.detail??doc.landscape.detail});
   const used=new Set(paths.flatMap(p=>p.sprites?.map(s=>s.assetId)??[]));
   const definitions=[...used].map(id=>{const a=forestAssetsById.get(id)!,source=images.images.get(id)!.source;return `<image id="forest-pilot-source-${allForestAssets.indexOf(a)}" width="${a.pixelWidth}" height="${a.pixelHeight}" href="${source}"/>`;}).join('');
   const spriteSvg=(s:ForestSprite)=>{const a=forestAssetsById.get(s.assetId)!,b=a.alpha;return `<g data-forest-asset="${a.id}" transform="translate(${s.x} ${s.y}) rotate(${s.angle*180/Math.PI})"><svg x="${s.left}" y="${s.top}" width="${s.width}" height="${s.height}" viewBox="${b.x} ${b.y} ${b.width} ${b.height}" preserveAspectRatio="xMidYMid meet"><use href="#forest-pilot-source-${allForestAssets.indexOf(a)}"/></svg></g>`;};
   const fallback=pilot&&images.ready.length<forestPackAssets[pack].length?'<desc data-forest-fallback="true">Some pilot images are unavailable. Their original procedural crowns are retained.</desc>':'';
   const meadowScene=grasslandSvg(paths,meadow,options.resolution/Math.max(doc.grid.width,doc.grid.height));
   const meadowFallback=grassland&&grassland!=='off'&&meadow.failed.length?'<desc data-grassland-fallback="true">Unavailable meadow artwork retains the original quiet terrain.</desc>':'';
-  const terrain=(meadowScene.defs?`<defs>${meadowScene.defs}</defs>`:'')+meadowFallback+(definitions?`<defs>${definitions}</defs>`:'')+fallback+paths.map(t=>t.ground63?groundSurfaceSvg(t.ground63,options.resolution/Math.max(doc.grid.width,doc.grid.height),true):t.grassland?meadowScene.content:t.sprites?t.sprites.map(spriteSvg).join(''):`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
+  const terrain=(meadowScene.defs?`<defs>${meadowScene.defs}</defs>`:'')+meadowFallback+(definitions?`<defs>${definitions}</defs>`:'')+fallback+paths.map(t=>t.subtle?`<g data-subtle-ground="true" opacity="${subtleOpacity(options.resolution/Math.max(doc.grid.width,doc.grid.height))}">${t.subtle.paths.map(p=>`<path d="${p.data}" fill="${p.fill??'none'}" stroke="${p.stroke}" stroke-width="${p.width}" stroke-linecap="round" opacity="${p.opacity}"/>`).join('')}</g>`:t.ground63?groundSurfaceSvg(t.ground63,options.resolution/Math.max(doc.grid.width,doc.grid.height),true):t.grassland?meadowScene.content:t.sprites?t.sprites.map(spriteSvg).join(''):`<path data-terrain="true" data-layer="${t.layer}" d="${t.data}" fill="${t.fill??'none'}" ${t.stroke?`stroke="${t.stroke}" stroke-width="${t.width}"`:''} opacity="${t.opacity??1}"/>`).join('');
   const visible=(id:string)=>doc.layers.find(l=>l.id===id)?.visible;
   const context=roadContext(doc),roads=doc.roads.filter(r=>visible(r.layerId)).sort((a,b)=>Number(isBridge(a)||isDefense(a))-Number(isBridge(b)||isDefense(b))).map(r=>{const g=roadGeometry(doc,r,context);return `<g data-road="${escapeText(r.id)}" data-layer="${isBridge(r)||isDefense(r)?'infrastructure':'roads'}">${infrastructureStrokes(r,g,style,reduced).map(s=>`<path d="${s.data}" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash.join(' ')}"`:''} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</g>`;}).join('');
   const grid=options.grid?`<path data-grid="true" stroke="#a5b78e" opacity=".2" stroke-width=".035" d="${Array.from({length:doc.grid.width+1},(_,x)=>`M${x} 0V${doc.grid.height}`).join('')}${Array.from({length:doc.grid.height+1},(_,y)=>`M0 ${y}H${doc.grid.width}`).join('')}"/>`:'';
@@ -64,8 +65,8 @@ export function mapSvg(doc: SettlementDocument, options: ImageOptions): string {
 }
 export async function renderPng(doc: SettlementDocument, options: ImageOptions): Promise<Blob> {
   const {width,height}=imageDimensions(doc,options.resolution);
-  if(options.style==='illustrated')await Promise.all([prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b))),options.forestPilot?forestImagesForPack(options.forestPack).prepare():Promise.resolve(),options.ground63||options.grassland&&options.grassland!=='off'?grasslandImages.prepare():Promise.resolve()]);
-  if(options.style==='illustrated'&&options.ground63)try{await prepareGroundSurface(illustratedGroundPlan(doc),options.resolution/Math.max(doc.grid.width,doc.grid.height),true);}catch{throw new Error('Illustrated ground PNG preparation failed. Try 1024 pixels or turn the ground comparison off; your project is unchanged.');}
+  if(options.style==='illustrated')await Promise.all([prepareBundledImages(doc.buildings.map(b=>resolveBuildingAsset(doc,b))),options.forestPilot?forestImagesForPack(options.forestPack).prepare():Promise.resolve(),groundUsesImages(options)?grasslandImages.prepare():Promise.resolve()]);
+  if(options.style==='illustrated'&&groundMode(options)==='rich')try{await prepareGroundSurface(illustratedGroundPlan(doc),options.resolution/Math.max(doc.grid.width,doc.grid.height),true);}catch{throw new Error('Illustrated ground PNG preparation failed. Try 1024 pixels or turn the ground comparison off; your project is unchanged.');}
   const url=URL.createObjectURL(new Blob([mapSvg(doc,options)],{type:'image/svg+xml;charset=utf-8'}));
   const canvas=document.createElement('canvas');
   try {

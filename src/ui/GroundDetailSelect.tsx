@@ -1,0 +1,5 @@
+import {groundMode,type GroundOptions,type GroundDetail} from '../rendering/groundDetail';
+export function GroundDetailSelect({options,onChange,disabled=false,label='Ground Detail'}:{options:GroundOptions;onChange:(v:GroundDetail|undefined)=>void;disabled?:boolean;label?:string}){
+ const mode=groundMode(options),legacy=mode==='legacy'&&options.grassland&&options.grassland!=='off';
+ return <><label>{label}<select aria-label={label} disabled={disabled} value={legacy?'legacy':mode==='legacy'?'flat':mode} onChange={e=>onChange(e.target.value==='legacy'?undefined:e.target.value as GroundDetail)}>{legacy&&<option value="legacy">Previous meadow pilot · preserved</option>}<option value="flat">Flat · clean original ground</option><option value="subtle">Subtle · recommended</option><option value="rich">Rich · 6C.3 countryside</option></select></label>{!legacy&&options.grassland&&options.grassland!=='off'&&<button disabled={disabled} onClick={()=>onChange(undefined)}>Restore previous meadow pilot</button>}</>;
+}

@@ -163,3 +163,5 @@ Opt-in restrained bright meadow patches, source-border audit, comparisons, perfo
 Sharper meadow edges, continuous Fit shading, source-detail rendering and iPhone checks: [Phase 6C.2.1](docs/phase6c21-grassland-clarity.md).
 
 Phase 6C.3 ground composition, comparisons, resource limits and iPhone tests: [Illustrated ground](docs/phase6c3-illustrated-ground.md).
+
+Phase 6C.3.1 Flat / Subtle / Rich ground modes, preserved preferences, matched screenshots and iPhone checks: [Ground Detail](docs/phase6c31-ground-detail.md).
