@@ -165,3 +165,5 @@ Sharper meadow edges, continuous Fit shading, source-detail rendering and iPhone
 Phase 6C.3 ground composition, comparisons, resource limits and iPhone tests: [Illustrated ground](docs/phase6c3-illustrated-ground.md).
 
 Phase 6C.3.1 Flat / Subtle / Rich ground modes, preserved preferences, matched screenshots and iPhone checks: [Ground Detail](docs/phase6c31-ground-detail.md).
+
+Phase 6C.4 stylised Illustrated water, shared shoreline/export geometry, comparisons and iPhone checks: [Water, rivers and coastlines](docs/phase6c4-water.md).

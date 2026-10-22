@@ -1,0 +1,1725 @@
+{
+  "release": "6C.4",
+  "reference": {
+    "seed": 1847,
+    "preset": "Viking Fishing Village",
+    "environment": "river",
+    "layout": "contextual",
+    "buildings": 35,
+    "map": [
+      96,
+      96
+    ],
+    "focus": [
+      75,
+      46
+    ],
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 2
+  },
+  "tests": {
+    "files": 34,
+    "passed": 381,
+    "durationSeconds": 109.6,
+    "build": "passed",
+    "releaseCheck": "passed"
+  },
+  "planningBaseline": [
+    {
+      "detail": false,
+      "reduced": false,
+      "hash": "f0e498b4"
+    },
+    {
+      "detail": false,
+      "reduced": true,
+      "hash": "f0e498b4"
+    },
+    {
+      "detail": true,
+      "reduced": false,
+      "hash": "67da37c"
+    },
+    {
+      "detail": true,
+      "reduced": true,
+      "hash": "b09247f2"
+    }
+  ],
+  "pixelProof": {
+    "outsideWaterBufferIdentical": true,
+    "differenceBoundsOutsideWater": null,
+    "imageSize": [
+      1024,
+      1024
+    ],
+    "waterBufferTiles": 1.5
+  },
+  "views": {
+    "before": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "subtle": {
+          "count": 30,
+          "opacity": 0,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 286.6875,
+          "y": 280.20833333333337,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.5,
+        "scale": 0.5000003624627495,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000023,
+          "y": 286.9999825880957,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1,
+        "scale": 0.9999999805943397,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000045,
+          "y": 286.99999569374995,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.3999998921801046,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000023,
+          "y": 286.9999982775005,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.7999997843602092,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000045,
+          "y": 286.99999655500096,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999999451132968,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000136,
+          "y": 286.9999935406254,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      }
+    ],
+    "after": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "subtle": {
+          "count": 30,
+          "opacity": 0,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 286.6875,
+          "y": 280.20833333333337,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.5,
+        "scale": 0.5000003624627495,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000023,
+          "y": 286.9999825880957,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1,
+        "scale": 0.9999999805943397,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000045,
+          "y": 286.99999569374995,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.3999998921801046,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000023,
+          "y": 286.9999982775005,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.7999997843602092,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000045,
+          "y": 286.99999655500096,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999999451132968,
+        "subtle": {
+          "count": 30,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000000000136,
+          "y": 286.9999935406254,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 2241,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      }
+    ],
+    "bridge": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "subtle": {
+          "count": 128,
+          "opacity": 0,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 171.22916666666669,
+          "y": 280.20833333333337,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.5,
+        "scale": 0.4999998480530923,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00000435296374,
+          "y": 286.9999825881449,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1,
+        "scale": 1.0000000682717969,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 194.99999344713615,
+          "y": 286.9999956938775,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.4000001773951788,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 194.9999897494589,
+          "y": 286.9999982775504,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.8000000570578668,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 194.99997949891986,
+          "y": 286.99999655510214,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999999322645494,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 194.99998921702922,
+          "y": 286.9999935408173,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      }
+    ],
+    "lake": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "subtle": {
+          "count": 128,
+          "opacity": 0,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 93.125,
+          "y": 354.9166666666667,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.5,
+        "scale": 0.5000003624627495,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 193.12500000000006,
+          "y": 287.00004792948266,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1,
+        "scale": 0.9999999805943397,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 193.1250000000001,
+          "y": 287.0000348238286,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.3999998921801046,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 193.12500000000003,
+          "y": 287.00003224007787,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.7999997843602092,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 193.12500000000006,
+          "y": 287.0000339625776,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999999451132968,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 193.1250000000001,
+          "y": 287.00003697695365,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      }
+    ],
+    "coast": [
+      {
+        "zoom": "fit",
+        "scale": 0.10611979166666667,
+        "subtle": {
+          "count": 128,
+          "opacity": 0,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 279.89583333333337,
+          "y": 276.8125,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.5,
+        "scale": 0.4999998480530923,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00001633532224,
+          "y": 287,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1,
+        "scale": 0.9999996961061846,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00001741185542,
+          "y": 287,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.4,
+        "scale": 0.400000028528878,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.0000237494104,
+          "y": 287,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 0.8,
+        "scale": 0.7999997593253761,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.00003224003103,
+          "y": 287,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      },
+      {
+        "zoom": 1.5,
+        "scale": 1.4999998981729739,
+        "subtle": {
+          "count": 128,
+          "opacity": 1,
+          "listening": false
+        },
+        "ground63": null,
+        "rect": {
+          "x": 195.0000337471779,
+          "y": 287,
+          "width": 0,
+          "height": 0
+        },
+        "image": null,
+        "forest": {
+          "nodes": 1,
+          "sprites": 147,
+          "assets": [
+            "hearthlands.viking.canopy.beech.01",
+            "hearthlands.viking.canopy.beech.02",
+            "hearthlands.viking.canopy.beech.03",
+            "hearthlands.viking.canopy.beech.04",
+            "hearthlands.viking.canopy.beech.05",
+            "hearthlands.viking.canopy.birch.01",
+            "hearthlands.viking.canopy.birch.02",
+            "hearthlands.viking.canopy.birch.03",
+            "hearthlands.viking.canopy.birch.04",
+            "hearthlands.viking.canopy.birch.05",
+            "hearthlands.viking.canopy.oak.01",
+            "hearthlands.viking.canopy.oak.02",
+            "hearthlands.viking.canopy.oak.03",
+            "hearthlands.viking.canopy.oak.04",
+            "hearthlands.viking.canopy.oak.05",
+            "hearthlands.viking.canopy.pine.01",
+            "hearthlands.viking.canopy.pine.02",
+            "hearthlands.viking.canopy.pine.03",
+            "hearthlands.viking.canopy.pine.04",
+            "hearthlands.viking.canopy.pine.05"
+          ],
+          "listening": false
+        },
+        "meadow": null
+      }
+    ]
+  },
+  "browserChecks": {
+    "forest": {
+      "count": 2241,
+      "ids": [
+        "hearthlands.viking.canopy.beech.01",
+        "hearthlands.viking.canopy.beech.02",
+        "hearthlands.viking.canopy.beech.03",
+        "hearthlands.viking.canopy.beech.04",
+        "hearthlands.viking.canopy.beech.05",
+        "hearthlands.viking.canopy.birch.01",
+        "hearthlands.viking.canopy.birch.02",
+        "hearthlands.viking.canopy.birch.03",
+        "hearthlands.viking.canopy.birch.04",
+        "hearthlands.viking.canopy.birch.05",
+        "hearthlands.viking.canopy.oak.01",
+        "hearthlands.viking.canopy.oak.02",
+        "hearthlands.viking.canopy.oak.03",
+        "hearthlands.viking.canopy.oak.04",
+        "hearthlands.viking.canopy.oak.05",
+        "hearthlands.viking.canopy.pine.01",
+        "hearthlands.viking.canopy.pine.02",
+        "hearthlands.viking.canopy.pine.03",
+        "hearthlands.viking.canopy.pine.04",
+        "hearthlands.viking.canopy.pine.05"
+      ],
+      "listening": false
+    },
+    "grassland": {
+      "count": 7,
+      "ids": [
+        "hearthlands.terrain.grassland.base.01",
+        "hearthlands.terrain.grassland.flower.01",
+        "hearthlands.terrain.grassland.flower.02",
+        "hearthlands.terrain.grassland.scrub.01"
+      ],
+      "listening": false
+    },
+    "downloads": [
+      "/tmp/hearthlands-6c4-off-1024.png",
+      "/tmp/hearthlands-6c4-on-1024.png",
+      "/tmp/hearthlands-6c4-on-2048.png",
+      "/tmp/hearthlands-6c4-on-4096.png"
+    ],
+    "treeModuleRequestsBeforeOptIn": 0,
+    "afterCanopyOptIn": 1,
+    "afterOriginalComparison": 2,
+    "afterMeadowOptIn": 3,
+    "profileReopen": true,
+    "projectIsolation": true,
+    "sourceUnchanged": true,
+    "mobileViewports": [
+      [
+        375,
+        667
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        844,
+        390
+      ]
+    ]
+  },
+  "performance": {
+    "environment": "Production Chromium touch emulation, DPR 3, cloud CPU; physical Safari untested",
+    "method": "120 RAF intervals during 40 touch pan moves per mode at Fit and 80%; isolated runs; same WaterVisual scene functions and decoded building/forest images throughout gestures",
+    "scenes": [
+      {
+        "buildings": 35,
+        "width": 96,
+        "buildingPngs": 19,
+        "results": [
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.700000000000728,
+            "worst": 16.800000000000182,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 16.700000000000728,
+            "worst": 16.799999999999272,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 16.700000000000728,
+            "worst": 16.799999999999272,
+            "ground": {
+              "count": 30,
+              "opacity": 0,
+              "listening": false
+            }
+          },
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 33.399999999999636,
+            "worst": 33.400000000001455,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50.099999999998545,
+            "worst": 66.59999999999854,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50,
+            "worst": 50.10000000000218,
+            "ground": {
+              "count": 30,
+              "opacity": 1,
+              "listening": false
+            }
+          }
+        ]
+      },
+      {
+        "buildings": 100,
+        "width": 150,
+        "buildingPngs": 40,
+        "results": [
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.700000000000728,
+            "worst": 33.30000000000109,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 16.799999999999272,
+            "worst": 50,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 33.30000000000109,
+            "worst": 33.400000000001455,
+            "ground": {
+              "count": 152,
+              "opacity": 0,
+              "listening": false
+            }
+          },
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50,
+            "worst": 50,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 33.400000000001455,
+            "worst": 50,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 33.400000000001455,
+            "worst": 50,
+            "ground": {
+              "count": 152,
+              "opacity": 1,
+              "listening": false
+            }
+          }
+        ]
+      },
+      {
+        "buildings": 100,
+        "width": 192,
+        "buildingPngs": 40,
+        "results": [
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.699999999999818,
+            "p95": 16.80000000000109,
+            "worst": 33.400000000001455,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 16.700000000000728,
+            "worst": 33.30000000000109,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": "fit",
+            "dpr": 3,
+            "median": 16.69999999999891,
+            "p95": 16.80000000000109,
+            "worst": 33.399999999999636,
+            "ground": {
+              "count": 376,
+              "opacity": 0,
+              "listening": false
+            }
+          },
+          {
+            "state": "planning",
+            "style": "planning",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50,
+            "worst": 66.70000000000073,
+            "ground": null
+          },
+          {
+            "state": "illustrated-off",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50,
+            "worst": 50.10000000000218,
+            "ground": null
+          },
+          {
+            "state": "illustrated-on",
+            "style": "illustrated",
+            "zoom": 0.8,
+            "dpr": 3,
+            "median": 16.700000000000728,
+            "p95": 50.099999999998545,
+            "worst": 66.70000000000073,
+            "ground": {
+              "count": 376,
+              "opacity": 1,
+              "listening": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Water shading is stylised, not physical depth.",
+    "Logical terrain remains cell-based; corner rounding only affects presentation.",
+    "Physical Safari hardware is not available.",
+    "Existing forest/building/Rich-ground/export costs remain."
+  ]
+}

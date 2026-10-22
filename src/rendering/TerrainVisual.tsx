@@ -1,3 +1,4 @@
+import {WaterVisual} from './WaterVisual';
 import {SubtleGroundVisual} from './SubtleGroundVisual';
 import type {GroundRegion} from './illustratedGround';
 import {IllustratedGroundVisual} from './IllustratedGroundVisual';
@@ -22,7 +23,7 @@ const TerrainSurface=memo(function TerrainSurface({paths,cell,width,height,cache
  // A disposable overview bitmap speeds camera redraws. It is presentation only,
  // bounded to 2048px per edge, never saved/exported; close zoom keeps native vectors.
  useLayoutEffect(()=>{const group=root.current;if(!group)return;group.clearCache();if(cachePixels>0&&paths.length){try{group.cache({x:0,y:0,width,height,pixelRatio:Math.min(cachePixels,2048/Math.max(width,height)),hitCanvasPixelRatio:1});}catch{group.clearCache();}}return()=>{group.clearCache();};},[paths,extraPaths,width,height,cachePixels]);
- return <Group ref={root} listening={false} scaleX={cell} scaleY={cell}>{(['base','nature','water','relief'] as const).map(layer=><Group key={layer} name={layer}>{paths.filter(p=>(p.layer??'base')===layer).map((p,i)=>p.sprites?<ForestRasterVisual key={i} sprites={p.sprites}/>:<TerrainBatch key={i} path={p}/>)}</Group>)}{!!extraPaths.length&&<GroundBatches paths={extraPaths} width={width} height={height} cachedByParent={cachePixels>0}/>}</Group>;
+ return <Group ref={root} listening={false} scaleX={cell} scaleY={cell}>{(['base','nature','water','relief'] as const).map(layer=><Group key={layer} name={layer}>{paths.filter(p=>(p.layer??'base')===layer).map((p,i)=>p.water?<WaterVisual key={i} scene={p.water}/>:p.sprites?<ForestRasterVisual key={i} sprites={p.sprites}/>:<TerrainBatch key={i} path={p}/>)}</Group>)}{!!extraPaths.length&&<GroundBatches paths={extraPaths} width={width} height={height} cachedByParent={cachePixels>0}/>}</Group>;
 });
 
 /** Keep grassland outside overview bitmaps so the Fit fade never rebuilds trees.

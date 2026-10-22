@@ -1,3 +1,4 @@
+import {illustratedWater,type WaterScene} from './waterGeometry';
 import {groundMode,type GroundDetail} from './groundDetail';
 import {subtleGround,type SubtleScene} from './subtleGround';
 import {illustratedGroundPlan,type GroundPlan} from './illustratedGround';
@@ -14,7 +15,7 @@ import type { Cell, SettlementDocument } from '../model/document';
 import { terrainQuery, terrainKey, type LandscapeCell } from '../model/terrain';
 export const groundColors={grass:'#536447',dirt:'#806b4b',sand:'#b4a375',rock:'#737775',soil:'#66523b'};
 export interface TerrainChunk {data:string;bounds:{x:number;y:number;width:number;height:number}}
-export interface TerrainPath {subtle?:SubtleScene;ground63?:GroundPlan;groundFine?:boolean; grassland?:readonly GrasslandPatch[]; grasslandGround?:readonly TerrainPath[]; sprites?:readonly ForestSprite[]; chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
+export interface TerrainPath {water?:WaterScene;subtle?:SubtleScene;ground63?:GroundPlan;groundFine?:boolean; grassland?:readonly GrasslandPatch[]; grasslandGround?:readonly TerrainPath[]; sprites?:readonly ForestSprite[]; chunks?:TerrainChunk[]; layer?:TerrainLayer; data:string; fill?:string; stroke?:string; width?:number; opacity?:number }
 export interface TerrainView {groundDetail?:GroundDetail;ground63?:boolean; grassland?:GrasslandMode; grasslandAssets?:readonly string[]; contours:boolean; detail:boolean; style?:VisualStyle; reduced?:boolean; forestPilot?:boolean; forestPack?:ForestPack; forestAssets?:readonly string[] }
 const tile=(x:number,y:number)=>`M${x} ${y}h1v1h-1Z`;
 const n=(v:number)=>Math.round(v*1000)/1000;
@@ -52,11 +53,11 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     if(value>0&&value<.5)add(tile(x,y),fill,undefined,undefined,.1);
   }
   layer='nature';if(!illustrated)for(const t of cells)coverage(t,'vegetation','#294c3e');
-  layer='water';for(const t of cells)coverage(t,'water',illustrated?'#477f88':'#355d69');
+  layer='water';if(!illustrated)for(const t of cells)coverage(t,'water','#355d69');
   // Small seeded details and material seams soften large painted surfaces without changing queries.
   if(fine)for(const t of cells){
     const {x,y}=t,r=hash(doc.seed,x,y),cx=x+.3+r*.4,cy=y+.35+hash(doc.seed+51,x,y)*.3;
-    if(t.water>=.5){layer='water';if(illustrated&&r>.5)add(`M${n(x+.1)} ${n(y+.28)}q.35 -.08 .75 .02`,undefined,'#244f66',.12,.12);if(r>.72)add(`M${x+.15} ${y+.5}q.2 -.08 .4 0t.3 0`,undefined,'#7d9d9a',.025,.35);continue;}
+    if(t.water>=.5){layer='water';if(!illustrated&&r>.72)add(`M${x+.15} ${y+.5}q.2 -.08 .4 0t.3 0`,undefined,'#7d9d9a',.025,.35);continue;}
     layer='nature';
     if(illustrated&&r>.65)add(`M${x} ${y}h1v1h-1Z`,'#b4b878',undefined,undefined,.06);
     if(!illustrated&&t.vegetation>=.35&&r>.28)add(`M${n(cx-.2)} ${n(cy+.17)}Q${n(cx-.35)} ${n(cy-.05)} ${n(cx)} ${n(cy-.34)}Q${n(cx+.34)} ${n(cy-.06)} ${n(cx+.18)} ${n(cy+.17)}Z`,illustrated?'#638151':'#355e45','#1e4035',.035,.8);
@@ -83,6 +84,7 @@ export function terrainGeometry(doc:SettlementDocument,options:TerrainView=doc.l
     add(contour.join(''),undefined,'#e7d6a2',.035,.5);
   }
   const paths=[...groups.values()].map(g=>({...g.path,data:g.parts.join('')}));
+  if(illustrated){const water=illustratedWater(doc,options.detail);if(water.mask)paths.push({layer:'water',data:'',water});}
   if(illustrated&&groundMode(options)==='subtle')paths.push({layer:'base',data:'',subtle:subtleGround(doc)});
   else if(illustrated&&groundMode(options)==='rich')paths.push({layer:'base',data:'',ground63:illustratedGroundPlan(doc),groundFine:fine});
   else if(illustrated&&groundMode(options)==='legacy'&&options.grassland&&options.grassland!=='off'){const ready=new Set(options.grasslandAssets??[]),patches=grasslandPatches(doc,options.grassland).filter(p=>ready.has(p.assetId));if(ready.size){const ground=grasslandGround(doc,options.grassland);if(patches.length||ground.length)paths.push({layer:'base',data:'',grassland:patches,grasslandGround:ground});}}
